@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -50,7 +50,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun CameraTranslatorScreen(
     viewModel: CameraTranslatorViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onProcessImage: suspend (Context, Uri) -> Unit = { _, _ -> }
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -58,7 +59,16 @@ fun CameraTranslatorScreen(
     val snackbar = remember { SnackbarHostState() }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) viewModel.setImage(uri)
+        if (uri == null) return@rememberLauncherForActivityResult
+        viewModel.setImage(uri)
+        viewModel.setProcessing(true)
+        scope.launch {
+            try {
+                onProcessImage(context, uri)
+            } catch (e: Exception) {
+                viewModel.setError(e.message ?: "پردازش تصویر ناموفق بود")
+            }
+        }
     }
 
     fun copyText(text: String, label: String) {
@@ -105,23 +115,20 @@ fun CameraTranslatorScreen(
                 }
             }
 
-            if (state.isProcessing) CircularProgressIndicator()
+            if (state.isProcessing) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    CircularProgressIndicator()
+                    Text("در حال استخراج متن از تصویر...", modifier = Modifier.padding(top = 8.dp))
+                }
+            }
             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
 
-            ResultCard(
-                title = "متن OCR شده",
-                text = state.extractedText,
-                emptyText = "متن تشخیص‌داده‌شده اینجا نمایش داده می‌شود.",
-                copyLabel = "متن OCR",
-                onCopy = { copyText(state.extractedText, "متن OCR") }
-            )
-            ResultCard(
-                title = "ترجمه فارسی",
-                text = state.translatedText,
-                emptyText = "ترجمه فارسی اینجا نمایش داده می‌شود.",
-                copyLabel = "ترجمه",
-                onCopy = { copyText(state.translatedText, "ترجمه") }
-            )
+            ResultCard("متن OCR شده", state.extractedText, "متن تشخیص‌داده‌شده اینجا نمایش داده می‌شود.", "کپی متن OCR") {
+                copyText(state.extractedText, "متن OCR")
+            }
+            ResultCard("ترجمه فارسی", state.translatedText, "ترجمه فارسی اینجا نمایش داده می‌شود.", "کپی ترجمه") {
+                copyText(state.translatedText, "ترجمه")
+            }
         }
     }
 }
@@ -140,10 +147,10 @@ private fun ResultCard(
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(if (text.isBlank()) emptyText else text)
                 if (text.isNotBlank()) {
-                    TextButton(onClick = onCopy) {
+                    OutlinedButton(onClick = onCopy, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Default.ContentCopy, contentDescription = null)
-                        Spacer(Modifier.padding(horizontal = 3.dp))
-                        Text("کپی $copyLabel")
+                        Spacer(Modifier.padding(horizontal = 4.dp))
+                        Text(copyLabel)
                     }
                 }
             }
