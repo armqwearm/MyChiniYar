@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.chiniyar.app.ui.screens.HomeScreen
+import com.chiniyar.app.ui.screens.translator.TranslatorScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -23,7 +24,7 @@ fun AppNavHost(navController: NavHostController) {
                 onCitiesClick = { navController.navigate(AppDestination.Cities.route) }
             )
         }
-        composable(AppDestination.Translator.route) { PlaceholderScreen("مترجم") }
+        composable(AppDestination.Translator.route) { TranslatorScreen() }
         composable(AppDestination.CameraTranslator.route) { PlaceholderScreen("مترجم تصویری") }
         composable(AppDestination.Learning.route) { PlaceholderScreen("یادگیری زبان چینی") }
         composable(AppDestination.Cities.route) { PlaceholderScreen("شهرهای چین") }
