@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,11 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun TranslatorScreen(
-    viewModel: TranslatorViewModel = viewModel(factory = TranslatorViewModelFactory())
+    viewModel: TranslatorViewModel,
+    onBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -35,12 +36,22 @@ fun TranslatorScreen(
         modifier = Modifier.fillMaxSize().padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text("مترجم چینی", style = MaterialTheme.typography.headlineMedium)
-        Text("ترجمه سریع چینی و فارسی؛ موتور محلی فعلاً برای نمونه‌های پایه فعال است.")
+        Row(modifier = Modifier.fillMaxWidth()) {
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
+            }
+            Text(
+                "مترجم چینی",
+                modifier = Modifier.padding(top = 10.dp),
+                style = MaterialTheme.typography.headlineMedium
+            )
+        }
+
+        Text("ترجمه سریع چینی و فارسی")
 
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                "چینی (${state.source.code})  ←  فارسی (${state.target.code})",
+                "${state.source.code}  ↔  ${state.target.code}",
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium
             )
@@ -60,16 +71,14 @@ fun TranslatorScreen(
 
         Button(
             onClick = viewModel::translate,
-            enabled = !state.isLoading,
+            enabled = !state.isLoading && state.input.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
         ) {
             if (state.isLoading) CircularProgressIndicator(strokeWidth = 2.dp)
             else Text("ترجمه")
         }
 
-        state.error?.let {
-            Text(it, color = MaterialTheme.colorScheme.error)
-        }
+        state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
 
         Spacer(Modifier.height(4.dp))
         Text("نتیجه", style = MaterialTheme.typography.titleMedium)
