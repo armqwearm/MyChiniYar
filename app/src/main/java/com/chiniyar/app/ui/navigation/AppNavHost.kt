@@ -1,6 +1,12 @@
 package com.chiniyar.app.ui.navigation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,11 +32,11 @@ fun AppNavHost(navController: NavHostController) {
 
 @Composable
 private fun PlaceholderScreen(title: String) {
-    androidx.compose.material3.Scaffold { padding ->
-        androidx.compose.material3.Text(
+    Scaffold { padding ->
+        Text(
             text = title,
-            modifier = androidx.compose.ui.Modifier.padding(padding).padding(24.dp),
-            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
+            modifier = Modifier.padding(padding).padding(24.dp),
+            style = MaterialTheme.typography.headlineMedium
         )
     }
 }
