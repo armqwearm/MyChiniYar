@@ -26,11 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun DictionaryScreen(
-    viewModel: DictionaryViewModel,
-    onBack: () -> Unit
-) {
-    val entries by viewModel.uiState.collectAsStateWithLifecycle()
+fun DictionaryScreen(viewModel: DictionaryViewModel, onBack: () -> Unit) {
+    val query by viewModel.query.collectAsStateWithLifecycle()
+    val entries by viewModel.entries.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -49,7 +47,7 @@ fun DictionaryScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedTextField(
-                value = "",
+                value = query,
                 onValueChange = viewModel::setQuery,
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
