@@ -7,14 +7,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.chiniyar.app.di.AppContainer
 import com.chiniyar.app.ui.screens.HomeScreen
 import com.chiniyar.app.ui.screens.translator.TranslatorScreen
+import com.chiniyar.app.ui.screens.translator.TranslatorViewModel
+import com.chiniyar.app.ui.screens.translator.TranslatorViewModelFactory
 
 @Composable
-fun AppNavHost(navController: NavHostController) {
+fun AppNavHost(
+    navController: NavHostController,
+    appContainer: AppContainer
+) {
     NavHost(navController = navController, startDestination = AppDestination.Home.route) {
         composable(AppDestination.Home.route) {
             HomeScreen(
@@ -24,7 +31,15 @@ fun AppNavHost(navController: NavHostController) {
                 onCitiesClick = { navController.navigate(AppDestination.Cities.route) }
             )
         }
-        composable(AppDestination.Translator.route) { TranslatorScreen() }
+        composable(AppDestination.Translator.route) {
+            val translatorViewModel: TranslatorViewModel = viewModel(
+                factory = TranslatorViewModelFactory(appContainer)
+            )
+            TranslatorScreen(
+                viewModel = translatorViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
         composable(AppDestination.CameraTranslator.route) { PlaceholderScreen("مترجم تصویری") }
         composable(AppDestination.Learning.route) { PlaceholderScreen("یادگیری زبان چینی") }
         composable(AppDestination.Cities.route) { PlaceholderScreen("شهرهای چین") }
