@@ -49,7 +49,7 @@ class TranslatorViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             when (val result = translateText(state.input, state.source, state.target)) {
                 is AppResult.Success -> _uiState.value = _uiState.value.copy(
-                    output = result.value.translatedText,
+                    output = result.data.translatedText,
                     isLoading = false
                 )
                 is AppResult.Error -> _uiState.value = _uiState.value.copy(
