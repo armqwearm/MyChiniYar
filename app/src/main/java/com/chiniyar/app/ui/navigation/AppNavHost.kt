@@ -13,32 +13,34 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.chiniyar.app.di.AppContainer
 import com.chiniyar.app.ui.screens.HomeScreen
+import com.chiniyar.app.ui.screens.dictionary.DictionaryScreen
+import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModel
+import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModelFactory
 import com.chiniyar.app.ui.screens.translator.TranslatorScreen
 import com.chiniyar.app.ui.screens.translator.TranslatorViewModel
 import com.chiniyar.app.ui.screens.translator.TranslatorViewModelFactory
 
 @Composable
-fun AppNavHost(
-    navController: NavHostController,
-    appContainer: AppContainer
-) {
+fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
     NavHost(navController = navController, startDestination = AppDestination.Home.route) {
         composable(AppDestination.Home.route) {
             HomeScreen(
                 onTranslatorClick = { navController.navigate(AppDestination.Translator.route) },
+                onDictionaryClick = { navController.navigate(AppDestination.Dictionary.route) },
                 onCameraClick = { navController.navigate(AppDestination.CameraTranslator.route) },
                 onLearningClick = { navController.navigate(AppDestination.Learning.route) },
                 onCitiesClick = { navController.navigate(AppDestination.Cities.route) }
             )
         }
         composable(AppDestination.Translator.route) {
-            val translatorViewModel: TranslatorViewModel = viewModel(
-                factory = TranslatorViewModelFactory(appContainer)
+            val vm: TranslatorViewModel = viewModel(factory = TranslatorViewModelFactory(appContainer))
+            TranslatorScreen(viewModel = vm, onBack = { navController.popBackStack() })
+        }
+        composable(AppDestination.Dictionary.route) {
+            val vm: DictionaryViewModel = viewModel(
+                factory = DictionaryViewModelFactory(appContainer.searchDictionaryUseCase)
             )
-            TranslatorScreen(
-                viewModel = translatorViewModel,
-                onBack = { navController.popBackStack() }
-            )
+            DictionaryScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
         composable(AppDestination.CameraTranslator.route) { PlaceholderScreen("مترجم تصویری") }
         composable(AppDestination.Learning.route) { PlaceholderScreen("یادگیری زبان چینی") }
