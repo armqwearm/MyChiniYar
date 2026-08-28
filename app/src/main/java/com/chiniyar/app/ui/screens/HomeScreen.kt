@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.LocationCity
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -34,12 +35,14 @@ private data class HomeFeature(
 @Composable
 fun HomeScreen(
     onTranslatorClick: () -> Unit,
+    onDictionaryClick: () -> Unit,
     onCameraClick: () -> Unit,
     onLearningClick: () -> Unit,
     onCitiesClick: () -> Unit
 ) {
     val features = listOf(
         HomeFeature("مترجم", "ترجمه سریع چینی و فارسی", Icons.Default.Translate, onTranslatorClick),
+        HomeFeature("واژه‌نامه", "Hanzi، Pinyin و معنی فارسی", Icons.Default.MenuBook, onDictionaryClick),
         HomeFeature("مترجم تصویری", "استخراج و ترجمه متن عکس", Icons.Default.CameraAlt, onCameraClick),
         HomeFeature("یادگیری چینی", "Hanzi، Pinyin و واژگان", Icons.Default.Book, onLearningClick),
         HomeFeature("شهرهای چین", "راهنمای شهرها و اطلاعات کاربردی", Icons.Default.LocationCity, onCitiesClick)
@@ -51,10 +54,7 @@ fun HomeScreen(
     ) {
         Spacer(Modifier.height(20.dp))
         Text("چینی‌یار", style = MaterialTheme.typography.headlineLarge)
-        Text(
-            "یادگیری، ترجمه و شناخت چین در یک برنامه",
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Text("یادگیری، ترجمه و شناخت چین در یک برنامه", style = MaterialTheme.typography.bodyLarge)
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier.fillMaxWidth().weight(1f),
