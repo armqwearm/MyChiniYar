@@ -23,9 +23,11 @@ class InMemoryTranslationRepository : TranslationRepository {
         target: Language
     ): AppResult<Translation> {
         val translated = when {
-            source == Language.Chinese && target == Language.Persian -> zhToFa[text] ?: "ترجمه‌ای برای این عبارت در داده محلی پیدا نشد."
-            source == Language.Persian && target == Language.Chinese -> zhToFa.entries.firstOrNull { it.value == text }?.key
-                ?: "برای این عبارت، ترجمه محلی موجود نیست."
+            source == Language.CHINESE && target == Language.PERSIAN ->
+                zhToFa[text] ?: "ترجمه‌ای برای این عبارت در داده محلی پیدا نشد."
+            source == Language.PERSIAN && target == Language.CHINESE ->
+                zhToFa.entries.firstOrNull { it.value == text }?.key
+                    ?: "برای این عبارت، ترجمه محلی موجود نیست."
             else -> text
         }
         return AppResult.Success(Translation(text, translated, source, target, confidence = 0.7f))
