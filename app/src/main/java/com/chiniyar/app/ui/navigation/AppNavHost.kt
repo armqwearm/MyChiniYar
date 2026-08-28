@@ -2,6 +2,12 @@ package com.chiniyar.app.ui.navigation
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -35,9 +41,7 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
             TranslatorScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
         composable(AppDestination.Dictionary.route) {
-            val vm: DictionaryViewModel = viewModel(
-                factory = DictionaryViewModelFactory(appContainer.searchDictionaryUseCase)
-            )
+            val vm: DictionaryViewModel = viewModel(factory = DictionaryViewModelFactory(appContainer.searchDictionaryUseCase))
             DictionaryScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
         composable(AppDestination.CameraTranslator.route) {
@@ -51,11 +55,11 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
 
 @Composable
 private fun PlaceholderScreen(title: String) {
-    androidx.compose.material3.Scaffold { padding ->
-        androidx.compose.material3.Text(
+    Scaffold { padding ->
+        Text(
             text = title,
-            modifier = androidx.compose.ui.Modifier.padding(padding).padding(24.dp),
-            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
+            modifier = Modifier.padding(padding).padding(24.dp),
+            style = MaterialTheme.typography.headlineMedium
         )
     }
 }
