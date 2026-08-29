@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,7 +33,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -51,7 +49,7 @@ import kotlinx.coroutines.launch
 fun CameraTranslatorScreen(
     viewModel: CameraTranslatorViewModel,
     onBack: () -> Unit,
-    onProcessImage: suspend (Context, Uri) -> Unit = { _, _ -> }
+    ocrProcessor: ChineseOcrProcessor = remember { ChineseOcrProcessor() }
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -64,9 +62,15 @@ fun CameraTranslatorScreen(
         viewModel.setProcessing(true)
         scope.launch {
             try {
-                onProcessImage(context, uri)
+                val text = ocrProcessor.recognize(context, uri)
+                if (text.isBlank()) {
+                    viewModel.setError("متن قابل تشخیصی در تصویر پیدا نشد.")
+                } else {
+                    viewModel.setExtractedText(text)
+                    viewModel.setProcessing(false)
+                }
             } catch (e: Exception) {
-                viewModel.setError(e.message ?: "پردازش تصویر ناموفق بود")
+                viewModel.setError(e.message ?: "تشخیص متن از تصویر ناموفق بود")
             }
         }
     }
@@ -82,14 +86,12 @@ fun CameraTranslatorScreen(
             TopAppBar(
                 title = { Text("مترجم تصویری") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
-                    }
+                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "بازگشت") }
                 },
                 actions = {
                     if (state.imageUri != null) {
                         IconButton(onClick = { viewModel.setImage(null) }) {
-                            Icon(Icons.Default.Clear, contentDescription = "پاک کردن")
+                            Icon(Icons.Default.Clear, "پاک کردن")
                         }
                     }
                 }
@@ -104,21 +106,16 @@ fun CameraTranslatorScreen(
             Text("تصویر دارای متن چینی را انتخاب کنید.", style = MaterialTheme.typography.bodyLarge)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Button(onClick = { picker.launch("image/*") }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.Image, contentDescription = null)
-                    Spacer(Modifier.padding(horizontal = 3.dp))
-                    Text("گالری")
+                    Icon(Icons.Default.Image, null); Spacer(Modifier.padding(horizontal = 3.dp)); Text("گالری")
                 }
                 OutlinedButton(onClick = { picker.launch("image/*") }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.CameraAlt, contentDescription = null)
-                    Spacer(Modifier.padding(horizontal = 3.dp))
-                    Text("دوربین")
+                    Icon(Icons.Default.CameraAlt, null); Spacer(Modifier.padding(horizontal = 3.dp)); Text("دوربین")
                 }
             }
-
             if (state.isProcessing) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     CircularProgressIndicator()
-                    Text("در حال استخراج متن از تصویر...", modifier = Modifier.padding(top = 8.dp))
+                    Text("در حال استخراج متن آفلاین...", modifier = Modifier.padding(top = 8.dp))
                 }
             }
             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
@@ -134,13 +131,7 @@ fun CameraTranslatorScreen(
 }
 
 @Composable
-private fun ResultCard(
-    title: String,
-    text: String,
-    emptyText: String,
-    copyLabel: String,
-    onCopy: () -> Unit
-) {
+private fun ResultCard(title: String, text: String, emptyText: String, copyLabel: String, onCopy: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(title, style = MaterialTheme.typography.titleMedium)
         Card(modifier = Modifier.fillMaxWidth()) {
@@ -148,7 +139,7 @@ private fun ResultCard(
                 Text(if (text.isBlank()) emptyText else text)
                 if (text.isNotBlank()) {
                     OutlinedButton(onClick = onCopy, modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ContentCopy, contentDescription = null)
+                        Icon(Icons.Default.ContentCopy, null)
                         Spacer(Modifier.padding(horizontal = 4.dp))
                         Text(copyLabel)
                     }
