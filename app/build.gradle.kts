@@ -4,7 +4,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("com.google.devtools.ksp")
 }
 
 android {
@@ -45,11 +44,7 @@ dependencies {
     // Bundled Chinese OCR model: no network is required for OCR.
     implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
 
-    // Persistent offline vocabulary bank.
-    implementation("androidx.room:room-runtime:2.7.2")
-    implementation("androidx.room:room-ktx:2.7.2")
-    ksp("androidx.room:room-compiler:2.7.2")
-
+    // Vocabulary persistence uses Android's built-in SQLite; no ORM/KSP needed.
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
