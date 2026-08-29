@@ -1,54 +1,93 @@
 package com.chiniyar.app.data.local
 
+import android.content.ContentValues
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.Dao
-import androidx.room.Query
-import androidx.room.Insert
-import androidx.room.Delete
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
-@Entity(tableName = "vocabulary")
-data class VocabularyEntity(
-    @PrimaryKey val word: String,
-    val pinyin: String,
-    val meaning: String,
-    val createdAt: Long = System.currentTimeMillis()
-)
+/**
+ * Small, persistent, fully offline vocabulary database.
+ * Uses Android's built-in SQLite instead of an external ORM so the app has no
+ * annotation-processing dependency for the vocabulary feature.
+ */
+class VocabularyDatabase private constructor(context: Context) :
+    SQLiteOpenHelper(context.applicationContext, DB_NAME, null, DB_VERSION) {
 
-@Dao
-interface VocabularyDao {
-    @Query("SELECT * FROM vocabulary ORDER BY createdAt DESC")
-    fun observeAll(): Flow<List<VocabularyEntity>>
+    override fun onCreate(db: SQLiteDatabase) {
+        db.execSQL(
+            """
+            CREATE TABLE vocabulary (
+                word TEXT PRIMARY KEY NOT NULL,
+                pinyin TEXT NOT NULL DEFAULT '',
+                meaning TEXT NOT NULL DEFAULT '',
+                createdAt INTEGER NOT NULL
+            )
+            """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX vocabulary_createdAt_idx ON vocabulary(createdAt)")
+    }
 
-    @Query("SELECT EXISTS(SELECT 1 FROM vocabulary WHERE word = :word)")
-    suspend fun contains(word: String): Boolean
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < 2) {
+            // Reserved for future schema migrations.
+        }
+    }
 
-    @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
-    suspend fun insert(entry: VocabularyEntity)
+    suspend fun add(entry: VocabularyEntry) = withContext(Dispatchers.IO) {
+        val values = ContentValues().apply {
+            put("word", entry.word.trim())
+            put("pinyin", entry.pinyin)
+            put("meaning", entry.meaning)
+            put("createdAt", entry.createdAt)
+        }
+        writableDatabase.insertWithOnConflict(
+            "vocabulary", null, values, SQLiteDatabase.CONFLICT_REPLACE
+        )
+    }
 
-    @Delete
-    suspend fun delete(entry: VocabularyEntity)
-}
+    suspend fun remove(word: String) = withContext(Dispatchers.IO) {
+        writableDatabase.delete("vocabulary", "word = ?", arrayOf(word.trim()))
+    }
 
-@Database(entities = [VocabularyEntity::class], version = 1, exportSchema = false)
-abstract class VocabularyDatabase : RoomDatabase() {
-    abstract fun vocabularyDao(): VocabularyDao
+    suspend fun contains(word: String): Boolean = withContext(Dispatchers.IO) {
+        readableDatabase.rawQuery(
+            "SELECT 1 FROM vocabulary WHERE word = ? LIMIT 1", arrayOf(word.trim())
+        ).use { it.moveToFirst() }
+    }
+
+    fun observeAll(): Flow<List<VocabularyEntry>> = flow {
+        emit(withContext(Dispatchers.IO) {
+            val result = mutableListOf<VocabularyEntry>()
+            readableDatabase.rawQuery(
+                "SELECT word, pinyin, meaning, createdAt FROM vocabulary ORDER BY createdAt DESC",
+                null
+            ).use { cursor ->
+                while (cursor.moveToNext()) {
+                    result += VocabularyEntry(
+                        word = cursor.getString(0),
+                        pinyin = cursor.getString(1),
+                        meaning = cursor.getString(2),
+                        createdAt = cursor.getLong(3)
+                    )
+                }
+            }
+            result
+        })
+    }
 
     companion object {
-        @Volatile private var INSTANCE: VocabularyDatabase? = null
+        private const val DB_NAME = "chiniyar_vocabulary.db"
+        private const val DB_VERSION = 1
+
+        @Volatile private var instance: VocabularyDatabase? = null
 
         fun getInstance(context: Context): VocabularyDatabase =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: Room.databaseBuilder(
-                    context.applicationContext,
-                    VocabularyDatabase::class.java,
-                    "chiniyar_vocabulary.db"
-                ).build().also { INSTANCE = it }
+            instance ?: synchronized(this) {
+                instance ?: VocabularyDatabase(context).also { instance = it }
             }
     }
 }
