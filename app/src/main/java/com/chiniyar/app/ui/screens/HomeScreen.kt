@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.LocationCity
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ fun HomeScreen(
     onTranslatorClick: () -> Unit,
     onDictionaryClick: () -> Unit,
     onCameraClick: () -> Unit,
+    onVocabularyBankClick: () -> Unit,
     onLearningClick: () -> Unit,
     onCitiesClick: () -> Unit
 ) {
@@ -44,6 +46,7 @@ fun HomeScreen(
         HomeFeature("مترجم", "ترجمه سریع چینی و فارسی", Icons.Default.Translate, onTranslatorClick),
         HomeFeature("واژه‌نامه", "Hanzi، Pinyin و معنی فارسی", Icons.Default.MenuBook, onDictionaryClick),
         HomeFeature("مترجم تصویری", "استخراج و ترجمه متن عکس", Icons.Default.CameraAlt, onCameraClick),
+        HomeFeature("بانک لغات من", "لغات ذخیره‌شده و قابل جست‌وجو", Icons.Default.Star, onVocabularyBankClick),
         HomeFeature("یادگیری چینی", "Hanzi، Pinyin و واژگان", Icons.Default.Book, onLearningClick),
         HomeFeature("شهرهای چین", "راهنمای شهرها و اطلاعات کاربردی", Icons.Default.LocationCity, onCitiesClick)
     )
