@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.chiniyar.app.data.analysis.AnalyzedWord
 import com.chiniyar.app.data.analysis.ChineseWordAnalyzer
+import com.chiniyar.app.data.analysis.OfflineChineseDictionary
 import com.chiniyar.app.data.local.VocabularyDatabase
 import com.chiniyar.app.data.local.VocabularyEntry
 import com.chiniyar.app.data.translation.OfflineChinesePersianTranslator
@@ -80,6 +81,7 @@ fun CameraTranslatorScreen(
                     return@launch
                 }
                 viewModel.setExtractedText(text)
+
                 viewModel.setProcessing(true, "در حال آماده‌سازی ترجمه آفلاین...")
                 val translated = translator.translate(text)
                 if (translated.isBlank()) {
@@ -89,11 +91,17 @@ fun CameraTranslatorScreen(
                 viewModel.setTranslatedText(translated)
 
                 val candidates = analyzer.segment(text)
-                viewModel.setProcessing(true, "در حال استخراج واژه‌ها و معنی آن‌ها...")
+                viewModel.setProcessing(true, "در حال استخراج ۲۰ واژه غیرتکراری...")
                 val savedWords = vocabularyDb.allWords()
                 val analyzed = candidates.map { word ->
-                    val meaning = runCatching { translator.translate(word) }.getOrDefault("")
-                    AnalyzedWord(word, analyzer.pinyin(word), meaning.ifBlank { "معنی پیدا نشد" }, word in savedWords)
+                    val localMeaning = OfflineChineseDictionary.meaning(word)
+                    val meaning = localMeaning ?: runCatching { translator.translate(word) }.getOrDefault("")
+                    AnalyzedWord(
+                        word = word,
+                        pinyin = analyzer.pinyin(word),
+                        meaning = meaning.ifBlank { "معنی پیدا نشد" },
+                        saved = word in savedWords
+                    )
                 }
                 viewModel.setWords(analyzed)
                 viewModel.setProcessing(false)
@@ -111,9 +119,9 @@ fun CameraTranslatorScreen(
 
     fun saveWord(word: AnalyzedWord) {
         scope.launch {
-            vocabularyDb.add(VocabularyEntry(word.word, word.pinyin, word.meaning))
+            val inserted = vocabularyDb.add(VocabularyEntry(word.word, word.pinyin, word.meaning))
             viewModel.setWordSaved(word.word, true)
-            snackbar.showSnackbar("${word.word} به بانک لغات اضافه شد")
+            snackbar.showSnackbar(if (inserted) "${word.word} به بانک لغات اضافه شد" else "${word.word} قبلاً در بانک لغات بود")
         }
     }
 
@@ -159,7 +167,7 @@ fun CameraTranslatorScreen(
 
             if (state.words.isNotEmpty()) {
                 Text("واژه‌های متن — ${state.words.size} مورد", style = MaterialTheme.typography.titleLarge)
-                Text("۲۰ واژه غیرتکراری اول؛ معنی از مترجم روی دستگاه و تلفظ کاملاً محلی استخراج می‌شود.", style = MaterialTheme.typography.bodyMedium)
+                Text("۲۰ واژه غیرتکراری اول؛ واژه‌های موجود در فرهنگ داخلی کاملاً آفلاین معنی می‌شوند.", style = MaterialTheme.typography.bodyMedium)
                 state.words.forEach { word ->
                     WordCard(word) { saveWord(word) }
                 }
