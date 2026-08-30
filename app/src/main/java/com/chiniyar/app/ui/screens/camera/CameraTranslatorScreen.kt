@@ -49,6 +49,7 @@ import com.chiniyar.app.data.analysis.ChineseWordAnalyzer
 import com.chiniyar.app.data.local.VocabularyDatabase
 import com.chiniyar.app.data.local.VocabularyEntry
 import com.chiniyar.app.data.translation.OfflineChinesePersianTranslator
+import com.chiniyar.app.data.translation.TranslationManager
 import com.chiniyar.app.domain.translation.CameraTranslationUseCase
 import kotlinx.coroutines.launch
 
@@ -66,11 +67,12 @@ fun CameraTranslatorScreen(
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
     val vocabularyDb = remember { VocabularyDatabase.getInstance(context) }
-    val processor = remember(ocrProcessor, translator, analyzer, vocabularyDb) {
-        CameraTranslationUseCase(ocrProcessor, translator, analyzer, vocabularyDb)
+    val translationManager = remember(translator) { TranslationManager(translator) }
+    val processor = remember(ocrProcessor, translationManager, analyzer, vocabularyDb) {
+        CameraTranslationUseCase(ocrProcessor, translationManager, analyzer, vocabularyDb)
     }
 
-    DisposableEffect(translator) { onDispose { translator.close() } }
+    DisposableEffect(translationManager) { onDispose { translationManager.close() } }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
