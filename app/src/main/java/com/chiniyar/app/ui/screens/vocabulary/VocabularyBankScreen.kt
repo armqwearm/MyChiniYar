@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.chiniyar.app.data.local.VocabularyDatabase
 import com.chiniyar.app.data.local.VocabularyEntry
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,15 +41,15 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val db = remember { VocabularyDatabase.getInstance(context) }
     val scope = rememberCoroutineScope()
-    val allEntries by db.observeAll().collectAsState(initial = emptyList())
+    val allEntries by db.words.collectAsState(initial = emptyList<VocabularyEntry>())
     var query by remember { mutableStateOf("") }
 
     val filtered = remember(allEntries, query) {
         val q = query.trim()
-        if (q.isEmpty()) allEntries else allEntries.filter {
-            it.word.contains(q, ignoreCase = true) ||
-                it.pinyin.contains(q, ignoreCase = true) ||
-                it.meaning.contains(q, ignoreCase = true)
+        if (q.isEmpty()) allEntries else allEntries.filter { entry ->
+            entry.word.contains(q, ignoreCase = true) ||
+                entry.pinyin.contains(q, ignoreCase = true) ||
+                entry.meaning.contains(q, ignoreCase = true)
         }
     }
 
@@ -59,13 +58,18 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
             TopAppBar(
                 title = { Text("بانک لغات من") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "بازگشت") }
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
+                    }
                 }
             )
         }
     ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedTextField(
@@ -73,7 +77,7 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                 onValueChange = { query = it },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                leadingIcon = { Icon(Icons.Default.Search, null) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 label = { Text("جست‌وجوی لغت") },
                 placeholder = { Text("Hanzi، Pinyin یا معنی") }
             )
@@ -100,8 +104,14 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
 @Composable
 private fun VocabularyCard(entry: VocabularyEntry, onDelete: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.fillMaxWidth().padding(14.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(entry.word, style = MaterialTheme.typography.headlineSmall)
                 Text(entry.pinyin, style = MaterialTheme.typography.bodyMedium)
                 Text(entry.meaning, style = MaterialTheme.typography.bodyLarge)
