@@ -2,9 +2,7 @@ package com.chiniyar.app.data.translation
 
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.common.model.DownloadConditions
-import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.translate.TranslateLanguage
-import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
@@ -33,14 +31,6 @@ class OfflineChinesePersianTranslator {
         if (text.isBlank()) return ""
         ensureModelDownloaded()
         return awaitTask(translator.translate(text))
-    }
-
-    suspend fun isModelDownloaded(): Boolean {
-        val models = awaitTask(
-            RemoteModelManager.getInstance()
-                .getDownloadedModels(TranslateRemoteModel::class.java)
-        )
-        return models.any { it.language == TranslateLanguage.PERSIAN }
     }
 
     fun close() = translator.close()
