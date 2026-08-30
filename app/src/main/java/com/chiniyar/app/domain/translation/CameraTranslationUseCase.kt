@@ -20,14 +20,18 @@ class CameraTranslationUseCase(
         context: Context,
         imageUri: Uri,
         onStatus: (String) -> Unit = {}
-    ): Result {
+    ): kotlin.Result<ResultData> {
         onStatus("در حال استخراج متن چینی آفلاین...")
         val text = ocrProcessor.recognize(context, imageUri).trim()
-        if (text.isBlank()) return Result.failure(IllegalStateException("متن قابل تشخیصی در تصویر پیدا نشد."))
+        if (text.isBlank()) {
+            return kotlin.Result.failure(IllegalStateException("متن قابل تشخیصی در تصویر پیدا نشد."))
+        }
 
         onStatus("در حال آماده‌سازی ترجمه آفلاین...")
         val translated = translator.translate(text).trim()
-        if (translated.isBlank()) return Result.failure(IllegalStateException("ترجمه‌ای برای متن استخراج‌شده دریافت نشد."))
+        if (translated.isBlank()) {
+            return kotlin.Result.failure(IllegalStateException("ترجمه‌ای برای متن استخراج‌شده دریافت نشد."))
+        }
 
         onStatus("در حال استخراج ۲۰ واژه غیرتکراری...")
         val savedWords = vocabularyDb.allWords()
@@ -42,7 +46,7 @@ class CameraTranslationUseCase(
             )
         }
 
-        return Result.success(ResultData(text, translated, analyzed))
+        return kotlin.Result.success(ResultData(text, translated, analyzed))
     }
 
     data class ResultData(
