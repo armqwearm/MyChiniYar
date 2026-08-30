@@ -44,6 +44,9 @@ dependencies {
     // Bundled Chinese OCR model: no network is required for OCR.
     implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
 
+    // On-device Chinese -> Persian translation. Model is downloaded once and cached locally.
+    implementation("com.google.mlkit:translate:17.0.3")
+
     // Vocabulary persistence uses Android's built-in SQLite; no ORM/KSP needed.
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
