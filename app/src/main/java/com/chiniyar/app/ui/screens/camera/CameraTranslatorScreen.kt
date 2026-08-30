@@ -35,6 +35,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -42,6 +43,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.chiniyar.app.data.translation.OfflineChinesePersianTranslator
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,28 +51,43 @@ import kotlinx.coroutines.launch
 fun CameraTranslatorScreen(
     viewModel: CameraTranslatorViewModel,
     onBack: () -> Unit,
-    ocrProcessor: ChineseOcrProcessor = remember { ChineseOcrProcessor() }
+    ocrProcessor: ChineseOcrProcessor = remember { ChineseOcrProcessor() },
+    translator: OfflineChinesePersianTranslator = remember { OfflineChinesePersianTranslator() }
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
 
+    DisposableEffect(translator) {
+        onDispose { translator.close() }
+    }
+
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         viewModel.setImage(uri)
-        viewModel.setProcessing(true)
+        viewModel.setProcessing(true, "در حال استخراج متن چینی آفلاین...")
         scope.launch {
             try {
                 val text = ocrProcessor.recognize(context, uri)
                 if (text.isBlank()) {
                     viewModel.setError("متن قابل تشخیصی در تصویر پیدا نشد.")
+                    return@launch
+                }
+
+                viewModel.setExtractedText(text)
+                viewModel.setProcessing(true, "در حال آماده‌سازی مدل ترجمه؛ فقط بار اول به اینترنت Wi‑Fi نیاز دارد...")
+
+                val translated = translator.translate(text)
+                if (translated.isBlank()) {
+                    viewModel.setError("ترجمه‌ای برای متن استخراج‌شده دریافت نشد.")
                 } else {
-                    viewModel.setExtractedText(text)
-                    viewModel.setProcessing(false)
+                    viewModel.setTranslatedText(translated)
                 }
             } catch (e: Exception) {
-                viewModel.setError(e.message ?: "تشخیص متن از تصویر ناموفق بود")
+                viewModel.setError(
+                    e.message ?: "ترجمه انجام نشد. اگر مدل ترجمه هنوز دانلود نشده، یک بار با Wi‑Fi امتحان کنید."
+                )
             }
         }
     }
@@ -106,16 +123,20 @@ fun CameraTranslatorScreen(
             Text("تصویر دارای متن چینی را انتخاب کنید.", style = MaterialTheme.typography.bodyLarge)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Button(onClick = { picker.launch("image/*") }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.Image, null); Spacer(Modifier.padding(horizontal = 3.dp)); Text("گالری")
+                    Icon(Icons.Default.Image, null)
+                    Spacer(Modifier.padding(horizontal = 3.dp))
+                    Text("گالری")
                 }
                 OutlinedButton(onClick = { picker.launch("image/*") }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.CameraAlt, null); Spacer(Modifier.padding(horizontal = 3.dp)); Text("دوربین")
+                    Icon(Icons.Default.CameraAlt, null)
+                    Spacer(Modifier.padding(horizontal = 3.dp))
+                    Text("دوربین")
                 }
             }
             if (state.isProcessing) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     CircularProgressIndicator()
-                    Text("در حال استخراج متن آفلاین...", modifier = Modifier.padding(top = 8.dp))
+                    Text(state.statusMessage.ifBlank { "در حال پردازش..." }, modifier = Modifier.padding(top = 8.dp))
                 }
             }
             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
