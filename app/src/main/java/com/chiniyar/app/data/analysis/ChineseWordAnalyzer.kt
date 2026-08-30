@@ -1,9 +1,5 @@
 package com.chiniyar.app.data.analysis
 
-import net.sourceforge.pinyin4j.HanyuPinyinCaseType
-import net.sourceforge.pinyin4j.HanyuPinyinOutputFormat
-import net.sourceforge.pinyin4j.HanyuPinyinToneType
-import net.sourceforge.pinyin4j.HanyuPinyinVCharType
 import net.sourceforge.pinyin4j.PinyinHelper
 
 /** Lightweight on-device Chinese word extraction and pinyin conversion. */
@@ -23,12 +19,6 @@ class ChineseWordAnalyzer {
         "没有", "不是", "不要", "不能", "不会", "应该", "可能", "当然", "还要", "找到",
         "看到", "听到", "告诉", "帮助", "使用", "打开", "关闭", "下载", "安装", "信息", "语言"
     )
-
-    private val pinyinFormat = HanyuPinyinOutputFormat().apply {
-        caseType = HanyuPinyinCaseType.LOWERCASE
-        toneType = HanyuPinyinToneType.WITH_TONE_MARK
-        vCharType = HanyuPinyinVCharType.WITH_U_UNICODE
-    }
 
     fun segment(text: String): List<String> {
         val chars = text.filter(::isChinese)
@@ -51,11 +41,11 @@ class ChineseWordAnalyzer {
         return result.distinct().take(20)
     }
 
+    /** Returns numeric-tone pinyin, e.g. 学习 -> xue2 xi2. */
     fun pinyin(word: String): String = buildString {
         word.forEachIndexed { index, char ->
-            val syllables = PinyinHelper.toHanyuPinyinStringArray(char, pinyinFormat)
             if (index > 0) append(' ')
-            append(syllables?.firstOrNull() ?: char)
+            append(PinyinHelper.toHanyuPinyinStringArray(char)?.firstOrNull() ?: char)
         }
     }
 
