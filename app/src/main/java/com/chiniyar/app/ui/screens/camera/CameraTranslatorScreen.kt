@@ -46,10 +46,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.chiniyar.app.data.analysis.AnalyzedWord
 import com.chiniyar.app.data.analysis.ChineseWordAnalyzer
-import com.chiniyar.app.data.analysis.OfflineChineseDictionary
 import com.chiniyar.app.data.local.VocabularyDatabase
 import com.chiniyar.app.data.local.VocabularyEntry
 import com.chiniyar.app.data.translation.OfflineChinesePersianTranslator
+import com.chiniyar.app.domain.translation.CameraTranslationUseCase
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,47 +66,30 @@ fun CameraTranslatorScreen(
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
     val vocabularyDb = remember { VocabularyDatabase.getInstance(context) }
+    val processor = remember(ocrProcessor, translator, analyzer, vocabularyDb) {
+        CameraTranslationUseCase(ocrProcessor, translator, analyzer, vocabularyDb)
+    }
 
     DisposableEffect(translator) { onDispose { translator.close() } }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         viewModel.setImage(uri)
-        viewModel.setProcessing(true, "در حال استخراج متن چینی آفلاین...")
+        viewModel.setProcessing(true, "در حال پردازش تصویر...")
         scope.launch {
-            try {
-                val text = ocrProcessor.recognize(context, uri)
-                if (text.isBlank()) {
-                    viewModel.setError("متن قابل تشخیصی در تصویر پیدا نشد.")
-                    return@launch
+            val result = runCatching {
+                processor.execute(context, uri) { status ->
+                    viewModel.setProcessing(true, status)
                 }
-                viewModel.setExtractedText(text)
+            }.getOrElse { error -> kotlin.Result.failure<CameraTranslationUseCase.ResultData>(error) }
 
-                viewModel.setProcessing(true, "در حال آماده‌سازی ترجمه آفلاین...")
-                val translated = translator.translate(text)
-                if (translated.isBlank()) {
-                    viewModel.setError("ترجمه‌ای برای متن استخراج‌شده دریافت نشد.")
-                    return@launch
-                }
-                viewModel.setTranslatedText(translated)
-
-                val candidates = analyzer.segment(text)
-                viewModel.setProcessing(true, "در حال استخراج ۲۰ واژه غیرتکراری...")
-                val savedWords = vocabularyDb.allWords()
-                val analyzed = candidates.map { word ->
-                    val localMeaning = OfflineChineseDictionary.meaning(word)
-                    val meaning = localMeaning ?: runCatching { translator.translate(word) }.getOrDefault("")
-                    AnalyzedWord(
-                        word = word,
-                        pinyin = analyzer.pinyin(word),
-                        meaning = meaning.ifBlank { "معنی پیدا نشد" },
-                        saved = word in savedWords
-                    )
-                }
-                viewModel.setWords(analyzed)
+            result.onSuccess { data ->
+                viewModel.setExtractedText(data.extractedText)
+                viewModel.setTranslatedText(data.translatedText)
+                viewModel.setWords(data.words)
                 viewModel.setProcessing(false)
-            } catch (e: Exception) {
-                viewModel.setError(e.message ?: "پردازش تصویر انجام نشد.")
+            }.onFailure { error ->
+                viewModel.setError(error.message ?: "پردازش تصویر انجام نشد.")
             }
         }
     }
@@ -158,19 +141,13 @@ fun CameraTranslatorScreen(
             }
             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
 
-            ResultCard("متن OCR شده", state.extractedText, "متن تشخیص‌داده‌شده اینجا نمایش داده می‌شود.", "کپی متن OCR") {
-                copyText(state.extractedText, "متن OCR")
-            }
-            ResultCard("ترجمه فارسی", state.translatedText, "ترجمه فارسی اینجا نمایش داده می‌شود.", "کپی ترجمه") {
-                copyText(state.translatedText, "ترجمه")
-            }
+            ResultCard("متن OCR شده", state.extractedText, "متن تشخیص‌داده‌شده اینجا نمایش داده می‌شود.", "کپی متن OCR") { copyText(state.extractedText, "متن OCR") }
+            ResultCard("ترجمه فارسی", state.translatedText, "ترجمه فارسی اینجا نمایش داده می‌شود.", "کپی ترجمه") { copyText(state.translatedText, "ترجمه") }
 
             if (state.words.isNotEmpty()) {
                 Text("واژه‌های متن — ${state.words.size} مورد", style = MaterialTheme.typography.titleLarge)
-                Text("۲۰ واژه غیرتکراری اول؛ واژه‌های موجود در فرهنگ داخلی کاملاً آفلاین معنی می‌شوند.", style = MaterialTheme.typography.bodyMedium)
-                state.words.forEach { word ->
-                    WordCard(word) { saveWord(word) }
-                }
+                Text("۲۰ واژه غیرتکراری اول؛ معنی واژه‌های موجود در فرهنگ داخلی بدون اینترنت انجام می‌شود.", style = MaterialTheme.typography.bodyMedium)
+                state.words.forEach { word -> WordCard(word) { saveWord(word) } }
             }
         }
     }
