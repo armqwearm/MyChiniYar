@@ -1,142 +1,33 @@
 package com.chiniyar.app.data.analysis
 
-/**
- * Small bundled dictionary for the most common words encountered in beginner/intermediate
- * Chinese text. It is intentionally local so these entries never require a network request.
- * Unknown words can still fall back to the on-device ML Kit translator.
- */
+import android.content.Context
+
+/** Loads the offline Chinese-Persian lexicon from a versioned app asset. */
 object OfflineChineseDictionary {
-    private val entries = mapOf(
-        "你好" to "سلام",
-        "您好" to "سلام (محترمانه)",
-        "谢谢" to "ممنون / متشکرم",
-        "再见" to "خداحافظ",
-        "对不起" to "متأسفم / ببخشید",
-        "没关系" to "اشکالی ندارد",
-        "不客气" to "خواهش می‌کنم",
-        "请问" to "ببخشید، می‌توانم بپرسم؟",
-        "可以" to "می‌شود / می‌توانم",
-        "不可以" to "نمی‌شود / مجاز نیست",
-        "喜欢" to "دوست داشتن",
-        "不喜欢" to "دوست نداشتن",
-        "学习" to "یادگیری / مطالعه کردن",
-        "中文" to "زبان چینی",
-        "汉语" to "زبان چینی",
-        "中国" to "چین",
-        "中国人" to "چینی / فرد چینی",
-        "今天" to "امروز",
-        "明天" to "فردا",
-        "昨天" to "دیروز",
-        "现在" to "الان / اکنون",
-        "时间" to "زمان / وقت",
-        "时候" to "زمان / هنگام",
-        "什么" to "چه / چی",
-        "为什么" to "چرا",
-        "怎么" to "چطور / چگونه",
-        "哪里" to "کجا",
-        "哪个" to "کدام",
-        "多少" to "چقدر / چند",
-        "非常" to "بسیار / خیلی",
-        "真的" to "واقعاً",
-        "已经" to "قبلاً / دیگر",
-        "正在" to "در حالِ",
-        "一起" to "با هم",
-        "需要" to "نیاز داشتن",
-        "知道" to "دانستن",
-        "认识" to "شناختن / آشنا بودن",
-        "觉得" to "فکر کردن / احساس کردن",
-        "希望" to "امیدوار بودن / امید",
-        "开始" to "شروع کردن",
-        "结束" to "تمام کردن / پایان یافتن",
-        "工作" to "کار / کار کردن",
-        "学校" to "مدرسه",
-        "老师" to "معلم / استاد",
-        "学生" to "دانش‌آموز / دانشجو",
-        "朋友" to "دوست",
-        "家人" to "اعضای خانواده",
-        "孩子" to "کودک / بچه",
-        "爸爸" to "پدر / بابا",
-        "妈妈" to "مادر / مامان",
-        "哥哥" to "برادر بزرگ‌تر",
-        "姐姐" to "خواهر بزرگ‌تر",
-        "弟弟" to "برادر کوچک‌تر",
-        "妹妹" to "خواهر کوچک‌تر",
-        "吃饭" to "غذا خوردن",
-        "喝水" to "آب نوشیدن",
-        "睡觉" to "خوابیدن",
-        "起床" to "از خواب بیدار شدن",
-        "上班" to "سر کار رفتن",
-        "回家" to "به خانه برگشتن",
-        "东西" to "چیز / کالا",
-        "商店" to "فروشگاه",
-        "饭店" to "رستوران",
-        "医院" to "بیمارستان",
-        "机场" to "فرودگاه",
-        "车站" to "ایستگاه",
-        "地铁" to "مترو",
-        "出租车" to "تاکسی",
-        "飞机" to "هواپیما",
-        "火车" to "قطار",
-        "汽车" to "خودرو / ماشین",
-        "手机" to "تلفن همراه",
-        "电脑" to "رایانه / کامپیوتر",
-        "电话" to "تلفن",
-        "问题" to "سؤال / مشکل",
-        "办法" to "راه‌حل / روش",
-        "机会" to "فرصت",
-        "世界" to "جهان / دنیا",
-        "生活" to "زندگی",
-        "国家" to "کشور",
-        "城市" to "شهر",
-        "价格" to "قیمت",
-        "便宜" to "ارزان",
-        "贵" to "گران",
-        "好吃" to "خوشمزه",
-        "漂亮" to "زیبا",
-        "高兴" to "خوشحال",
-        "快乐" to "شاد / خوشحال",
-        "天气" to "آب‌وهوا",
-        "下雨" to "باران باریدن",
-        "下雪" to "برف باریدن",
-        "太阳" to "خورشید",
-        "春天" to "بهار",
-        "夏天" to "تابستان",
-        "秋天" to "پاییز",
-        "冬天" to "زمستان",
-        "早上" to "صبح",
-        "晚上" to "شب / عصر",
-        "下午" to "بعدازظهر",
-        "上午" to "پیش از ظهر",
-        "这里" to "اینجا",
-        "那里" to "آنجا",
-        "因为" to "زیرا / چون",
-        "所以" to "بنابراین / پس",
-        "但是" to "اما",
-        "如果" to "اگر",
-        "虽然" to "اگرچه",
-        "然后" to "سپس / بعد",
-        "还有" to "همچنین / هنوز هست",
-        "没有" to "نداشتن / وجود نداشتن",
-        "不是" to "نیست",
-        "不要" to "نکن / نخواه",
-        "不能" to "نمی‌تواند / مجاز نیست",
-        "不会" to "نمی‌تواند / بلد نیست",
-        "应该" to "باید",
-        "可能" to "ممکن است",
-        "当然" to "البته / مسلماً",
-        "找到" to "پیدا کردن",
-        "看到" to "دیدن",
-        "听到" to "شنیدن",
-        "告诉" to "گفتن / اطلاع دادن",
-        "帮助" to "کمک کردن",
-        "使用" to "استفاده کردن",
-        "打开" to "باز کردن",
-        "关闭" to "بستن / خاموش کردن",
-        "下载" to "دانلود کردن",
-        "安装" to "نصب کردن",
-        "信息" to "اطلاعات",
-        "语言" to "زبان"
-    )
+    private const val ASSET_PATH = "dictionary/zh_fa_dictionary.tsv"
+
+    @Volatile
+    private var entries: Map<String, String> = emptyMap()
+
+    fun initialize(context: Context) {
+        if (entries.isNotEmpty()) return
+        synchronized(this) {
+            if (entries.isNotEmpty()) return
+            val loaded = context.applicationContext.assets.open(ASSET_PATH).bufferedReader().useLines { lines ->
+                buildMap {
+                    lines.forEach { line ->
+                        if (line.isBlank() || line.startsWith("#")) return@forEach
+                        val separator = line.indexOf('\t')
+                        if (separator <= 0 || separator >= line.lastIndex) return@forEach
+                        val word = line.substring(0, separator).trim()
+                        val meaning = line.substring(separator + 1).trim()
+                        if (word.isNotEmpty() && meaning.isNotEmpty()) put(word, meaning)
+                    }
+                }
+            }
+            entries = loaded
+        }
+    }
 
     fun meaning(word: String): String? = entries[word]
 
