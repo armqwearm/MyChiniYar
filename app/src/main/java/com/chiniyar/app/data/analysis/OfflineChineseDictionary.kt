@@ -13,19 +13,9 @@ object OfflineChineseDictionary {
         if (entries.isNotEmpty()) return
         synchronized(this) {
             if (entries.isNotEmpty()) return
-            val loaded = context.applicationContext.assets.open(ASSET_PATH).bufferedReader().useLines { lines ->
-                buildMap {
-                    lines.forEach { line ->
-                        if (line.isBlank() || line.startsWith("#")) return@forEach
-                        val separator = line.indexOf('\t')
-                        if (separator <= 0 || separator >= line.lastIndex) return@forEach
-                        val word = line.substring(0, separator).trim()
-                        val meaning = line.substring(separator + 1).trim()
-                        if (word.isNotEmpty() && meaning.isNotEmpty()) put(word, meaning)
-                    }
-                }
-            }
-            entries = loaded
+            entries = context.applicationContext.assets.open(ASSET_PATH)
+                .bufferedReader()
+                .useLines(OfflineDictionaryParser::parse)
         }
     }
 
