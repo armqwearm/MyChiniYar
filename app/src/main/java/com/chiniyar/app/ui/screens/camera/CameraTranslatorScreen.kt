@@ -3,7 +3,6 @@ package com.chiniyar.app.ui.screens.camera
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -19,8 +18,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,6 +44,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.chiniyar.app.data.analysis.AnalyzedWord
+import com.chiniyar.app.data.analysis.ChineseWordAnalyzer
+import com.chiniyar.app.data.local.VocabularyDatabase
+import com.chiniyar.app.data.local.VocabularyEntry
 import com.chiniyar.app.data.translation.OfflineChinesePersianTranslator
 import kotlinx.coroutines.launch
 
@@ -52,16 +57,16 @@ fun CameraTranslatorScreen(
     viewModel: CameraTranslatorViewModel,
     onBack: () -> Unit,
     ocrProcessor: ChineseOcrProcessor = remember { ChineseOcrProcessor() },
-    translator: OfflineChinesePersianTranslator = remember { OfflineChinesePersianTranslator() }
+    translator: OfflineChinesePersianTranslator = remember { OfflineChinesePersianTranslator() },
+    analyzer: ChineseWordAnalyzer = remember { ChineseWordAnalyzer() }
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
+    val vocabularyDb = remember { VocabularyDatabase.getInstance(context) }
 
-    DisposableEffect(translator) {
-        onDispose { translator.close() }
-    }
+    DisposableEffect(translator) { onDispose { translator.close() } }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -74,20 +79,26 @@ fun CameraTranslatorScreen(
                     viewModel.setError("متن قابل تشخیصی در تصویر پیدا نشد.")
                     return@launch
                 }
-
                 viewModel.setExtractedText(text)
-                viewModel.setProcessing(true, "در حال آماده‌سازی مدل ترجمه؛ فقط بار اول به اینترنت Wi‑Fi نیاز دارد...")
-
+                viewModel.setProcessing(true, "در حال آماده‌سازی ترجمه آفلاین...")
                 val translated = translator.translate(text)
                 if (translated.isBlank()) {
                     viewModel.setError("ترجمه‌ای برای متن استخراج‌شده دریافت نشد.")
-                } else {
-                    viewModel.setTranslatedText(translated)
+                    return@launch
                 }
+                viewModel.setTranslatedText(translated)
+
+                val candidates = analyzer.segment(text)
+                viewModel.setProcessing(true, "در حال استخراج واژه‌ها و معنی آن‌ها...")
+                val savedWords = vocabularyDb.allWords()
+                val analyzed = candidates.map { word ->
+                    val meaning = runCatching { translator.translate(word) }.getOrDefault("")
+                    AnalyzedWord(word, analyzer.pinyin(word), meaning.ifBlank { "معنی پیدا نشد" }, word in savedWords)
+                }
+                viewModel.setWords(analyzed)
+                viewModel.setProcessing(false)
             } catch (e: Exception) {
-                viewModel.setError(
-                    e.message ?: "ترجمه انجام نشد. اگر مدل ترجمه هنوز دانلود نشده، یک بار با Wi‑Fi امتحان کنید."
-                )
+                viewModel.setError(e.message ?: "پردازش تصویر انجام نشد.")
             }
         }
     }
@@ -98,19 +109,21 @@ fun CameraTranslatorScreen(
         scope.launch { snackbar.showSnackbar("$label کپی شد") }
     }
 
+    fun saveWord(word: AnalyzedWord) {
+        scope.launch {
+            vocabularyDb.add(VocabularyEntry(word.word, word.pinyin, word.meaning))
+            viewModel.setWordSaved(word.word, true)
+            snackbar.showSnackbar("${word.word} به بانک لغات اضافه شد")
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("مترجم تصویری") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "بازگشت") }
-                },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "بازگشت") } },
                 actions = {
-                    if (state.imageUri != null) {
-                        IconButton(onClick = { viewModel.setImage(null) }) {
-                            Icon(Icons.Default.Clear, "پاک کردن")
-                        }
-                    }
+                    if (state.imageUri != null) IconButton(onClick = { viewModel.setImage(null) }) { Icon(Icons.Default.Clear, "پاک کردن") }
                 }
             )
         },
@@ -123,14 +136,10 @@ fun CameraTranslatorScreen(
             Text("تصویر دارای متن چینی را انتخاب کنید.", style = MaterialTheme.typography.bodyLarge)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Button(onClick = { picker.launch("image/*") }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.Image, null)
-                    Spacer(Modifier.padding(horizontal = 3.dp))
-                    Text("گالری")
+                    Icon(Icons.Default.Image, null); Spacer(Modifier.padding(horizontal = 3.dp)); Text("گالری")
                 }
                 OutlinedButton(onClick = { picker.launch("image/*") }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.CameraAlt, null)
-                    Spacer(Modifier.padding(horizontal = 3.dp))
-                    Text("دوربین")
+                    Icon(Icons.Default.CameraAlt, null); Spacer(Modifier.padding(horizontal = 3.dp)); Text("دوربین")
                 }
             }
             if (state.isProcessing) {
@@ -147,6 +156,14 @@ fun CameraTranslatorScreen(
             ResultCard("ترجمه فارسی", state.translatedText, "ترجمه فارسی اینجا نمایش داده می‌شود.", "کپی ترجمه") {
                 copyText(state.translatedText, "ترجمه")
             }
+
+            if (state.words.isNotEmpty()) {
+                Text("واژه‌های متن — ${state.words.size} مورد", style = MaterialTheme.typography.titleLarge)
+                Text("۲۰ واژه غیرتکراری اول؛ معنی از مترجم روی دستگاه و تلفظ کاملاً محلی استخراج می‌شود.", style = MaterialTheme.typography.bodyMedium)
+                state.words.forEach { word ->
+                    WordCard(word) { saveWord(word) }
+                }
+            }
         }
     }
 }
@@ -160,11 +177,25 @@ private fun ResultCard(title: String, text: String, emptyText: String, copyLabel
                 Text(if (text.isBlank()) emptyText else text)
                 if (text.isNotBlank()) {
                     OutlinedButton(onClick = onCopy, modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ContentCopy, null)
-                        Spacer(Modifier.padding(horizontal = 4.dp))
-                        Text(copyLabel)
+                        Icon(Icons.Default.ContentCopy, null); Spacer(Modifier.padding(horizontal = 4.dp)); Text(copyLabel)
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WordCard(word: AnalyzedWord, onSave: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth().padding(14.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(word.word, style = MaterialTheme.typography.titleLarge)
+                Text(word.pinyin, style = MaterialTheme.typography.bodyMedium)
+                Text(word.meaning, style = MaterialTheme.typography.bodyLarge)
+            }
+            IconButton(onClick = { if (!word.saved) onSave() }) {
+                Icon(if (word.saved) Icons.Default.Star else Icons.Default.StarBorder, if (word.saved) "ذخیره شده" else "افزودن به بانک لغات")
             }
         }
     }
