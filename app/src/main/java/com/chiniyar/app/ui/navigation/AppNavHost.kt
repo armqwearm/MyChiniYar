@@ -22,6 +22,7 @@ import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModelFactory
 import com.chiniyar.app.ui.screens.translator.TranslatorScreen
 import com.chiniyar.app.ui.screens.translator.TranslatorViewModel
 import com.chiniyar.app.ui.screens.translator.TranslatorViewModelFactory
+import com.chiniyar.app.ui.screens.vocabulary.VocabularyBankScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +33,7 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
                 onTranslatorClick = { navController.navigate(AppDestination.Translator.route) },
                 onDictionaryClick = { navController.navigate(AppDestination.Dictionary.route) },
                 onCameraClick = { navController.navigate(AppDestination.CameraTranslator.route) },
+                onVocabularyBankClick = { navController.navigate(AppDestination.VocabularyBank.route) },
                 onLearningClick = { navController.navigate(AppDestination.Learning.route) },
                 onCitiesClick = { navController.navigate(AppDestination.Cities.route) }
             )
@@ -47,6 +49,9 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
         composable(AppDestination.CameraTranslator.route) {
             val vm: CameraTranslatorViewModel = viewModel()
             CameraTranslatorScreen(viewModel = vm, onBack = { navController.popBackStack() })
+        }
+        composable(AppDestination.VocabularyBank.route) {
+            VocabularyBankScreen(onBack = { navController.popBackStack() })
         }
         composable(AppDestination.Learning.route) { PlaceholderScreen("یادگیری زبان چینی") }
         composable(AppDestination.Cities.route) { PlaceholderScreen("شهرهای چین") }
