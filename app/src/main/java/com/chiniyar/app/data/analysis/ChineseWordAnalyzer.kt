@@ -1,17 +1,12 @@
 package com.chiniyar.app.data.analysis
 
-import com.belerweb.pinyin4j.HanyuPinyinOutputFormat
-import com.belerweb.pinyin4j.HanyuPinyinToneType
-import com.belerweb.pinyin4j.HanyuPinyinCaseType
-import com.belerweb.pinyin4j.HanyuPinyinVCharType
-import com.belerweb.pinyin4j.PinyinHelper
+import net.sourceforge.pinyin4j.HanyuPinyinCaseType
+import net.sourceforge.pinyin4j.HanyuPinyinOutputFormat
+import net.sourceforge.pinyin4j.HanyuPinyinToneType
+import net.sourceforge.pinyin4j.HanyuPinyinVCharType
+import net.sourceforge.pinyin4j.PinyinHelper
 
-/** Lightweight on-device Chinese word extraction.
- *
- * Chinese has no whitespace between words. We use a small built-in lexicon and
- * longest-match-first segmentation, then fall back to individual Han characters.
- * This keeps the first 20 unique vocabulary candidates deterministic and offline.
- */
+/** Lightweight on-device Chinese word extraction and pinyin conversion. */
 class ChineseWordAnalyzer {
     private val lexicon = setOf(
         "你好", "您好", "谢谢", "再见", "对不起", "没关系", "不客气", "请问", "可以", "不可以",
@@ -24,8 +19,8 @@ class ChineseWordAnalyzer {
         "办法", "机会", "世界", "生活", "国家", "城市", "北京", "上海", "广州", "深圳", "日本",
         "美国", "英国", "人民币", "美元", "价格", "便宜", "贵", "好吃", "漂亮", "高兴", "快乐",
         "天气", "下雨", "下雪", "太阳", "春天", "夏天", "秋天", "冬天", "早上", "晚上", "下午",
-        "上午", "这里", "那里", "一起", "因为", "所以", "但是", "如果", "虽然", "然后", "还有",
-        "没有", "不是", "不要", "不能", "不会", "应该", "可能", "当然", "已经", "还要", "找到",
+        "上午", "这里", "那里", "因为", "所以", "但是", "如果", "虽然", "然后", "还有",
+        "没有", "不是", "不要", "不能", "不会", "应该", "可能", "当然", "还要", "找到",
         "看到", "听到", "告诉", "帮助", "使用", "打开", "关闭", "下载", "安装", "信息", "语言"
     )
 
@@ -36,15 +31,13 @@ class ChineseWordAnalyzer {
     }
 
     fun segment(text: String): List<String> {
-        val chars = text.filter { isChinese(it) }
+        val chars = text.filter(::isChinese)
         if (chars.isBlank()) return emptyList()
-
         val result = mutableListOf<String>()
         var index = 0
         while (index < chars.length) {
             var match: String? = null
-            val maxLength = minOf(4, chars.length - index)
-            for (length in maxLength downTo 2) {
+            for (length in minOf(4, chars.length - index) downTo 2) {
                 val candidate = chars.substring(index, index + length)
                 if (candidate in lexicon) {
                     match = candidate
@@ -61,8 +54,8 @@ class ChineseWordAnalyzer {
     fun pinyin(word: String): String = buildString {
         word.forEachIndexed { index, char ->
             val syllables = PinyinHelper.toHanyuPinyinStringArray(char, pinyinFormat)
-            if (index > 0 && syllables != null) append(' ')
-            if (syllables != null) append(syllables.first()) else append(char)
+            if (index > 0) append(' ')
+            append(syllables?.firstOrNull() ?: char)
         }
     }
 
