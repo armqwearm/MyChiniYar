@@ -10,10 +10,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-/**
- * Chinese -> Persian translation using the ML Kit on-device model.
- * The model is downloaded once (Wi-Fi by default) and then translation is local.
- */
+/** Chinese -> Persian translation using ML Kit's on-device model. */
 class OfflineChinesePersianTranslator {
     private val translator: Translator = Translation.getClient(
         TranslatorOptions.Builder()
@@ -22,14 +19,15 @@ class OfflineChinesePersianTranslator {
             .build()
     )
 
-    suspend fun ensureModelDownloaded() {
+    /** Downloads the model when needed. After success, translation runs on-device. */
+    suspend fun prepareModel(): Result<Unit> = runCatching {
         val conditions = DownloadConditions.Builder().requireWifi().build()
         awaitTask(translator.downloadModelIfNeeded(conditions))
     }
 
+    /** Translates only after the model has been prepared by the caller. */
     suspend fun translate(text: String): String {
         if (text.isBlank()) return ""
-        ensureModelDownloaded()
         return awaitTask(translator.translate(text))
     }
 
