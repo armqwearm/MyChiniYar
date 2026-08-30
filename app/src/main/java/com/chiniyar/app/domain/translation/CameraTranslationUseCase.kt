@@ -6,13 +6,13 @@ import com.chiniyar.app.data.analysis.AnalyzedWord
 import com.chiniyar.app.data.analysis.ChineseWordAnalyzer
 import com.chiniyar.app.data.analysis.OfflineChineseDictionary
 import com.chiniyar.app.data.local.VocabularyDatabase
-import com.chiniyar.app.data.translation.OfflineChinesePersianTranslator
+import com.chiniyar.app.data.translation.TranslationManager
 import com.chiniyar.app.ui.screens.camera.ChineseOcrProcessor
 
-/** Coordinates OCR, translation and word analysis without UI concerns. */
+/** Coordinates OCR, on-device translation and word analysis without UI concerns. */
 class CameraTranslationUseCase(
     private val ocrProcessor: ChineseOcrProcessor,
-    private val translator: OfflineChinesePersianTranslator,
+    private val translationManager: TranslationManager,
     private val analyzer: ChineseWordAnalyzer,
     private val vocabularyDb: VocabularyDatabase
 ) {
@@ -27,8 +27,19 @@ class CameraTranslationUseCase(
             return kotlin.Result.failure(IllegalStateException("متن قابل تشخیصی در تصویر پیدا نشد."))
         }
 
-        onStatus("در حال آماده‌سازی ترجمه آفلاین...")
-        val translated = translator.translate(text).trim()
+        onStatus("در حال آماده‌سازی مدل ترجمه آفلاین...")
+        val preparation = translationManager.prepare()
+        if (preparation.isFailure) {
+            return kotlin.Result.failure(
+                preparation.exceptionOrNull()
+                    ?: IllegalStateException("مدل ترجمه آماده نشد.")
+            )
+        }
+
+        onStatus("در حال ترجمه متن...")
+        val translated = translationManager.translate(text).getOrElse { error ->
+            return kotlin.Result.failure(error)
+        }.trim()
         if (translated.isBlank()) {
             return kotlin.Result.failure(IllegalStateException("ترجمه‌ای برای متن استخراج‌شده دریافت نشد."))
         }
@@ -37,7 +48,7 @@ class CameraTranslationUseCase(
         val savedWords = vocabularyDb.allWords()
         val analyzed = analyzer.segment(text).map { word ->
             val localMeaning = OfflineChineseDictionary.meaning(word)
-            val meaning = localMeaning ?: runCatching { translator.translate(word) }.getOrDefault("")
+            val meaning = localMeaning ?: translationManager.translate(word).getOrDefault("")
             AnalyzedWord(
                 word = word,
                 pinyin = analyzer.pinyin(word),
