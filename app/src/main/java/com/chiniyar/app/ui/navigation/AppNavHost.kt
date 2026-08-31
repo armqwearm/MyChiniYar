@@ -48,7 +48,15 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
         }
         composable(AppDestination.CameraTranslator.route) {
             val vm: CameraTranslatorViewModel = viewModel()
-            CameraTranslatorScreen(viewModel = vm, onBack = { navController.popBackStack() })
+            CameraTranslatorScreen(
+                viewModel = vm,
+                onBack = { navController.popBackStack() },
+                ocrProcessor = appContainer.chineseOcrProcessor,
+                translationManager = appContainer.translationManager,
+                analyzer = appContainer.chineseWordAnalyzer,
+                vocabularyDb = appContainer.vocabularyDatabase,
+                processor = appContainer.cameraTranslationUseCase
+            )
         }
         composable(AppDestination.VocabularyBank.route) {
             VocabularyBankScreen(onBack = { navController.popBackStack() })
