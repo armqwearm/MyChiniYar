@@ -6,35 +6,51 @@ import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlinx.coroutines.suspendCancellableCoroutine
 
-/** Chinese -> Persian translation using ML Kit's on-device model. */
+/** On-device Chinese <-> Persian translation using ML Kit. */
 class OfflineChinesePersianTranslator {
-    private val translator: Translator = Translation.getClient(
+    private val chineseToPersian: Translator = Translation.getClient(
         TranslatorOptions.Builder()
             .setSourceLanguage(TranslateLanguage.CHINESE)
             .setTargetLanguage(TranslateLanguage.PERSIAN)
             .build()
     )
 
-    /**
-     * Ensures the model exists locally. The network is needed only for the first download;
-     * subsequent translations use the on-device model.
-     */
+    private val persianToChinese: Translator = Translation.getClient(
+        TranslatorOptions.Builder()
+            .setSourceLanguage(TranslateLanguage.PERSIAN)
+            .setTargetLanguage(TranslateLanguage.CHINESE)
+            .build()
+    )
+
+    /** Prepare both direction models. The network is required only for first download. */
     suspend fun prepareModel(): Result<Unit> = runCatching {
-        // Do not require Wi-Fi: mobile data is also a valid one-time setup path.
-        awaitTask(translator.downloadModelIfNeeded(DownloadConditions.Builder().build()))
+        val conditions = DownloadConditions.Builder().build()
+        awaitTask(chineseToPersian.downloadModelIfNeeded(conditions))
+        awaitTask(persianToChinese.downloadModelIfNeeded(conditions))
     }
 
-    /** Translates using the local model after prepareModel() succeeds. */
-    suspend fun translate(text: String): String {
+    suspend fun translateChineseToPersian(text: String): String =
+        translateWith(chineseToPersian, text)
+
+    suspend fun translatePersianToChinese(text: String): String =
+        translateWith(persianToChinese, text)
+
+    /** Kept for camera pipeline compatibility: Chinese -> Persian. */
+    suspend fun translate(text: String): String = translateChineseToPersian(text)
+
+    fun close() {
+        chineseToPersian.close()
+        persianToChinese.close()
+    }
+
+    private suspend fun translateWith(translator: Translator, text: String): String {
         if (text.isBlank()) return ""
         return awaitTask(translator.translate(text))
     }
-
-    fun close() = translator.close()
 
     private suspend fun <T> awaitTask(task: Task<T>): T = suspendCancellableCoroutine { continuation ->
         task.addOnSuccessListener { result ->
