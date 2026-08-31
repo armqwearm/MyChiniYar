@@ -51,11 +51,8 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
             CameraTranslatorScreen(
                 viewModel = vm,
                 onBack = { navController.popBackStack() },
-                ocrProcessor = appContainer.chineseOcrProcessor,
-                translationManager = appContainer.translationManager,
-                analyzer = appContainer.chineseWordAnalyzer,
-                vocabularyDb = appContainer.vocabularyDatabase,
-                processor = appContainer.cameraTranslationUseCase
+                processor = appContainer.cameraTranslationUseCase,
+                vocabularyDb = appContainer.vocabularyDatabase
             )
         }
         composable(AppDestination.VocabularyBank.route) {
