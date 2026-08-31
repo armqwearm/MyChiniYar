@@ -45,10 +45,7 @@ class InMemoryDictionaryRepository : DictionaryRepository {
         DictionaryEntry("我不吃猪肉。", "wǒ bù chī zhūròu.", "من گوشت خوک نمی‌خورم.", "رستوران", "对不起，我不吃猪肉。"),
         DictionaryEntry("有没有素食？", "yǒu méiyǒu sùshí?", "غذای گیاهی دارید؟", "رستوران", "请问，有没有素食？"),
         DictionaryEntry("请给我菜单。", "qǐng gěi wǒ càidān.", "لطفاً منو را بدهید.", "رستوران", "请给我菜单，谢谢。"),
-        DictionaryEntry("我要结账。", "wǒ yào jiézhàng.", "می‌خواهم حساب کنم / صورتحساب را می‌خواهم.", "رستوران", "请帮我结账。"),
-        DictionaryEntry("请给我发票。", "qǐng gěi wǒ fāpiào.", "لطفاً فاکتور بدهید.", "خرید", "请给我发票，谢谢。"),
-        DictionaryEntry("谢谢你的帮助。", "xièxie nǐ de bāngzhù.", "از کمکتان ممنونم.", "عبارت", "谢谢你的帮助。"),
-        DictionaryEntry("不好意思。", "bù hǎo yìsi.", "ببخشید / عذر می‌خواهم.", "عبارت", "不好意思，打扰一下。")
+        DictionaryEntry("我要结账。", "wǒ yào jiézhàng.", "می‌خواهم حساب کنم / صورتحساب را می‌خواهم.", "رستوران", "请帮我结账。")
     )
 
     override fun search(query: String): Flow<List<DictionaryEntry>> = flow {
