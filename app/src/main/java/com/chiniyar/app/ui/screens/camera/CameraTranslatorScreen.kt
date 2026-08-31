@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.activity.result.ActivityResultLauncher
 import com.chiniyar.app.data.analysis.AnalyzedWord
 import com.chiniyar.app.data.local.VocabularyDatabase
 import com.chiniyar.app.data.local.VocabularyEntry
@@ -84,9 +85,7 @@ fun CameraTranslatorScreen(
                         viewModel.setExtractedText(text)
                         viewModel.setProcessing(true, "متن OCR آماده شد؛ در حال پردازش ادامه کار...")
                     },
-                    onWordsResult = { words ->
-                        viewModel.setWords(words)
-                    }
+                    onWordsResult = { words -> viewModel.setWords(words) }
                 )
             }.getOrElse { error ->
                 kotlin.Result.failure<CameraTranslationUseCase.ResultData>(error)
@@ -110,25 +109,44 @@ fun CameraTranslatorScreen(
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         val uri = cameraUri
+        cameraUri = null
         if (success && uri != null) processUri(uri)
         else if (uri != null) context.contentResolver.delete(uri, null, null)
-        cameraUri = null
+    }
+
+    fun createCameraUri(): Uri? {
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "chiniyar_${System.currentTimeMillis()}.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyChiniYar")
+        }
+        return context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
     }
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) launchCamera(context, cameraLauncher) {
-            scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
+        if (granted) {
+            val uri = createCameraUri()
+            if (uri == null) scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
+            else {
+                cameraUri = uri
+                cameraLauncher.launch(uri)
+            }
         } else {
             scope.launch { snackbar.showSnackbar("برای استفاده از دوربین، دسترسی دوربین را فعال کنید") }
         }
     }
 
     fun openCamera() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            launchCamera(context, cameraLauncher) {
-                scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
-            }
-        } else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            return
+        }
+        val uri = createCameraUri()
+        if (uri == null) scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
+        else {
+            cameraUri = uri
+            cameraLauncher.launch(uri)
+        }
     }
 
     fun copyText(text: String, label: String) {
@@ -190,7 +208,7 @@ fun CameraTranslatorScreen(
 
 private fun launchCamera(
     context: Context,
-    launcher: androidx.activity.result.ActivityResultLauncher<Uri>,
+    launcher: ActivityResultLauncher<Uri>,
     onFailure: () -> Unit
 ) {
     val values = ContentValues().apply {
