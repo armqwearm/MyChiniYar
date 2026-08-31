@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +15,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +32,7 @@ private const val WEBSITE_URL = "https://yajingchinese.ir/"
 private const val TELEGRAM_URL = "https://t.me/yajingchinese"
 private const val BALE_URL = "https://ble.ir/Yajing_chinese"
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LearningScreen(onBack: () -> Unit) {
     val context = LocalContext.current
