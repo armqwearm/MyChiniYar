@@ -199,7 +199,7 @@ fun CameraTranslatorScreen(
             ResultCard("ترجمه فارسی", state.translatedText, "ترجمه فارسی اینجا نمایش داده می‌شود.", "کپی ترجمه") { copyText(state.translatedText, "ترجمه") }
             if (state.words.isNotEmpty()) {
                 Text("واژه‌های متن — ${state.words.size} مورد", style = MaterialTheme.typography.titleLarge)
-                Text("۲۰ واژه غیرتکراری اول؛ معنی واژه‌های موجود در فرهنگ داخلی بدون اینترنت انجام می‌شود.", style = MaterialTheme.typography.bodyMedium)
+                Text("۴۰ واژه غیرتکراری اول؛ معنی واژه‌های موجود در فرهنگ داخلی بدون اینترنت انجام می‌شود.", style = MaterialTheme.typography.bodyMedium)
                 state.words.forEach { word -> WordCard(word) { saveWord(word) } }
             }
         }
