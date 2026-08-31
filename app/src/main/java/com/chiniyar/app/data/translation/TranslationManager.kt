@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/** Coordinates model preparation and on-device translation. */
+/** Coordinates model preparation and on-device Chinese/Persian translation. */
 class TranslationManager(
     private val translator: OfflineChinesePersianTranslator = OfflineChinesePersianTranslator()
 ) {
@@ -23,13 +23,23 @@ class TranslationManager(
         }
     }
 
-    suspend fun translate(text: String): Result<String> {
-        if (text.isBlank()) return Result.success("")
+    suspend fun translateChineseToPersian(text: String): Result<String> = translate {
+        translator.translateChineseToPersian(text)
+    }
+
+    suspend fun translatePersianToChinese(text: String): Result<String> = translate {
+        translator.translatePersianToChinese(text)
+    }
+
+    /** Camera pipeline compatibility: Chinese -> Persian. */
+    suspend fun translate(text: String): Result<String> = translateChineseToPersian(text)
+
+    fun close() = translator.close()
+
+    private suspend fun translate(action: suspend () -> String): Result<String> {
         if (_state.value !is TranslationModelState.Ready) {
             return Result.failure(IllegalStateException("Translation model is not ready"))
         }
-        return runCatching { translator.translate(text) }
+        return runCatching { action() }
     }
-
-    fun close() = translator.close()
 }
