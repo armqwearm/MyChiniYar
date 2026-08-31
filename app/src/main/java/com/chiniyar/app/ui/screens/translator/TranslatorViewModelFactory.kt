@@ -10,7 +10,7 @@ class TranslatorViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TranslatorViewModel::class.java)) {
-            return TranslatorViewModel(appContainer.translateTextUseCase) as T
+            return TranslatorViewModel(appContainer.translationManager) as T
         }
         throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
     }
