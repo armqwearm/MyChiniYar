@@ -19,13 +19,16 @@ class OfflineChinesePersianTranslator {
             .build()
     )
 
-    /** Downloads the model when needed. After success, translation runs on-device. */
+    /**
+     * Ensures the model exists locally. The network is needed only for the first download;
+     * subsequent translations use the on-device model.
+     */
     suspend fun prepareModel(): Result<Unit> = runCatching {
-        val conditions = DownloadConditions.Builder().requireWifi().build()
-        awaitTask(translator.downloadModelIfNeeded(conditions))
+        // Do not require Wi-Fi: mobile data is also a valid one-time setup path.
+        awaitTask(translator.downloadModelIfNeeded(DownloadConditions.Builder().build()))
     }
 
-    /** Translates only after the model has been prepared by the caller. */
+    /** Translates using the local model after prepareModel() succeeds. */
     suspend fun translate(text: String): String {
         if (text.isBlank()) return ""
         return awaitTask(translator.translate(text))
