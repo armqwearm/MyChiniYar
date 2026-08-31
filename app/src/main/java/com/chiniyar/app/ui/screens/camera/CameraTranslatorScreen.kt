@@ -19,7 +19,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
@@ -45,10 +44,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.chiniyar.app.data.analysis.AnalyzedWord
-import com.chiniyar.app.data.analysis.ChineseWordAnalyzer
 import com.chiniyar.app.data.local.VocabularyDatabase
 import com.chiniyar.app.data.local.VocabularyEntry
-import com.chiniyar.app.data.translation.TranslationManager
 import com.chiniyar.app.domain.translation.CameraTranslationUseCase
 import kotlinx.coroutines.launch
 
@@ -57,11 +54,8 @@ import kotlinx.coroutines.launch
 fun CameraTranslatorScreen(
     viewModel: CameraTranslatorViewModel,
     onBack: () -> Unit,
-    ocrProcessor: ChineseOcrProcessor,
-    translationManager: TranslationManager,
-    analyzer: ChineseWordAnalyzer,
-    vocabularyDb: VocabularyDatabase,
-    processor: CameraTranslationUseCase
+    processor: CameraTranslationUseCase,
+    vocabularyDb: VocabularyDatabase
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -71,19 +65,23 @@ fun CameraTranslatorScreen(
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         viewModel.setImage(uri)
+        viewModel.setError(null)
         viewModel.setProcessing(true, "در حال پردازش تصویر...")
         scope.launch {
             val result = runCatching {
                 processor.execute(context, uri) { status ->
                     viewModel.setProcessing(true, status)
                 }
-            }.getOrElse { error -> kotlin.Result.failure<CameraTranslationUseCase.ResultData>(error) }
+            }.getOrElse { error ->
+                kotlin.Result.failure<CameraTranslationUseCase.ResultData>(error)
+            }
 
             result.onSuccess { data ->
                 viewModel.setExtractedText(data.extractedText)
                 viewModel.setTranslatedText(data.translatedText)
                 viewModel.setWords(data.words)
                 viewModel.setProcessing(false)
+                viewModel.setError(null)
             }.onFailure { error ->
                 viewModel.setProcessing(false)
                 viewModel.setError(error.message ?: "پردازش تصویر انجام نشد.")
@@ -92,12 +90,14 @@ fun CameraTranslatorScreen(
     }
 
     fun copyText(text: String, label: String) {
+        if (text.isBlank()) return
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(ClipData.newPlainText(label, text))
         scope.launch { snackbar.showSnackbar("$label کپی شد") }
     }
 
     fun saveWord(word: AnalyzedWord) {
+        if (word.saved) return
         scope.launch {
             val inserted = vocabularyDb.add(
                 VocabularyEntry(word.word, word.pinyin, word.meaning)
@@ -110,10 +110,6 @@ fun CameraTranslatorScreen(
         }
     }
 
-    // Keep these dependencies in the signature so the screen is fully application-injected.
-    @Suppress("UNUSED_VARIABLE")
-    val injectedDependencies = listOf(ocrProcessor, translationManager, analyzer)
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -125,7 +121,7 @@ fun CameraTranslatorScreen(
                 },
                 actions = {
                     if (state.imageUri != null) {
-                        IconButton(onClick = { viewModel.setImage(null) }) {
+                        IconButton(onClick = { viewModel.clearResults() }) {
                             Icon(Icons.Default.Clear, contentDescription = "پاک کردن")
                         }
                     }
@@ -155,7 +151,7 @@ fun CameraTranslatorScreen(
                 OutlinedButton(onClick = { picker.launch("image/*") }, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Default.CameraAlt, contentDescription = null)
                     Spacer(Modifier.padding(horizontal = 3.dp))
-                    Text("دوربین")
+                    Text("تصویر")
                 }
             }
             if (state.isProcessing) {
