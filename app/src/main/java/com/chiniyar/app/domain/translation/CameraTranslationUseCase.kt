@@ -19,13 +19,17 @@ class CameraTranslationUseCase(
     suspend fun execute(
         context: Context,
         imageUri: Uri,
-        onStatus: (String) -> Unit = {}
+        onStatus: (String) -> Unit = {},
+        onOcrResult: (String) -> Unit = {}
     ): kotlin.Result<ResultData> {
         onStatus("در حال استخراج متن چینی آفلاین...")
         val text = ocrProcessor.recognize(context, imageUri).trim()
         if (text.isBlank()) {
             return kotlin.Result.failure(IllegalStateException("متن قابل تشخیصی در تصویر پیدا نشد."))
         }
+
+        // OCR is an independent result and must be visible before model preparation.
+        onOcrResult(text)
 
         onStatus("در حال آماده‌سازی مدل ترجمه آفلاین...")
         val preparation = translationManager.prepare()
@@ -50,14 +54,12 @@ class CameraTranslationUseCase(
         val meanings = linkedMapOf<String, String>()
         val missing = words.filter { OfflineChineseDictionary.meaning(it).isNullOrBlank() }
 
-        missing.takeIf { it.isNotEmpty() }?.let { unknownWords ->
+        if (missing.isNotEmpty()) {
             onStatus("در حال تکمیل معنی واژه‌ها...")
-            val batch = unknownWords.joinToString(separator = "\n")
+            val batch = missing.joinToString(separator = "\n")
             val translatedBatch = translationManager.translate(batch).getOrDefault("")
-            val translatedLines = translatedBatch.lines()
-            unknownWords.forEachIndexed { index, word ->
-                val translatedMeaning = translatedLines.getOrNull(index)?.trim().orEmpty()
-                if (translatedMeaning.isNotEmpty()) meanings[word] = translatedMeaning
+            translatedBatch.lines().forEachIndexed { index, line ->
+                if (index < missing.size && line.isNotBlank()) meanings[missing[index]] = line.trim()
             }
         }
 
