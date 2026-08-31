@@ -1,9 +1,11 @@
 package com.chiniyar.app.ui.screens.camera
 
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -39,15 +41,16 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.chiniyar.app.data.analysis.AnalyzedWord
 import com.chiniyar.app.data.local.VocabularyDatabase
 import com.chiniyar.app.data.local.VocabularyEntry
@@ -85,7 +88,6 @@ fun CameraTranslatorScreen(
             }.getOrElse { error ->
                 kotlin.Result.failure<CameraTranslationUseCase.ResultData>(error)
             }
-
             result.onSuccess { data ->
                 viewModel.setExtractedText(data.extractedText)
                 viewModel.setTranslatedText(data.translatedText)
@@ -113,19 +115,44 @@ fun CameraTranslatorScreen(
         cameraUri = null
     }
 
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            val values = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, "chiniyar_${System.currentTimeMillis()}.jpg")
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyChiniYar")
+            }
+            val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            if (uri == null) {
+                scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
+            } else {
+                cameraUri = uri
+                cameraLauncher.launch(uri)
+            }
+        } else {
+            scope.launch { snackbar.showSnackbar("برای استفاده از دوربین، دسترسی دوربین را فعال کنید") }
+        }
+    }
+
     fun openCamera() {
-        val values = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "chiniyar_${System.currentTimeMillis()}.jpg")
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyChiniYar")
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            val values = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, "chiniyar_${System.currentTimeMillis()}.jpg")
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyChiniYar")
+            }
+            val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            if (uri == null) {
+                scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
+                return
+            }
+            cameraUri = uri
+            cameraLauncher.launch(uri)
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
-        val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-        if (uri == null) {
-            scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
-            return
-        }
-        cameraUri = uri
-        cameraLauncher.launch(uri)
     }
 
     fun copyText(text: String, label: String) {
@@ -140,9 +167,7 @@ fun CameraTranslatorScreen(
         scope.launch {
             val inserted = vocabularyDb.add(VocabularyEntry(word.word, word.pinyin, word.meaning))
             viewModel.setWordSaved(word.word, true)
-            snackbar.showSnackbar(
-                if (inserted) "${word.word} به بانک لغات اضافه شد" else "${word.word} قبلاً در بانک لغات بود"
-            )
+            snackbar.showSnackbar(if (inserted) "${word.word} به بانک لغات اضافه شد" else "${word.word} قبلاً در بانک لغات بود")
         }
     }
 
@@ -150,7 +175,7 @@ fun CameraTranslatorScreen(
         topBar = {
             TopAppBar(
                 title = { Text("مترجم تصویری") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "بازگشت") } },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت") } },
                 actions = {
                     if (state.imageUri != null) IconButton(onClick = { viewModel.clearResults() }) {
                         Icon(Icons.Default.Clear, contentDescription = "پاک کردن")
@@ -180,14 +205,8 @@ fun CameraTranslatorScreen(
                 }
             }
             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-
-            ResultCard("متن OCR شده", state.extractedText, "متن تشخیص‌داده‌شده اینجا نمایش داده می‌شود.", "کپی متن OCR") {
-                copyText(state.extractedText, "متن OCR")
-            }
-            ResultCard("ترجمه فارسی", state.translatedText, "ترجمه فارسی اینجا نمایش داده می‌شود.", "کپی ترجمه") {
-                copyText(state.translatedText, "ترجمه")
-            }
-
+            ResultCard("متن OCR شده", state.extractedText, "متن تشخیص‌داده‌شده اینجا نمایش داده می‌شود.", "کپی متن OCR") { copyText(state.extractedText, "متن OCR") }
+            ResultCard("ترجمه فارسی", state.translatedText, "ترجمه فارسی اینجا نمایش داده می‌شود.", "کپی ترجمه") { copyText(state.translatedText, "ترجمه") }
             if (state.words.isNotEmpty()) {
                 Text("واژه‌های متن — ${state.words.size} مورد", style = MaterialTheme.typography.titleLarge)
                 Text("۲۰ واژه غیرتکراری اول؛ معنی واژه‌های موجود در فرهنگ داخلی بدون اینترنت انجام می‌شود.", style = MaterialTheme.typography.bodyMedium)
