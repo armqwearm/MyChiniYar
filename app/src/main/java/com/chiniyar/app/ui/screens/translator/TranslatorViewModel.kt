@@ -47,8 +47,8 @@ class TranslatorViewModel(
             _uiState.value = state.copy(error = "متنی برای ترجمه وارد کنید")
             return
         }
-        if (state.source != Language.CHINESE || state.target != Language.PERSIAN) {
-            _uiState.value = state.copy(error = "در Release 1 ترجمه آفلاین چینی ↔ فارسی پشتیبانی می‌شود.")
+        if (!isSupportedDirection(state.source, state.target)) {
+            _uiState.value = state.copy(error = "در Release 1 فقط ترجمه چینی ↔ فارسی پشتیبانی می‌شود.")
             return
         }
 
@@ -69,7 +69,14 @@ class TranslatorViewModel(
             }
 
             _uiState.value = _uiState.value.copy(statusMessage = "در حال ترجمه...")
-            val result = translationManager.translate(state.input)
+            val result = when (state.source to state.target) {
+                Language.CHINESE to Language.PERSIAN ->
+                    translationManager.translateChineseToPersian(state.input)
+                Language.PERSIAN to Language.CHINESE ->
+                    translationManager.translatePersianToChinese(state.input)
+                else -> Result.failure(IllegalArgumentException("Unsupported translation direction"))
+            }
+
             if (result.isSuccess) {
                 _uiState.value = _uiState.value.copy(
                     output = result.getOrThrow().trim(),
@@ -86,4 +93,8 @@ class TranslatorViewModel(
             }
         }
     }
+
+    private fun isSupportedDirection(source: Language, target: Language): Boolean =
+        (source == Language.CHINESE && target == Language.PERSIAN) ||
+            (source == Language.PERSIAN && target == Language.CHINESE)
 }
