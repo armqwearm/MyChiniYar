@@ -5,7 +5,7 @@ import net.sourceforge.pinyin4j.PinyinHelper
 /**
  * Offline longest-match segmenter backed by the bundled Chinese dictionary.
  * Unknown Han characters are retained as single-character candidates.
- * The returned list is ordered by first appearance and contains at most 20 unique items.
+ * The returned list is ordered by first appearance and contains at most 40 unique items.
  */
 class ChineseWordAnalyzer {
     fun segment(text: String): List<String> {
@@ -55,7 +55,7 @@ class ChineseWordAnalyzer {
         char in '\u3400'..'\u4DBF' || char in '\u4E00'..'\u9FFF'
 
     companion object {
-        private const val MAX_WORDS = 20
+        private const val MAX_WORDS = 40
 
         // Minimal deterministic fallback for JVM unit tests and safe startup.
         // The full lexicon is supplied by the versioned TSV asset at runtime.
