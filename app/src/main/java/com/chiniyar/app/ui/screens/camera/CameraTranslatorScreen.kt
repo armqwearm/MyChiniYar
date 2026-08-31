@@ -82,7 +82,10 @@ fun CameraTranslatorScreen(
                     onStatus = { status -> viewModel.setProcessing(true, status) },
                     onOcrResult = { text ->
                         viewModel.setExtractedText(text)
-                        viewModel.setProcessing(true, "متن OCR آماده شد؛ در حال ادامه ترجمه...")
+                        viewModel.setProcessing(true, "متن OCR آماده شد؛ در حال پردازش ادامه کار...")
+                    },
+                    onWordsResult = { words ->
+                        viewModel.setWords(words)
                     }
                 )
             }.getOrElse { error ->
@@ -93,7 +96,7 @@ fun CameraTranslatorScreen(
                 viewModel.setTranslatedText(data.translatedText)
                 viewModel.setWords(data.words)
                 viewModel.setProcessing(false)
-                viewModel.setError(null)
+                viewModel.setError(data.translationError)
             }.onFailure { error ->
                 viewModel.setProcessing(false)
                 viewModel.setError(error.message ?: "پردازش تصویر انجام نشد.")
@@ -107,30 +110,14 @@ fun CameraTranslatorScreen(
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         val uri = cameraUri
-        if (success && uri != null) {
-            processUri(uri)
-        } else if (uri != null) {
-            context.contentResolver.delete(uri, null, null)
-        }
+        if (success && uri != null) processUri(uri)
+        else if (uri != null) context.contentResolver.delete(uri, null, null)
         cameraUri = null
     }
 
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            val values = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, "chiniyar_${System.currentTimeMillis()}.jpg")
-                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyChiniYar")
-            }
-            val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-            if (uri == null) {
-                scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
-            } else {
-                cameraUri = uri
-                cameraLauncher.launch(uri)
-            }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) launchCamera(context, cameraLauncher) {
+            scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
         } else {
             scope.launch { snackbar.showSnackbar("برای استفاده از دوربین، دسترسی دوربین را فعال کنید") }
         }
@@ -138,21 +125,10 @@ fun CameraTranslatorScreen(
 
     fun openCamera() {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            val values = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, "chiniyar_${System.currentTimeMillis()}.jpg")
-                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyChiniYar")
-            }
-            val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-            if (uri == null) {
+            launchCamera(context, cameraLauncher) {
                 scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
-                return
             }
-            cameraUri = uri
-            cameraLauncher.launch(uri)
-        } else {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
+        } else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
     fun copyText(text: String, label: String) {
@@ -176,11 +152,7 @@ fun CameraTranslatorScreen(
             TopAppBar(
                 title = { Text("مترجم تصویری") },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت") } },
-                actions = {
-                    if (state.imageUri != null) IconButton(onClick = { viewModel.clearResults() }) {
-                        Icon(Icons.Default.Clear, contentDescription = "پاک کردن")
-                    }
-                }
+                actions = { if (state.imageUri != null) IconButton(onClick = { viewModel.clearResults() }) { Icon(Icons.Default.Clear, contentDescription = "پاک کردن") } }
             )
         },
         snackbarHost = { SnackbarHost(snackbar) }
@@ -214,6 +186,20 @@ fun CameraTranslatorScreen(
             }
         }
     }
+}
+
+private fun launchCamera(
+    context: Context,
+    launcher: androidx.activity.result.ActivityResultLauncher<Uri>,
+    onFailure: () -> Unit
+) {
+    val values = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, "chiniyar_${System.currentTimeMillis()}.jpg")
+        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyChiniYar")
+    }
+    val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    if (uri == null) onFailure() else launcher.launch(uri)
 }
 
 @Composable
