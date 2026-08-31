@@ -16,6 +16,7 @@ import com.chiniyar.app.di.AppContainer
 import com.chiniyar.app.ui.screens.HomeScreen
 import com.chiniyar.app.ui.screens.camera.CameraTranslatorScreen
 import com.chiniyar.app.ui.screens.camera.CameraTranslatorViewModel
+import com.chiniyar.app.ui.screens.cities.CitiesScreen
 import com.chiniyar.app.ui.screens.dictionary.DictionaryScreen
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModel
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModelFactory
@@ -59,7 +60,7 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
             VocabularyBankScreen(onBack = { navController.popBackStack() })
         }
         composable(AppDestination.Learning.route) { PlaceholderScreen("یادگیری زبان چینی") }
-        composable(AppDestination.Cities.route) { PlaceholderScreen("شهرهای چین") }
+        composable(AppDestination.Cities.route) { CitiesScreen(onBack = { navController.popBackStack() }) }
     }
 }
 
