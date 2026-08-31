@@ -45,14 +45,30 @@ class CameraTranslationUseCase(
         }
 
         onStatus("در حال استخراج ۲۰ واژه غیرتکراری...")
+        val words = analyzer.segment(text)
         val savedWords = vocabularyDb.allWords()
-        val analyzed = analyzer.segment(text).map { word ->
-            val localMeaning = OfflineChineseDictionary.meaning(word)
-            val meaning = localMeaning ?: translationManager.translate(word).getOrDefault("")
+        val meanings = linkedMapOf<String, String>()
+        val missing = words.filter { OfflineChineseDictionary.meaning(it).isNullOrBlank() }
+
+        missing.takeIf { it.isNotEmpty() }?.let { unknownWords ->
+            onStatus("در حال تکمیل معنی واژه‌ها...")
+            val batch = unknownWords.joinToString(separator = "\n")
+            val translatedBatch = translationManager.translate(batch).getOrDefault("")
+            val translatedLines = translatedBatch.lines()
+            unknownWords.forEachIndexed { index, word ->
+                val translatedMeaning = translatedLines.getOrNull(index)?.trim().orEmpty()
+                if (translatedMeaning.isNotEmpty()) meanings[word] = translatedMeaning
+            }
+        }
+
+        val analyzed = words.map { word ->
+            val meaning = OfflineChineseDictionary.meaning(word)
+                ?: meanings[word]
+                ?: "معنی پیدا نشد"
             AnalyzedWord(
                 word = word,
                 pinyin = analyzer.pinyin(word),
-                meaning = meaning.ifBlank { "معنی پیدا نشد" },
+                meaning = meaning,
                 saved = word in savedWords
             )
         }
