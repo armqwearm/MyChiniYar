@@ -92,38 +92,42 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
     var ttsError by remember { mutableStateOf(false) }
     var ttsReady by remember { mutableStateOf(false) }
     var pendingPhrase by remember { mutableStateOf<TravelPhrase?>(null) }
+    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
 
-    val tts = remember(context) {
-        TextToSpeech(context) { status ->
+    DisposableEffect(context) {
+        var initializedEngine: TextToSpeech? = null
+        initializedEngine = TextToSpeech(context) { status ->
             mainHandler.post {
-                if (status == TextToSpeech.SUCCESS) {
-                    ttsReady = true
-                    val languageResult = ttsInstance?.setLanguage(Locale.SIMPLIFIED_CHINESE)
-                    if (languageResult == TextToSpeech.LANG_MISSING_DATA || languageResult == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        ttsError = true
-                        ttsReady = false
-                        pendingPhrase = null
-                    } else {
-                        ttsError = false
-                        pendingPhrase?.let { phrase ->
-                            pendingPhrase = null
-                            speakPhrase(phrase, ttsInstance!!, mainHandler, { isSpeaking = it }, { speakingPhrase = it }, { ttsError = it })
-                        }
-                    }
-                } else {
+                val engine = initializedEngine ?: tts
+                if (status != TextToSpeech.SUCCESS || engine == null) {
                     ttsReady = false
                     ttsError = true
+                    pendingPhrase = null
+                    return@post
+                }
+
+                val languageResult = engine.setLanguage(Locale.SIMPLIFIED_CHINESE)
+                if (languageResult == TextToSpeech.LANG_MISSING_DATA || languageResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    ttsReady = false
+                    ttsError = true
+                    pendingPhrase = null
+                    return@post
+                }
+
+                ttsReady = true
+                ttsError = false
+                pendingPhrase?.let { phrase ->
+                    pendingPhrase = null
+                    engine.stop()
+                    speakingPhrase = phrase.chinese
+                    isSpeaking = true
+                    engine.speak(phrase.chinese, TextToSpeech.QUEUE_FLUSH, null, "travel_${phrase.chinese.hashCode()}")
                 }
             }
         }
-    }
+        tts = initializedEngine
 
-    // Holder used only during asynchronous TextToSpeech initialization.
-    var ttsInstance: TextToSpeech? = remember { null }
-    ttsInstance = tts
-
-    DisposableEffect(tts) {
-        tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+        initializedEngine?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
                 mainHandler.post { isSpeaking = true; ttsError = false }
             }
@@ -136,20 +140,25 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
                 mainHandler.post { isSpeaking = false; speakingPhrase = null; ttsError = true }
             }
         })
+
         onDispose {
-            tts.stop()
-            tts.shutdown()
+            initializedEngine?.stop()
+            initializedEngine?.shutdown()
+            tts = null
+            ttsReady = false
+            pendingPhrase = null
         }
     }
 
     fun speak(phrase: TravelPhrase) {
-        if (!ttsReady) {
+        val engine = tts
+        if (engine == null || !ttsReady) {
             pendingPhrase = phrase
             ttsError = false
             return
         }
 
-        val result = tts.setLanguage(Locale.SIMPLIFIED_CHINESE)
+        val result = engine.setLanguage(Locale.SIMPLIFIED_CHINESE)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
             ttsReady = false
             pendingPhrase = null
@@ -157,16 +166,16 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
             return
         }
 
-        tts.stop()
+        engine.stop()
         ttsError = false
         speakingPhrase = phrase.chinese
         isSpeaking = true
-        tts.speak(phrase.chinese, TextToSpeech.QUEUE_FLUSH, null, "travel_${phrase.chinese.hashCode()}")
+        engine.speak(phrase.chinese, TextToSpeech.QUEUE_FLUSH, null, "travel_${phrase.chinese.hashCode()}")
     }
 
     fun stopSpeaking() {
         pendingPhrase = null
-        tts.stop()
+        tts?.stop()
         isSpeaking = false
         speakingPhrase = null
     }
@@ -277,22 +286,4 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
             }
         }
     }
-}
-
-private fun speakPhrase(
-    phrase: TravelPhrase,
-    tts: TextToSpeech,
-    handler: Handler,
-    setSpeaking: (Boolean) -> Unit,
-    setPhrase: (String?) -> Unit,
-    setError: (Boolean) -> Unit
-) {
-    val result = tts.setLanguage(Locale.SIMPLIFIED_CHINESE)
-    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-        handler.post { setSpeaking(false); setPhrase(null); setError(true) }
-        return
-    }
-    tts.stop()
-    handler.post { setError(false); setPhrase(phrase.chinese); setSpeaking(true) }
-    tts.speak(phrase.chinese, TextToSpeech.QUEUE_FLUSH, null, "travel_pending_${phrase.chinese.hashCode()}")
 }
