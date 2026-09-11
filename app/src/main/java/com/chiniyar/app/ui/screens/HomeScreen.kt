@@ -20,10 +20,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.LocationCity
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -48,7 +48,7 @@ private data class HomeFeature(
 @Composable
 fun HomeScreen(
     onTranslatorClick: () -> Unit,
-    onDictionaryClick: () -> Unit,
+    onTravelPhrasesClick: () -> Unit,
     onCameraClick: () -> Unit,
     onVocabularyBankClick: () -> Unit,
     onLearningClick: () -> Unit,
@@ -57,7 +57,7 @@ fun HomeScreen(
     val colors = MaterialTheme.colorScheme
     val features = listOf(
         HomeFeature("مترجم متنی", "چینی ↔ فارسی، سریع و آفلاین", Icons.Default.Translate, onTranslatorClick, colors.primary),
-        HomeFeature("واژه‌نامه", "Hanzi، Pinyin و معنی فارسی", Icons.Default.MenuBook, onDictionaryClick, colors.tertiary),
+        HomeFeature("عبارات سفر", "۳۰ عبارت ضروری + تلفظ صوتی", Icons.Default.FlightTakeoff, onTravelPhrasesClick, colors.tertiary),
         HomeFeature("مترجم تصویری", "عکس بگیر، متن را استخراج و ترجمه کن", Icons.Default.CameraAlt, onCameraClick, colors.primary),
         HomeFeature("بانک لغات من", "واژه‌های مورد علاقه را ذخیره کن", Icons.Default.Star, onVocabularyBankClick, colors.tertiary),
         HomeFeature("یادگیری چینی", "واژگان، آموزش و منابع مفید", Icons.Default.Book, onLearningClick, colors.secondary),
@@ -163,7 +163,7 @@ fun HomeScreen(
                             ) {
                                 Icon(
                                     feature.icon,
-                                    contentDescription = null,
+                                    contentDescription = feature.title,
                                     tint = feature.accent,
                                     modifier = Modifier.size(23.dp)
                                 )
