@@ -20,13 +20,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -247,7 +247,10 @@ private fun WordCard(word: AnalyzedWord, onSave: () -> Unit) {
                 Text(word.meaning, style = MaterialTheme.typography.bodyLarge)
             }
             IconButton(onClick = { if (!word.saved) onSave() }) {
-                Icon(if (word.saved) Icons.Default.Star else Icons.Default.StarBorder, if (word.saved) "ذخیره شده" else "افزودن به بانک لغات")
+                Icon(
+                    if (word.saved) Icons.Default.Check else Icons.Default.Add,
+                    if (word.saved) "ذخیره شده" else "افزودن به بانک لغات"
+                )
             }
         }
     }
