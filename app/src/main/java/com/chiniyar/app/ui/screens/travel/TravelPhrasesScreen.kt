@@ -1,5 +1,7 @@
 package com.chiniyar.app.ui.screens.travel
 
+import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.compose.foundation.background
@@ -35,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -82,26 +85,55 @@ private val travelPhrases = listOf(
 @Composable
 fun TravelPhrasesScreen(onBack: () -> Unit) {
     val colors = MaterialTheme.colorScheme
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
+    val mainHandler = remember { Handler(Looper.getMainLooper()) }
     var isSpeaking by remember { mutableStateOf(false) }
     var speakingPhrase by remember { mutableStateOf<String?>(null) }
     var ttsError by remember { mutableStateOf(false) }
-    val tts = remember(context) { TextToSpeech(context) { } }
+    var ttsReady by remember { mutableStateOf(false) }
+    var pendingPhrase by remember { mutableStateOf<TravelPhrase?>(null) }
+
+    val tts = remember(context) {
+        TextToSpeech(context) { status ->
+            mainHandler.post {
+                if (status == TextToSpeech.SUCCESS) {
+                    ttsReady = true
+                    val languageResult = ttsInstance?.setLanguage(Locale.SIMPLIFIED_CHINESE)
+                    if (languageResult == TextToSpeech.LANG_MISSING_DATA || languageResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        ttsError = true
+                        ttsReady = false
+                        pendingPhrase = null
+                    } else {
+                        ttsError = false
+                        pendingPhrase?.let { phrase ->
+                            pendingPhrase = null
+                            speakPhrase(phrase, ttsInstance!!, mainHandler, { isSpeaking = it }, { speakingPhrase = it }, { ttsError = it })
+                        }
+                    }
+                } else {
+                    ttsReady = false
+                    ttsError = true
+                }
+            }
+        }
+    }
+
+    // Holder used only during asynchronous TextToSpeech initialization.
+    var ttsInstance: TextToSpeech? = remember { null }
+    ttsInstance = tts
 
     DisposableEffect(tts) {
         tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
-                isSpeaking = true
-                ttsError = false
+                mainHandler.post { isSpeaking = true; ttsError = false }
             }
+
             override fun onDone(utteranceId: String?) {
-                isSpeaking = false
-                speakingPhrase = null
+                mainHandler.post { isSpeaking = false; speakingPhrase = null }
             }
+
             override fun onError(utteranceId: String?) {
-                isSpeaking = false
-                speakingPhrase = null
-                ttsError = true
+                mainHandler.post { isSpeaking = false; speakingPhrase = null; ttsError = true }
             }
         })
         onDispose {
@@ -111,13 +143,20 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
     }
 
     fun speak(phrase: TravelPhrase) {
+        if (!ttsReady) {
+            pendingPhrase = phrase
+            ttsError = false
+            return
+        }
+
         val result = tts.setLanguage(Locale.SIMPLIFIED_CHINESE)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-            isSpeaking = false
-            speakingPhrase = null
+            ttsReady = false
+            pendingPhrase = null
             ttsError = true
             return
         }
+
         tts.stop()
         ttsError = false
         speakingPhrase = phrase.chinese
@@ -126,6 +165,7 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
     }
 
     fun stopSpeaking() {
+        pendingPhrase = null
         tts.stop()
         isSpeaking = false
         speakingPhrase = null
@@ -237,4 +277,22 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
             }
         }
     }
+}
+
+private fun speakPhrase(
+    phrase: TravelPhrase,
+    tts: TextToSpeech,
+    handler: Handler,
+    setSpeaking: (Boolean) -> Unit,
+    setPhrase: (String?) -> Unit,
+    setError: (Boolean) -> Unit
+) {
+    val result = tts.setLanguage(Locale.SIMPLIFIED_CHINESE)
+    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+        handler.post { setSpeaking(false); setPhrase(null); setError(true) }
+        return
+    }
+    tts.stop()
+    handler.post { setError(false); setPhrase(phrase.chinese); setSpeaking(true) }
+    tts.speak(phrase.chinese, TextToSpeech.QUEUE_FLUSH, null, "travel_pending_${phrase.chinese.hashCode()}")
 }
