@@ -16,8 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -82,14 +82,11 @@ private val travelPhrases = listOf(
 @Composable
 fun TravelPhrasesScreen(onBack: () -> Unit) {
     val colors = MaterialTheme.colorScheme
+    val context = androidx.compose.ui.platform.LocalContext.current
     var isSpeaking by remember { mutableStateOf(false) }
     var speakingPhrase by remember { mutableStateOf<String?>(null) }
-    val tts = remember {
-        TextToSpeech(null) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                // Locale is configured before each speak action as a safety measure.
-            }
-        }
+    val tts = remember(context) {
+        TextToSpeech(context) { }
     }
 
     DisposableEffect(tts) {
@@ -97,18 +94,15 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
             override fun onStart(utteranceId: String?) {
                 isSpeaking = true
             }
-
             override fun onDone(utteranceId: String?) {
                 isSpeaking = false
                 speakingPhrase = null
             }
-
             override fun onError(utteranceId: String?) {
                 isSpeaking = false
                 speakingPhrase = null
             }
         })
-
         onDispose {
             tts.stop()
             tts.shutdown()
@@ -116,8 +110,8 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
     }
 
     fun speak(phrase: TravelPhrase) {
-        val languageResult = tts.setLanguage(Locale.SIMPLIFIED_CHINESE)
-        if (languageResult == TextToSpeech.LANG_MISSING_DATA || languageResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+        val result = tts.setLanguage(Locale.SIMPLIFIED_CHINESE)
+        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
             isSpeaking = false
             speakingPhrase = null
             return
@@ -125,12 +119,7 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
         tts.stop()
         speakingPhrase = phrase.chinese
         isSpeaking = true
-        tts.speak(
-            phrase.chinese,
-            TextToSpeech.QUEUE_FLUSH,
-            null,
-            "travel_${phrase.chinese.hashCode()}"
-        )
+        tts.speak(phrase.chinese, TextToSpeech.QUEUE_FLUSH, null, "travel_${phrase.chinese.hashCode()}")
     }
 
     fun stopSpeaking() {
@@ -154,10 +143,7 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
         }
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Card(
@@ -171,11 +157,7 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Text("۳۰ عبارت ضروری سفر به چین", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold)
-                    Text(
-                        "برای هر عبارت روی آیکون 🔊 بزنید تا تلفظ چینی پخش شود.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Right
-                    )
+                    Text("برای هر عبارت روی آیکون 🔊 بزنید تا تلفظ چینی پخش شود.", style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Right)
                 }
             }
 
@@ -198,10 +180,7 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
                 }
             }
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxSize()) {
                 items(travelPhrases) { phrase ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -215,12 +194,8 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             IconButton(
-                                onClick = {
-                                    if (speakingPhrase == phrase.chinese) stopSpeaking() else speak(phrase)
-                                },
-                                modifier = Modifier
-                                    .size(46.dp)
-                                    .background(colors.primaryContainer, RoundedCornerShape(14.dp))
+                                onClick = { if (speakingPhrase == phrase.chinese) stopSpeaking() else speak(phrase) },
+                                modifier = Modifier.size(46.dp).background(colors.primaryContainer, RoundedCornerShape(14.dp))
                             ) {
                                 Icon(
                                     if (speakingPhrase == phrase.chinese) Icons.Default.Stop else Icons.Default.VolumeUp,
@@ -228,30 +203,14 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
                                     tint = colors.primary
                                 )
                             }
-
                             Column(
                                 modifier = Modifier.weight(1f),
                                 horizontalAlignment = Alignment.End,
                                 verticalArrangement = Arrangement.spacedBy(3.dp)
                             ) {
-                                Text(
-                                    phrase.chinese,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Right
-                                )
-                                Text(
-                                    phrase.pinyin,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = colors.secondary,
-                                    textAlign = TextAlign.Right
-                                )
-                                Text(
-                                    phrase.persian,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = colors.onSurfaceVariant,
-                                    textAlign = TextAlign.Right
-                                )
+                                Text(phrase.chinese, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Right)
+                                Text(phrase.pinyin, style = MaterialTheme.typography.bodyMedium, color = colors.secondary, textAlign = TextAlign.Right)
+                                Text(phrase.persian, style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant, textAlign = TextAlign.Right)
                             }
                         }
                     }
