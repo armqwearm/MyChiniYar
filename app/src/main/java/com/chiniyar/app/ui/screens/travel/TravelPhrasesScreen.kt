@@ -85,14 +85,14 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
     var isSpeaking by remember { mutableStateOf(false) }
     var speakingPhrase by remember { mutableStateOf<String?>(null) }
-    val tts = remember(context) {
-        TextToSpeech(context) { }
-    }
+    var ttsError by remember { mutableStateOf(false) }
+    val tts = remember(context) { TextToSpeech(context) { } }
 
     DisposableEffect(tts) {
         tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
                 isSpeaking = true
+                ttsError = false
             }
             override fun onDone(utteranceId: String?) {
                 isSpeaking = false
@@ -101,6 +101,7 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
             override fun onError(utteranceId: String?) {
                 isSpeaking = false
                 speakingPhrase = null
+                ttsError = true
             }
         })
         onDispose {
@@ -114,9 +115,11 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
             isSpeaking = false
             speakingPhrase = null
+            ttsError = true
             return
         }
         tts.stop()
+        ttsError = false
         speakingPhrase = phrase.chinese
         isSpeaking = true
         tts.speak(phrase.chinese, TextToSpeech.QUEUE_FLUSH, null, "travel_${phrase.chinese.hashCode()}")
@@ -158,6 +161,21 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
                 ) {
                     Text("۳۰ عبارت ضروری سفر به چین", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold)
                     Text("برای هر عبارت روی آیکون 🔊 بزنید تا تلفظ چینی پخش شود.", style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Right)
+                }
+            }
+
+            if (ttsError) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = colors.errorContainer),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(
+                        "تلفظ چینی روی دستگاه در دسترس نیست. بسته صدای زبان چینی را در تنظیمات Text-to-Speech دستگاه نصب یا فعال کنید.",
+                        modifier = Modifier.padding(12.dp),
+                        color = colors.onErrorContainer,
+                        textAlign = TextAlign.Right
+                    )
                 }
             }
 
