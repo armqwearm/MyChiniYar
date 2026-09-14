@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
@@ -86,7 +87,7 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                 colors = CardDefaults.cardColors(containerColor = colors.tertiaryContainer)
             ) {
                 Row(modifier = Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text("⭐", style = MaterialTheme.typography.headlineSmall)
+                    Icon(Icons.Default.Add, contentDescription = null, tint = colors.tertiary, modifier = Modifier.size(30.dp))
                     Column(modifier = Modifier.weight(1f).padding(start = 10.dp), horizontalAlignment = Alignment.End) {
                         Text("واژه‌های منتخب من", fontWeight = FontWeight.Bold)
                         Text("کلمات مهمت را برای مرور بعدی نگه دار", style = MaterialTheme.typography.bodySmall)
@@ -107,7 +108,7 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
             if (filtered.isEmpty()) {
                 Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
                     Text(
-                        if (allEntries.isEmpty()) "هنوز لغتی ذخیره نشده است. از مترجم تصویری با ⭐ لغت اضافه کنید."
+                        if (allEntries.isEmpty()) "هنوز لغتی ذخیره نشده است. از مترجم تصویری با + لغت اضافه کنید."
                         else "نتیجه‌ای برای جست‌وجوی شما پیدا نشد.",
                         modifier = Modifier.padding(18.dp),
                         style = MaterialTheme.typography.bodyLarge,
