@@ -21,6 +21,7 @@ import com.chiniyar.app.ui.screens.dictionary.DictionaryScreen
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModel
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModelFactory
 import com.chiniyar.app.ui.screens.learning.LearningScreen
+import com.chiniyar.app.ui.screens.routes.UrbanRoutesScreen
 import com.chiniyar.app.ui.screens.travel.TravelPhrasesScreen
 import com.chiniyar.app.ui.screens.translator.TranslatorScreen
 import com.chiniyar.app.ui.screens.translator.TranslatorViewModel
@@ -38,7 +39,8 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
                 onCameraClick = { navController.navigate(AppDestination.CameraTranslator.route) },
                 onVocabularyBankClick = { navController.navigate(AppDestination.VocabularyBank.route) },
                 onLearningClick = { navController.navigate(AppDestination.Learning.route) },
-                onCitiesClick = { navController.navigate(AppDestination.Cities.route) }
+                onCitiesClick = { navController.navigate(AppDestination.Cities.route) },
+                onUrbanRoutesClick = { navController.navigate(AppDestination.UrbanRoutes.route) }
             )
         }
         composable(AppDestination.Translator.route) {
@@ -67,7 +69,12 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
         composable(AppDestination.Learning.route) {
             LearningScreen(onBack = { navController.popBackStack() })
         }
-        composable(AppDestination.Cities.route) { CitiesScreen(onBack = { navController.popBackStack() }) }
+        composable(AppDestination.Cities.route) {
+            CitiesScreen(onBack = { navController.popBackStack() })
+        }
+        composable(AppDestination.UrbanRoutes.route) {
+            UrbanRoutesScreen(onBack = { navController.popBackStack() })
+        }
     }
 }
 
