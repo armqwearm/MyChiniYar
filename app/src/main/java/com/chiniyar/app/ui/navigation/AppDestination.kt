@@ -11,4 +11,5 @@ sealed interface AppDestination {
     data object TravelPhrases : AppDestination { override val route = "travel_phrases" }
     data object Learning : AppDestination { override val route = "learning" }
     data object Cities : AppDestination { override val route = "cities" }
+    data object UrbanRoutes : AppDestination { override val route = "urban_routes" }
 }
