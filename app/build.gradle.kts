@@ -16,13 +16,16 @@ android {
         versionCode = 1
         versionName = "1.0.0"
 
-        // Phone APK optimization: avoid bundling desktop emulator ABIs.
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
     }
+    signingConfigs {
+        getByName("debug")
+    }
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
