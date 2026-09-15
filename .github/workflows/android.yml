@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -34,6 +34,12 @@ jobs:
       - name: Build optimized signed release APK
         run: gradle --no-daemon :app:assembleRelease
 
+      - name: Verify release APK signature
+        run: |
+          APK=$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)
+          test -n "$APK"
+          $ANDROID_HOME/build-tools/36.0.0/apksigner verify --verbose "$APK"
+
       - name: Run unit tests
         run: gradle --no-daemon :app:testDebugUnitTest
 
@@ -48,3 +54,13 @@ jobs:
         with:
           name: chiniyar-release-apk
           path: app/build/outputs/apk/release/*.apk
+
+      - name: Publish GitHub Release
+        if: github.ref == 'refs/heads/release/1.0.0' && github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: MyChiniYar v1.0.0
+          generate_release_notes: true
+          prerelease: false
+          files: app/build/outputs/apk/release/*.apk
