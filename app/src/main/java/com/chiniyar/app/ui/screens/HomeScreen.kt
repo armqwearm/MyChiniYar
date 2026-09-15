@@ -21,10 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.DirectionsSubway
 import androidx.compose.material.icons.filled.LocationCity
 import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -33,7 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +57,8 @@ fun HomeScreen(
     onCameraClick: () -> Unit,
     onVocabularyBankClick: () -> Unit,
     onLearningClick: () -> Unit,
-    onCitiesClick: () -> Unit
+    onCitiesClick: () -> Unit,
+    onRoutesClick: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val features = listOf(
@@ -65,7 +67,8 @@ fun HomeScreen(
         HomeFeature("مترجم تصویری", "عکس بگیر، متن را استخراج و ترجمه کن", Icons.Default.CameraAlt, onCameraClick, colors.primary),
         HomeFeature("بانک لغات من", "واژه‌های مورد علاقه را ذخیره کن", Icons.Default.Star, onVocabularyBankClick, colors.tertiary),
         HomeFeature("یادگیری چینی", "واژگان، آموزش و منابع مفید", Icons.Default.Book, onLearningClick, colors.secondary),
-        HomeFeature("شهرهای چین", "۲۰ شهر معروف و راهنمای سفر", Icons.Default.LocationCity, onCitiesClick, colors.secondary)
+        HomeFeature("شهرهای چین", "۲۰ شهر معروف و راهنمای سفر", Icons.Default.LocationCity, onCitiesClick, colors.secondary),
+        HomeFeature("مسیرهای شهری", "راهنمای مترو و مسیر‌یابی در چین", Icons.Default.DirectionsSubway, onRoutesClick, colors.primary)
     )
 
     Box(
@@ -90,7 +93,6 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Spacer(Modifier.height(14.dp))
-
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(26.dp),
@@ -98,49 +100,24 @@ fun HomeScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 18.dp, vertical = 16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            "چینی‌یار",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = colors.primary
-                        )
-                        Text(
-                            "یادگیری چینی • سفر به چین • کشف بیشتر",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = colors.onPrimaryContainer
-                        )
+                        Text("چینی‌یار", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, color = colors.primary)
+                        Text("یادگیری چینی • سفر به چین • کشف بیشتر", style = MaterialTheme.typography.bodyMedium, color = colors.onPrimaryContainer)
                     }
                     Text("🏮", style = MaterialTheme.typography.headlineLarge)
                 }
             }
 
-            Text(
-                "همراه هوشمند شما برای چین",
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Right
-            )
-            Text(
-                "ترجمه، واژه‌ها و اطلاعات سفر؛ حتی وقتی اینترنت در دسترس نیست.",
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.bodyMedium,
-                color = colors.onSurfaceVariant,
-                textAlign = TextAlign.Right
-            )
+            Text("همراه هوشمند شما برای چین", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Right)
+            Text("ترجمه، واژه‌ها و اطلاعات سفر؛ حتی وقتی اینترنت در دسترس نیست.", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Right)
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+                modifier = Modifier.fillMaxWidth().weight(1f),
                 contentPadding = PaddingValues(vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -148,40 +125,17 @@ fun HomeScreen(
                 items(features) { feature ->
                     Card(
                         onClick = feature.action,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(1.dp, feature.accent.copy(alpha = 0.16f), RoundedCornerShape(22.dp)),
+                        modifier = Modifier.fillMaxWidth().border(1.dp, feature.accent.copy(alpha = 0.16f), RoundedCornerShape(22.dp)),
                         shape = RoundedCornerShape(22.dp),
                         colors = CardDefaults.cardColors(containerColor = colors.surface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(15.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(42.dp)
-                                    .background(feature.accent.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    feature.icon,
-                                    contentDescription = null,
-                                    tint = feature.accent,
-                                    modifier = Modifier.size(23.dp)
-                                )
+                        Column(modifier = Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Box(modifier = Modifier.size(42.dp).background(feature.accent.copy(alpha = 0.12f), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
+                                Icon(feature.icon, contentDescription = null, tint = feature.accent, modifier = Modifier.size(23.dp))
                             }
-                            Text(
-                                feature.title,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                feature.description,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = colors.onSurfaceVariant
-                            )
+                            Text(feature.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text(feature.description, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
                         }
                     }
                 }
@@ -192,13 +146,7 @@ fun HomeScreen(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 11.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text("🌸", style = MaterialTheme.typography.titleLarge)
                     Column(modifier = Modifier.weight(1f)) {
                         Text("آماده سفر به چین هستی؟", fontWeight = FontWeight.Bold)
