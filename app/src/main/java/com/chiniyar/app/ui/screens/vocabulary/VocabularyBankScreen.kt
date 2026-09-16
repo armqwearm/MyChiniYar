@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import com.chiniyar.app.core.common.OnlineChinesePronunciationButton
 import com.chiniyar.app.data.local.VocabularyDatabase
 import com.chiniyar.app.data.local.VocabularyEntry
 import kotlinx.coroutines.launch
@@ -152,6 +153,7 @@ private fun VocabularyCard(entry: VocabularyEntry, onDelete: () -> Unit) {
                 Text(entry.pinyin, style = MaterialTheme.typography.titleMedium, color = colors.secondary)
                 Text(entry.meaning, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Right)
             }
+            OnlineChinesePronunciationButton(entry.word)
             IconButton(onClick = onDelete) {
                 Icon(Icons.Default.Delete, contentDescription = "حذف", tint = colors.error)
             }
