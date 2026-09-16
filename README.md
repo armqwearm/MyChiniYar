@@ -16,6 +16,7 @@
 - امکان کپی جداگانه ترجمه
 - استخراج حداکثر **۴۰ واژه غیرتکراری** از متن
 - نمایش Pinyin برای واژه‌های چینی
+- تلفظ آنلاین واژه با دکمه 🔊 در کنار هر واژه
 - جست‌وجوی معنی از فرهنگ آفلاین و در صورت نبود معنی، استفاده از مسیر ترجمه موجود
 - امکان افزودن هر واژه به بانک لغات
 
@@ -32,6 +33,7 @@
 - نگهداری اطلاعات واژه به‌صورت محلی
 - مشاهده فهرست واژه‌های ذخیره‌شده
 - جست‌وجو و مدیریت واژه‌ها
+- تلفظ آنلاین هر واژه با دکمه 🔊
 - طراحی شده بر پایه Room برای توسعه‌های آینده
 
 ### 📖 واژه‌نامه سفر
@@ -73,6 +75,7 @@
 | واژه‌نامه سفر | ✅ |
 | ترجمه با مدل ML Kit پس از آماده‌سازی مدل | ✅ |
 | دریافت اولیه مدل ترجمه | نیازمند اینترنت |
+| تلفظ آنلاین واژه‌ها | ❌ نیازمند اینترنت |
 
 **نکته:** در اولین استفاده از ترجمه ML Kit ممکن است مدل زبان لازم باشد دریافت شود. پس از آماده‌شدن مدل، ترجمه می‌تواند روی دستگاه انجام شود.
 
@@ -92,33 +95,6 @@ Managers / Repositories
 Local Data / ML Kit / Room
 ```
 
-اجزای مهم:
-
-```text
-app/src/main/java/com/chiniyar/app/
-├── core/
-│   └── model/
-├── data/
-│   ├── analysis/
-│   ├── local/
-│   ├── repository/
-│   └── translation/
-├── domain/
-│   ├── repository/
-│   ├── translation/
-│   └── usecase/
-├── di/
-└── ui/
-    ├── navigation/
-    └── screens/
-        ├── camera/
-        ├── cities/
-        ├── dictionary/
-        ├── learning/
-        ├── translator/
-        └── vocabulary/
-```
-
 ## 🔧 فناوری‌ها
 
 - Kotlin
@@ -132,6 +108,7 @@ app/src/main/java/com/chiniyar/app/
 - Google ML Kit Text Recognition
 - Google ML Kit Translation
 - Pinyin4j
+- Android MediaPlayer for online pronunciation streaming
 - JUnit
 - GitHub Actions
 
@@ -160,22 +137,6 @@ gradle --no-daemon :app:testDebugUnitTest
 
 پروژه دارای GitHub Actions است و برای شاخه‌های توسعه و Release اجرا می‌شود.
 
-مراحل اصلی CI:
-
-```text
-Checkout
-  ↓
-JDK 17
-  ↓
-Gradle 8.13
-  ↓
-Build Debug APK
-  ↓
-Unit Tests
-  ↓
-Upload APK Artifact
-```
-
 ## 📱 Release 1.0.0
 
 نسخه `1.0.0` برای تثبیت هسته محصول و قابلیت‌های اصلی طراحی شده است.
@@ -188,6 +149,7 @@ Upload APK Artifact
 - استخراج و تحلیل واژه‌ها
 - فرهنگ و واژه‌نامه آفلاین
 - بانک لغات
+- تلفظ آنلاین واژه‌ها
 - اطلاعات شهرهای چین
 - بخش آموزش و منابع
 - CI پایدار و تست خودکار
@@ -207,7 +169,6 @@ gradle --no-daemon :app:testDebugUnitTest
 
 قابلیت‌های قابل توسعه برای نسخه‌های بعدی شامل موارد زیر هستند:
 
-- پخش تلفظ و Text-to-Speech چینی
 - فرهنگ لغت بسیار بزرگ‌تر و ساختارمندتر
 - جست‌وجوی پیشرفته و فیلتر بانک لغات
 - فلش‌کارت و سیستم مرور فاصله‌دار (SRS)
