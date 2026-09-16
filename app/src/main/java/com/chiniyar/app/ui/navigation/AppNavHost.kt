@@ -1,5 +1,6 @@
 package com.chiniyar.app.ui.navigation
 
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -15,11 +16,14 @@ import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModel
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModelFactory
 import com.chiniyar.app.ui.screens.learning.LearningScreen
 import com.chiniyar.app.ui.screens.routes.RoutesScreen
+import com.chiniyar.app.ui.screens.routes.UrbanRoutesScreen
+import com.chiniyar.app.ui.screens.travel.TravelPhrasesScreen
 import com.chiniyar.app.ui.screens.translator.TranslatorScreen
 import com.chiniyar.app.ui.screens.translator.TranslatorViewModel
 import com.chiniyar.app.ui.screens.translator.TranslatorViewModelFactory
 import com.chiniyar.app.ui.screens.vocabulary.VocabularyBankScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
     NavHost(navController = navController, startDestination = AppDestination.Home.route) {
@@ -29,9 +33,11 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
                 onDictionaryClick = { navController.navigate(AppDestination.Dictionary.route) },
                 onCameraClick = { navController.navigate(AppDestination.CameraTranslator.route) },
                 onVocabularyBankClick = { navController.navigate(AppDestination.VocabularyBank.route) },
+                onTravelPhrasesClick = { navController.navigate(AppDestination.TravelPhrases.route) },
                 onLearningClick = { navController.navigate(AppDestination.Learning.route) },
                 onCitiesClick = { navController.navigate(AppDestination.Cities.route) },
-                onRoutesClick = { navController.navigate(AppDestination.Routes.route) }
+                onRoutesClick = { navController.navigate(AppDestination.Routes.route) },
+                onUrbanRoutesClick = { navController.navigate(AppDestination.UrbanRoutes.route) }
             )
         }
         composable(AppDestination.Translator.route) {
@@ -54,6 +60,9 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
         composable(AppDestination.VocabularyBank.route) {
             VocabularyBankScreen(onBack = { navController.popBackStack() })
         }
+        composable(AppDestination.TravelPhrases.route) {
+            TravelPhrasesScreen(onBack = { navController.popBackStack() })
+        }
         composable(AppDestination.Learning.route) {
             LearningScreen(onBack = { navController.popBackStack() })
         }
@@ -62,6 +71,9 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
         }
         composable(AppDestination.Routes.route) {
             RoutesScreen(onBack = { navController.popBackStack() })
+        }
+        composable(AppDestination.UrbanRoutes.route) {
+            UrbanRoutesScreen(onBack = { navController.popBackStack() })
         }
     }
 }

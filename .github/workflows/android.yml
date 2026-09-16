@@ -4,11 +4,11 @@ on:
   push:
     branches: [ main, develop, 'feature/**', 'release/**' ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, 'release/**' ]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -31,17 +31,20 @@ jobs:
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
 
-      - name: Build optimized signed release APK
-        run: gradle --no-daemon :app:assembleRelease
-
-      - name: Verify release APK signature
-        run: |
-          APK=$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)
-          test -n "$APK"
-          $ANDROID_HOME/build-tools/36.0.0/apksigner verify --verbose "$APK"
-
       - name: Run unit tests
         run: gradle --no-daemon :app:testDebugUnitTest
+
+      - name: Build release APK (unsigned verification)
+        run: gradle --no-daemon :app:assembleRelease
+
+      - name: Verify APK outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s app/build/outputs/apk/debug/app-debug.apk
+          test -s app/build/outputs/apk/release/app-release-unsigned.apk
+          echo "Debug APK: $(stat -c%s app/build/outputs/apk/debug/app-debug.apk) bytes"
+          echo "Release APK: $(stat -c%s app/build/outputs/apk/release/app-release-unsigned.apk) bytes"
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
@@ -49,18 +52,8 @@ jobs:
           name: chiniyar-debug-apk
           path: app/build/outputs/apk/debug/*.apk
 
-      - name: Upload installable release APK
+      - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
           name: chiniyar-release-apk
           path: app/build/outputs/apk/release/*.apk
-
-      - name: Publish GitHub Release
-        if: github.ref == 'refs/heads/release/1.0.0' && github.event_name == 'push'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v1.0.0
-          name: MyChiniYar v1.0.0
-          generate_release_notes: true
-          prerelease: false
-          files: app/build/outputs/apk/release/*.apk

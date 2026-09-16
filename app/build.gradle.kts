@@ -15,17 +15,13 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
-
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
     }
-    signingConfigs {
-        getByName("debug")
-    }
+    buildFeatures { compose = true }
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -34,7 +30,6 @@ android {
             )
         }
     }
-    buildFeatures { compose = true }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
