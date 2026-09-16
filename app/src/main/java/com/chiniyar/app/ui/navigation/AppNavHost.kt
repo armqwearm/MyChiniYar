@@ -2,12 +2,6 @@ package com.chiniyar.app.ui.navigation
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.padding
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -21,6 +15,7 @@ import com.chiniyar.app.ui.screens.dictionary.DictionaryScreen
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModel
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModelFactory
 import com.chiniyar.app.ui.screens.learning.LearningScreen
+import com.chiniyar.app.ui.screens.routes.RoutesScreen
 import com.chiniyar.app.ui.screens.routes.UrbanRoutesScreen
 import com.chiniyar.app.ui.screens.travel.TravelPhrasesScreen
 import com.chiniyar.app.ui.screens.translator.TranslatorScreen
@@ -35,11 +30,13 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
         composable(AppDestination.Home.route) {
             HomeScreen(
                 onTranslatorClick = { navController.navigate(AppDestination.Translator.route) },
-                onTravelPhrasesClick = { navController.navigate(AppDestination.TravelPhrases.route) },
+                onDictionaryClick = { navController.navigate(AppDestination.Dictionary.route) },
                 onCameraClick = { navController.navigate(AppDestination.CameraTranslator.route) },
                 onVocabularyBankClick = { navController.navigate(AppDestination.VocabularyBank.route) },
+                onTravelPhrasesClick = { navController.navigate(AppDestination.TravelPhrases.route) },
                 onLearningClick = { navController.navigate(AppDestination.Learning.route) },
                 onCitiesClick = { navController.navigate(AppDestination.Cities.route) },
+                onRoutesClick = { navController.navigate(AppDestination.Routes.route) },
                 onUrbanRoutesClick = { navController.navigate(AppDestination.UrbanRoutes.route) }
             )
         }
@@ -72,19 +69,11 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
         composable(AppDestination.Cities.route) {
             CitiesScreen(onBack = { navController.popBackStack() })
         }
+        composable(AppDestination.Routes.route) {
+            RoutesScreen(onBack = { navController.popBackStack() })
+        }
         composable(AppDestination.UrbanRoutes.route) {
             UrbanRoutesScreen(onBack = { navController.popBackStack() })
         }
-    }
-}
-
-@Composable
-private fun PlaceholderScreen(title: String) {
-    Scaffold { padding ->
-        Text(
-            text = title,
-            modifier = Modifier.padding(padding).padding(24.dp),
-            style = MaterialTheme.typography.headlineMedium
-        )
     }
 }
