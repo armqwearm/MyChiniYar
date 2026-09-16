@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main, develop, 'feature/**', 'release/**' ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, 'release/**' ]
   workflow_dispatch:
 
 permissions:
@@ -31,11 +31,20 @@ jobs:
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
 
-      - name: Build release APK
-        run: gradle --no-daemon :app:assembleRelease
-
       - name: Run unit tests
         run: gradle --no-daemon :app:testDebugUnitTest
+
+      - name: Build release APK (unsigned verification)
+        run: gradle --no-daemon :app:assembleRelease
+
+      - name: Verify APK outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s app/build/outputs/apk/debug/app-debug.apk
+          test -s app/build/outputs/apk/release/app-release-unsigned.apk
+          echo "Debug APK: $(stat -c%s app/build/outputs/apk/debug/app-debug.apk) bytes"
+          echo "Release APK: $(stat -c%s app/build/outputs/apk/release/app-release-unsigned.apk) bytes"
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
