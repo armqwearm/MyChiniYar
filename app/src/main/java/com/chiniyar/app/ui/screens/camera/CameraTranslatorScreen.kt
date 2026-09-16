@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.activity.result.ActivityResultLauncher
+import com.chiniyar.app.core.common.OnlineChinesePronunciationButton
 import com.chiniyar.app.data.analysis.AnalyzedWord
 import com.chiniyar.app.data.local.VocabularyDatabase
 import com.chiniyar.app.data.local.VocabularyEntry
@@ -246,6 +247,7 @@ private fun WordCard(word: AnalyzedWord, onSave: () -> Unit) {
                 Text(word.pinyin, style = MaterialTheme.typography.bodyMedium)
                 Text(word.meaning, style = MaterialTheme.typography.bodyLarge)
             }
+            OnlineChinesePronunciationButton(word.word)
             IconButton(onClick = { if (!word.saved) onSave() }) {
                 Icon(
                     if (word.saved) Icons.Default.Check else Icons.Default.Add,
