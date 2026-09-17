@@ -1,19 +1,34 @@
 # MyChiniYar 1.0.0
 
-First release candidate of MyChiniYar.
+اولین نسخه پایدار هسته برنامه MyChiniYar.
 
-## Included
+## قابلیت‌های این نسخه
 
-- Chinese offline OCR from gallery and camera
-- Separate OCR text and translated text with copy actions
-- Chinese ↔ Persian text translation with on-device ML Kit translation models
-- Extraction of up to 40 unique Chinese words with Pinyin and meanings
-- Save words to the local vocabulary bank
-- 30 essential travel phrases with Chinese, Pinyin and Persian meaning
-- Offline guide to 20 well-known Chinese cities with travel information
-- Learning resources section with Yajing Chinese website, Telegram and Bale links
-- CI build and unit-test verification
+- OCR آفلاین متن چینی از تصویر گالری و دوربین
+- نمایش و کپی جداگانه متن OCR و ترجمه
+- ترجمه چینی ↔ فارسی با مدل روی دستگاه پس از آماده‌سازی
+- استخراج حداکثر ۴۰ واژه غیرتکراری همراه با Pinyin و معنی
+- افزودن واژه‌ها به بانک لغات محلی
+- ۳۰ عبارت ضروری سفر با چینی، Pinyin، معنی فارسی و دکمه تلفظ
+- تلفظ عبارات سفر با Android TextToSpeech در صورت وجود صدای چینی روی دستگاه
+- اطلاعات آفلاین ۲۰ شهر معروف چین
+- بخش مسیرهای شهری و معرفی MetroMan برای راهنمای مترو
+- بخش یادگیری و لینک‌های یاجینگ چینی
+- رابط کاربری سفرمحور با پس‌زمینه و آیکن اختصاصی
+- CI شامل Build، Unit Test و بررسی خروجی Release
 
-## First-run note
+## وضعیت آفلاین
 
-The OCR pipeline is offline. Translation models may need to be downloaded once on first use; subsequent translation uses the downloaded on-device model.
+- OCR: کاملاً آفلاین
+- فرهنگ داخلی: آفلاین
+- تحلیل و بانک لغات: آفلاین
+- اطلاعات شهرها و عبارات سفر: آفلاین
+- تلفظ عبارات سفر: وابسته به نصب بودن صدای چینی Android TTS
+- تلفظ واژه‌های مترجم تصویری و بانک لغات: در این نسخه آنلاین
+- دریافت اولیه مدل ترجمه: نیازمند اینترنت
+
+## وضعیت Build
+
+نسخه Release فعلی با R8 و محدودسازی ABI به arm64-v8a و armeabi-v7a ساخته می‌شود.
+
+> خروجی Release در CI فعلی unsigned است. برای انتشار عمومی و نصب به‌عنوان نسخه تولیدی، APK باید با کلید اختصاصی انتشار امضا شود.
