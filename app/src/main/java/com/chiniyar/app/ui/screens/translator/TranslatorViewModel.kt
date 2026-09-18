@@ -55,7 +55,7 @@ class TranslatorViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
-                statusMessage = "در حال آماده‌سازی مدل ترجمه آفلاین...",
+                statusMessage = "لطفاً صبر کنید؛ پکیج ترجمه آفلاین در حال دانلود و آماده‌سازی است. این مرحله در اولین استفاده ممکن است کمی طول بکشد.",
                 error = null
             )
             val prepared = translationManager.prepare()
