@@ -6,35 +6,27 @@ A build is not automatically a release.
 
 A release is complete only when the exact source, tested binary, signing identity and published asset can be tied together.
 
-## Current 1.0.0 line
+## Current 1.0.1 line
 
 Authoritative source branch:
 
 `main`
 
-The former `release/1.0.0` branch has been merged into `main` and is no longer required for the 1.0.0 baseline.
+The former `release/1.0.0` branch has been merged into `main` and is no longer required for the 1.0.x baseline.
 
 Current version configuration:
 
-- versionCode 1
-- versionName 1.0.0
-- intended public tag v1.0.0
+- versionCode 2
+- versionName 1.0.1
+- intended public tag v1.0.1
 
 ## Current CI behavior
 
-.github/workflows/android.yml currently performs:
+.github/workflows/android.yml continues to provide general CI validation.
 
-1. Debug build
-2. Unit tests
-3. Release build
-4. output verification
-5. artifact upload
+.github/workflows/release.yml is the production release workflow. A commit on `main` whose message starts with `release:` runs the production sequence automatically; a matching `vX.Y.Z` tag can also start the same workflow.
 
-The Release build output is:
-
-app-release-unsigned.apk
-
-It is an unsigned verification artifact, not a production APK.
+The production workflow builds, signs, verifies and publishes the APK using GitHub Actions Secrets.
 
 ## Required production sequence
 
@@ -57,7 +49,7 @@ Run smoke tests
         ↓
 Calculate SHA-256
         ↓
-Create/update tag
+Create/update release tag
         ↓
 Publish exact tested APK
 ~~~
@@ -158,13 +150,16 @@ Known historical drivers include native ML/OCR/translation libraries and multipl
 - [ ] Published APK is the same binary that was tested.
 - [ ] Release notes include known limitations.
 
-## If signing is not configured
+## Automated signing
 
-Keep the CI artifact clearly identified as unsigned verification.
+The production workflow reads the Android release keystore and its credentials only from GitHub Actions Secrets:
 
-Do not relabel it as production.
+- `CHINIYAR_KEYSTORE_BASE64`
+- `CHINIYAR_KEYSTORE_PASSWORD`
+- `CHINIYAR_KEY_ALIAS`
+- `CHINIYAR_KEY_PASSWORD`
 
-The correct next step is secure signing configuration followed by clean-install testing.
+The keystore is reconstructed only on the ephemeral GitHub Actions runner, used for signing, and never committed to the repository.
 
 ## Rollback principle
 
