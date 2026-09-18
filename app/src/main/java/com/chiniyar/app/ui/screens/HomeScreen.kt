@@ -98,7 +98,7 @@ fun HomeScreen(
             Text("ترجمه، واژه‌ها و اطلاعات سفر؛ حتی وقتی اینترنت در دسترس نیست.", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Right)
             LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.fillMaxWidth().weight(1f), contentPadding = PaddingValues(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 items(features) { feature ->
-                    Card(onClick = feature.action, modifier = Modifier.fillMaxWidth().border(1.dp, feature.accent.copy(alpha = 0.16f), RoundedCornerShape(22.dp)), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = colors.surface), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                    Card(onClick = feature.action, modifier = Modifier.fillMaxWidth().border(1.dp, feature.accent.copy(alpha = 0.16f), RoundedCornerShape(22.dp)), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = colors.surface.copy(alpha = 0.60f)), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
                         Column(modifier = Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Box(modifier = Modifier.size(42.dp).background(feature.accent.copy(alpha = 0.12f), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
                                 Icon(feature.icon, contentDescription = feature.title, tint = feature.accent, modifier = Modifier.size(23.dp))
@@ -109,7 +109,7 @@ fun HomeScreen(
                     }
                 }
             }
-            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer)) {
+            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer.copy(alpha = 0.68f))) {
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text("🌹", style = MaterialTheme.typography.titleLarge)
                     Column(modifier = Modifier.weight(1f)) {
