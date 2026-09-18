@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.DirectionsSubway
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.LocationCity
 import androidx.compose.material.icons.filled.Star
@@ -63,7 +64,8 @@ fun HomeScreen(
     onLearningClick: () -> Unit,
     onCitiesClick: () -> Unit,
     onRoutesClick: () -> Unit,
-    onUrbanRoutesClick: () -> Unit
+    onUrbanRoutesClick: () -> Unit,
+    onExhibitionsClick: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
@@ -74,7 +76,8 @@ fun HomeScreen(
         HomeFeature("بانک لغات من", "واژه‌های مورد علاقه را ذخیره کن", Icons.Default.Star, onVocabularyBankClick, colors.tertiary),
         HomeFeature("یادگیری چینی", "واژگان، آموزش و منابع مفید", Icons.Default.Book, onLearningClick, colors.secondary),
         HomeFeature("شهرهای چین", "۲۰ شهر معروف و راهنمای سفر", Icons.Default.LocationCity, onCitiesClick, colors.secondary),
-        HomeFeature("مسیرهای شهری", "راهنمای مترو و رفت‌وآمد در چین", Icons.Default.DirectionsSubway, onUrbanRoutesClick, colors.primary)
+        HomeFeature("مسیرهای شهری", "راهنمای مترو و رفت‌وآمد در چین", Icons.Default.DirectionsSubway, onUrbanRoutesClick, colors.primary),
+        HomeFeature("نمایشگاه‌های چین", "تقویم نمایشگاه‌های مهم + راهنمای بازدید", Icons.Default.Event, onExhibitionsClick, colors.tertiary)
     )
 
     Box(modifier = Modifier.fillMaxSize().background(colors.background)) {
