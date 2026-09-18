@@ -291,13 +291,19 @@ The release configuration now restricts native ABIs to two ARM variants and enab
 
 This is deliberate. Future dependency changes should include size measurements.
 
-## 17. Release-line history
+## 17. Repository and release-line status
 
-The current release line is release/1.0.0.
+The authoritative development branch is `main`.
 
-The UI change set that introduced the travel-oriented background, plus-style saving and the Home wording change was merged into that line.
+The `release/1.0.0` branch was merged into `main` and is no longer required for ongoing development. New feature work should branch from `main`; temporary release branches may be created only when a release workflow needs one.
 
-There is also an older GitHub v1.0.0 release/tag associated with historical main-branch code. It must not be assumed to represent the current release/1.0.0 branch or current binary.
+The current product baseline is version 1.0.0:
+- versionCode: 1
+- versionName: 1.0.0
+
+The UI change set that introduced the travel-oriented background, plus-style saving and the Home wording change is part of the current `main` history.
+
+There is also an older GitHub v1.0.0 release/tag associated with historical main-branch code. It must not be assumed to represent the current source tree or current binary.
 
 ## 18. CI/CD
 
@@ -364,9 +370,17 @@ It does not mean:
 3. Read docs/ARCHITECTURE.md.
 4. Read docs/TEST_PLAN.md.
 5. Read docs/RELEASE_PROCESS.md before changing release automation.
-6. Check release/1.0.0 HEAD.
+6. Check the current `main` HEAD and confirm it is the intended development/release source.
 7. Run Debug build and unit tests.
 8. For UI work, use a real Android device.
 9. Update documentation whenever implementation behavior changes.
 
 Project knowledge should live in Git, not in private conversation history.
+
+## 22. Branch policy
+
+- `main` is the authoritative current branch.
+- Feature branches should be short-lived and based on `main`.
+- Release branches are temporary and should be merged back into `main` before cleanup.
+- Do not treat an old tag or historical release asset as evidence of the current source or binary.
+- Before release work, record the exact `main` commit used to build and test the APK.
