@@ -2,18 +2,29 @@ name: Android Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*.*.*'
-  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: >-
+      github.event_name == 'push' &&
+      (
+        startsWith(github.ref, 'refs/tags/v') ||
+        (
+          github.ref == 'refs/heads/main' &&
+          startsWith(github.event.head_commit.message, 'release:')
+        )
+      )
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout exact tagged source
+      - name: Checkout exact source
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
@@ -29,6 +40,36 @@ jobs:
         with:
           gradle-version: '8.13'
 
+      - name: Read release version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          app_version="$(sed -n 's/^[[:space:]]*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n1)"
+          version_code="$(sed -n 's/^[[:space:]]*versionCode = \([0-9][0-9]*\).*/\1/p' app/build.gradle.kts | head -n1)"
+
+          test -n "$app_version" || { echo "Could not read versionName"; exit 1; }
+          test -n "$version_code" || { echo "Could not read versionCode"; exit 1; }
+
+          release_tag="v$app_version"
+
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            test "$GITHUB_REF_NAME" = "$release_tag" || {
+              echo "Tag $GITHUB_REF_NAME does not match app version $release_tag"
+              exit 1
+            }
+          fi
+
+          {
+            echo "app_version=$app_version"
+            echo "version_code=$version_code"
+            echo "release_tag=$release_tag"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Release version: $app_version (versionCode $version_code)"
+          echo "Release tag: $release_tag"
+
       - name: Validate release secrets
         env:
           KEYSTORE_B64: ${{ secrets.CHINIYAR_KEYSTORE_BASE64 }}
@@ -38,23 +79,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           test -n "$KEYSTORE_B64" || { echo "Missing CHINIYAR_KEYSTORE_BASE64"; exit 1; }
           test -n "$KEYSTORE_PASSWORD" || { echo "Missing CHINIYAR_KEYSTORE_PASSWORD"; exit 1; }
           test -n "$KEY_ALIAS" || { echo "Missing CHINIYAR_KEY_ALIAS"; exit 1; }
           test -n "$KEY_PASSWORD" || { echo "Missing CHINIYAR_KEY_PASSWORD"; exit 1; }
-          echo "All four release signing secrets are configured."
 
-      - name: Validate tag matches app version
-        shell: bash
-        run: |
-          set -euo pipefail
-          tag_version="${GITHUB_REF_NAME#v}"
-          app_version="$(sed -n 's/^[[:space:]]*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n1)"
-          test -n "$app_version" || { echo "Could not read versionName"; exit 1; }
-          test "$tag_version" = "$app_version" || {
-            echo "Tag version $tag_version does not match app version $app_version"
-            exit 1
-          }
+          echo "All required release signing secrets are configured."
+
+      - name: Build debug APK
+        run: gradle --no-daemon :app:assembleDebug
+
+      - name: Run unit tests
+        run: gradle --no-daemon :app:testDebugUnitTest
 
       - name: Build release APK
         run: gradle --no-daemon :app:assembleRelease
@@ -65,9 +102,23 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/chiniyar-release.jks"
           chmod 600 "$RUNNER_TEMP/chiniyar-release.jks"
           test -s "$RUNNER_TEMP/chiniyar-release.jks"
+
+      - name: Validate keystore credentials
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.CHINIYAR_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.CHINIYAR_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.CHINIYAR_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          keytool -list             -keystore "$RUNNER_TEMP/chiniyar-release.jks"             -storepass "$KEYSTORE_PASSWORD"             -alias "$KEY_ALIAS"             -keypass "$KEY_PASSWORD"             >/dev/null
+
+          echo "Keystore, alias and passwords are valid."
 
       - name: Sign APK
         env:
@@ -77,27 +128,65 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           BUILD_TOOLS="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n1)"
+
           "$BUILD_TOOLS/apksigner" sign             --ks "$RUNNER_TEMP/chiniyar-release.jks"             --ks-key-alias "$KEY_ALIAS"             --ks-pass "env:KEYSTORE_PASSWORD"             --key-pass "env:KEY_PASSWORD"             --out app/build/outputs/apk/release/app-release.apk             app/build/outputs/apk/release/app-release-unsigned.apk
+
           test -s app/build/outputs/apk/release/app-release.apk
 
-      - name: Verify APK signature
+      - name: Verify APK signature and collect certificate
         shell: bash
         run: |
           set -euo pipefail
+
           BUILD_TOOLS="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n1)"
-          "$BUILD_TOOLS/apksigner" verify --verbose --print-certs app/build/outputs/apk/release/app-release.apk
 
-      - name: Calculate SHA-256
+          "$BUILD_TOOLS/apksigner" verify             --verbose             --print-certs             app/build/outputs/apk/release/app-release.apk             | tee "$RUNNER_TEMP/apk-signature.txt"
+
+      - name: Calculate release metadata
+        id: metadata
         shell: bash
         run: |
           set -euo pipefail
-          sha256sum app/build/outputs/apk/release/app-release.apk | tee app-release.sha256
 
-      - name: Create GitHub Release
+          apk="app/build/outputs/apk/release/app-release.apk"
+          sha256="$(sha256sum "$apk" | awk '{print $1}')"
+          size="$(stat -c '%s' "$apk")"
+          cert_sha256="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' "$RUNNER_TEMP/apk-signature.txt" | head -n1)"
+
+          test -n "$sha256"
+          test -n "$cert_sha256"
+
+          cat > release-metadata.txt <<EOF
+          MyChiniYar Release
+          =================
+
+          Version: ${{ steps.version.outputs.app_version }}
+          Version code: ${{ steps.version.outputs.version_code }}
+          Source commit: $GITHUB_SHA
+          Release tag: ${{ steps.version.outputs.release_tag }}
+          APK file: app-release.apk
+          APK size: $size bytes
+          APK SHA-256: $sha256
+          Signing certificate SHA-256: $cert_sha256
+          EOF
+
+          echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
+          echo "size=$size" >> "$GITHUB_OUTPUT"
+          echo "cert_sha256=$cert_sha256" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
         shell: bash
         run: |
           set -euo pipefail
-          gh release create "$GITHUB_REF_NAME"             app/build/outputs/apk/release/app-release.apk             app-release.sha256             --title "MyChiniYar $GITHUB_REF_NAME"             --generate-notes
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release $RELEASE_TAG already exists; updating assets."
+            gh release upload "$RELEASE_TAG"               app/build/outputs/apk/release/app-release.apk               release-metadata.txt               --clobber
+          else
+            gh release create "$RELEASE_TAG"               app/build/outputs/apk/release/app-release.apk               release-metadata.txt               --title "MyChiniYar $RELEASE_TAG"               --generate-notes
+          fi
