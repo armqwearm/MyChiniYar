@@ -33,13 +33,15 @@ Read DEVELOPER_HANDOFF.md before making non-trivial changes.
 
 https://github.com/armqwearm/MyChiniYar
 
-Important branches:
+Branch policy:
 
-- main: historical/default branch; do not assume it is the latest product state.
-- release/1.0.0: current 1.0.0 release line.
-- feature/*: focused development branches.
+- main: authoritative current development and release source.
+- feature/*: focused, short-lived development branches based on `main`.
+- release/*: temporary release branches only when needed; merge the release result back into `main` before cleanup.
 
-Always inspect the target branch before changing release-critical code.
+The former `release/1.0.0` branch has already been merged into `main` and is no longer the authoritative source.
+
+Always inspect the target branch and current `main` HEAD before changing release-critical code.
 
 ## Environment
 
@@ -60,7 +62,7 @@ The project is configured for:
 - JUnit
 - GitHub Actions
 
-The visible repository root does not contain a checked-in Gradle wrapper. CI installs Gradle 8.13 explicitly.
+The visible repository root does not contain a checked-in Gradle wrapper. CI installs Gradle 8.13 explicitly; local development therefore requires a compatible Gradle 8.13 installation unless a wrapper is added later.
 
 ## Build and test
 
