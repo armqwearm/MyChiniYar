@@ -153,7 +153,8 @@ jobs:
           apk="app/build/outputs/apk/release/app-release.apk"
           sha256="$(sha256sum "$apk" | awk '{print $1}')"
           size="$(stat -c '%s' "$apk")"
-          cert_sha256="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' "$RUNNER_TEMP/apk-signature.txt" | head -n1)"
+          cert_line="$(grep -i 'certificate SHA-256 digest:' "$RUNNER_TEMP/apk-signature.txt" | head -n1 || true)"
+          cert_sha256="$(printf '%s' "$cert_line" | cut -d':' -f2- | tr -d '[:space:]')"
 
           test -n "$sha256"
           test -n "$cert_sha256"
