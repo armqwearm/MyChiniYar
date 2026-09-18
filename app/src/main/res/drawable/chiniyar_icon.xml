@@ -5,12 +5,12 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Keep the complete artwork safely inside launcher masks. -->
+    <!-- Keep the artwork comfortably inside launcher masks. -->
     <group
         android:pivotX="54"
         android:pivotY="54"
-        android:scaleX="0.84"
-        android:scaleY="0.84">
+        android:scaleX="0.76"
+        android:scaleY="0.76">
         <path android:fillColor="#E53935" android:pathData="M10,0 L98,0 Q108,0 108,10 L108,98 Q108,108 98,108 L10,108 Q0,108 0,98 L0,10 Q0,0 10,0 Z"/>
         <path android:fillColor="#DCEFF4" android:pathData="M0,58 L12,50 L23,55 L34,45 L47,53 L58,43 L68,51 L80,39 L91,49 L108,38 L108,108 L0,108 Z"/>
         <path android:fillColor="#27496D" android:pathData="M0,77 L18,70 L35,76 L51,67 L68,75 L85,62 L108,74 L108,108 L0,108 Z"/>
