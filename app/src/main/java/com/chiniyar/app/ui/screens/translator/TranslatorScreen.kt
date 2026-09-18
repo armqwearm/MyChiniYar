@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chiniyar.app.core.model.Language
 import kotlinx.coroutines.launch
@@ -62,6 +63,7 @@ fun TranslatorScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
     val colors = MaterialTheme.colorScheme
@@ -167,7 +169,10 @@ fun TranslatorScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Button(
-                    onClick = viewModel::translate,
+                    onClick = {
+                        keyboardController?.hide()
+                        viewModel.translate()
+                    },
                     enabled = !state.isLoading && state.input.isNotBlank(),
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(16.dp),
