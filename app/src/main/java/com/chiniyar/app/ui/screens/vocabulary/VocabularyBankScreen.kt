@@ -114,6 +114,13 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background)
             )
+        },
+        floatingActionButton = {
+            Button(onClick = ::openAddDialog, shape = RoundedCornerShape(18.dp)) {
+                Icon(Icons.Default.Add, contentDescription = null)
+                androidx.compose.foundation.layout.Spacer(Modifier.size(6.dp))
+                Text("افزودن لغت")
+            }
         }
     ) { padding ->
         Column(
@@ -146,14 +153,39 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
             )
             Text("${filtered.size} لغت", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             if (filtered.isEmpty()) {
-                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
-                    Text(
-                        if (allEntries.isEmpty()) "هنوز لغتی ذخیره نشده است. از دکمه «افزودن لغت» استفاده کنید."
-                        else "نتیجه‌ای برای جست‌وجوی شما پیدا نشد.",
-                        modifier = Modifier.padding(18.dp),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Right
-                    )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = colors.surface.copy(alpha = 0.72f))
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(20.dp),
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = colors.primary, modifier = Modifier.size(30.dp))
+                        Text(
+                            if (allEntries.isEmpty()) "هنوز لغتی ذخیره نشده است."
+                            else "نتیجه‌ای برای جست‌وجوی شما پیدا نشد.",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Right
+                        )
+                        if (allEntries.isEmpty()) {
+                            Text(
+                                "واژه‌های جدید را مستقیم به بانک شخصی‌ات اضافه کن.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Right
+                            )
+                            OutlinedButton(onClick = ::openAddDialog, modifier = Modifier.fillMaxWidth()) {
+                                Icon(Icons.Default.Add, contentDescription = null)
+                                androidx.compose.foundation.layout.Spacer(Modifier.size(6.dp))
+                                Text("افزودن اولین لغت")
+                            }
+                        }
+                    }
                 }
             } else {
                 LazyColumn(
