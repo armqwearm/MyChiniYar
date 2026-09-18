@@ -12,7 +12,7 @@ At the time of this snapshot, release/1.0.0 points to commit:
 
 7cf09a03345796b233cefcef9bbf65f501d855a7
 
-This commit is the documentation update at the end of the current release-line documentation pass. Earlier commits on the same release branch contain the product implementation and UI changes.
+This commit is the latest documentation update at the time of this snapshot. Earlier commits on the same release branch contain the product implementation and UI changes.
 
 ## Product state
 
@@ -33,6 +33,9 @@ The current 1.0.0 release line includes:
 - Custom app icon.
 
 ## CI state
+
+
+The latest CI run for this snapshot was run 242 (workflow run 35289970110), triggered by the documentation update commit. Its build was still in progress when this snapshot was written.
 
 The CI workflow is:
 
