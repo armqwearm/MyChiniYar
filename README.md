@@ -211,3 +211,21 @@ gradle --no-daemon :app:testDebugUnitTest
 ## 👨‍💻 وضعیت پروژه
 
 **MyChiniYar 1.0.0** به‌عنوان نسخه پایدار اولیه هسته برنامه در شاخه Release نگهداری می‌شود و توسعه قابلیت‌های بعدی می‌تواند بر مبنای همین نسخه ادامه پیدا کند.
+
+
+## 📚 مستندات توسعه
+
+برای اینکه همکار جدید بدون نیاز به توضیح شفاهی یا سابقه گفتگو بتواند پروژه را ادامه دهد، مستندات اصلی داخل Git نگهداری می‌شوند:
+
+- [Developer Handoff / Single Source of Truth](DEVELOPER_HANDOFF.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Test Plan](docs/TEST_PLAN.md)
+- [Release Process](docs/RELEASE_PROCESS.md)
+- [Project Status](docs/PROJECT_STATUS.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Release Notes](RELEASE_1.0.0.md)
+
+قاعده پروژه: هر تغییر مهم در رفتار، معماری، Build، تست یا Release باید مستندات مربوطه را نیز به‌روزرسانی کند.
+
+برای تحویل پروژه به یک همکار جدید، از DEVELOPER_HANDOFF.md شروع کنید.
