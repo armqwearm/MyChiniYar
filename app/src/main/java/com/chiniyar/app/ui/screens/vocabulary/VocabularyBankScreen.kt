@@ -14,9 +14,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -41,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import com.chiniyar.app.core.common.OnlineChinesePronunciationButton
+import com.chiniyar.app.data.analysis.ChineseWordAnalyzer
 import com.chiniyar.app.data.local.VocabularyDatabase
 import com.chiniyar.app.data.local.VocabularyEntry
 import kotlinx.coroutines.launch
@@ -53,7 +58,14 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     val allEntries by db.words.collectAsState(initial = emptyList<VocabularyEntry>())
     var query by remember { mutableStateOf("") }
+    var showAddDialog by remember { mutableStateOf(false) }
+    var newWord by remember { mutableStateOf("") }
+    var newPinyin by remember { mutableStateOf("") }
+    var newMeaning by remember { mutableStateOf("") }
+    var pinyinEdited by remember { mutableStateOf(false) }
+    var addError by remember { mutableStateOf<String?>(null) }
     val colors = MaterialTheme.colorScheme
+    val analyzer = remember { ChineseWordAnalyzer() }
 
     val filtered = remember(allEntries, query) {
         val q = query.trim()
@@ -61,6 +73,32 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
             entry.word.contains(q, ignoreCase = true) ||
                 entry.pinyin.contains(q, ignoreCase = true) ||
                 entry.meaning.contains(q, ignoreCase = true)
+        }
+    }
+
+    fun openAddDialog() {
+        newWord = ""
+        newPinyin = ""
+        newMeaning = ""
+        pinyinEdited = false
+        addError = null
+        showAddDialog = true
+    }
+
+    fun saveManualWord() {
+        val word = newWord.trim()
+        val pinyin = newPinyin.trim()
+        val meaning = newMeaning.trim()
+        addError = when {
+            word.isBlank() -> "لطفاً واژه چینی را وارد کنید."
+            meaning.isBlank() -> "لطفاً معنی واژه را وارد کنید."
+            else -> null
+        }
+        if (addError != null) return
+        scope.launch {
+            val inserted = db.add(VocabularyEntry(word, pinyin, meaning))
+            if (inserted) showAddDialog = false
+            else addError = "این واژه قبلاً در بانک لغات شما ثبت شده است."
         }
     }
 
@@ -91,7 +129,8 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                     Icon(Icons.Default.Add, contentDescription = null, tint = colors.tertiary, modifier = Modifier.size(30.dp))
                     Column(modifier = Modifier.weight(1f).padding(start = 10.dp), horizontalAlignment = Alignment.End) {
                         Text("واژه‌های منتخب من", fontWeight = FontWeight.Bold)
-                        Text("کلمات مهمت را برای مرور بعدی نگه دار", style = MaterialTheme.typography.bodySmall)
+                        Text("واژه‌های مهمت را ذخیره و هر زمان مرور کن", style = MaterialTheme.typography.bodySmall)
+                        Text("می‌توانی واژه را مستقیم و دستی هم اضافه کنی.", style = MaterialTheme.typography.labelMedium, color = colors.tertiary)
                     }
                 }
             }
@@ -109,7 +148,7 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
             if (filtered.isEmpty()) {
                 Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
                     Text(
-                        if (allEntries.isEmpty()) "هنوز لغتی ذخیره نشده است. از مترجم تصویری با + لغت اضافه کنید."
+                        if (allEntries.isEmpty()) "هنوز لغتی ذخیره نشده است. از دکمه «افزودن لغت» استفاده کنید."
                         else "نتیجه‌ای برای جست‌وجوی شما پیدا نشد.",
                         modifier = Modifier.padding(18.dp),
                         style = MaterialTheme.typography.bodyLarge,
@@ -117,13 +156,108 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                     )
                 }
             } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     items(filtered, key = { it.word }) { entry ->
                         VocabularyCard(entry) { scope.launch { db.remove(entry.word) } }
                     }
                 }
             }
         }
+    }
+
+    if (showAddDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddDialog = false },
+            title = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("افزودن واژه جدید", fontWeight = FontWeight.ExtraBold)
+                    Text("یک واژه را برای بانک شخصی خودت ثبت کن.", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(
+                        value = newWord,
+                        onValueChange = {
+                            newWord = it
+                            if (!pinyinEdited) newPinyin = analyzer.pinyin(it.trim())
+                            addError = null
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        label = { Text("واژه چینی") },
+                        placeholder = { Text("مثلاً 你好") },
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    OutlinedTextField(
+                        value = newPinyin,
+                        onValueChange = {
+                            newPinyin = it
+                            pinyinEdited = true
+                            addError = null
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        label = { Text("Pinyin") },
+                        placeholder = { Text("مثلاً ni3 hao3") },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = {
+                                    newPinyin = analyzer.pinyin(newWord.trim())
+                                    pinyinEdited = false
+                                },
+                                enabled = newWord.isNotBlank()
+                            ) {
+                                Icon(Icons.Default.AutoAwesome, contentDescription = "تولید پین‌یین")
+                            }
+                        },
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    OutlinedTextField(
+                        value = newMeaning,
+                        onValueChange = {
+                            newMeaning = it
+                            addError = null
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 2,
+                        maxLines = 3,
+                        label = { Text("معنی فارسی") },
+                        placeholder = { Text("مثلاً سلام") },
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    Text(
+                        "پین‌یین اختیاری است؛ معنی فارسی برای ذخیره واژه لازم است.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Right
+                    )
+                    addError?.let {
+                        Text(
+                            it,
+                            color = colors.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Right
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = ::saveManualWord) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                    androidx.compose.foundation.layout.Spacer(Modifier.size(5.dp))
+                    Text("ذخیره در بانک")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddDialog = false }) { Text("انصراف") }
+            }
+        )
     }
 }
 
