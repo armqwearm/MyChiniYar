@@ -79,7 +79,7 @@ fun LearningScreen(onBack: () -> Unit) {
                         Text("مسیر یادگیری چینی", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold)
                     }
                     Text(
-                        "برای یادگیری عمیق‌تر، واژگان و مهارت مکالمه، از منابع آموزشی منتخب استفاده کنید.",
+                        "یجینگ چاینیز با استفاده از جدیدترین متدهای آموزش زبان چینی، از جمله گیمیفیکیشن و هوش مصنوعی، به کودکان و بزرگسالان کمک می‌کند چینی را جذاب‌تر و کاربردی‌تر یاد بگیرند.",
                         modifier = Modifier.padding(top = 8.dp),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Right
@@ -98,7 +98,7 @@ fun LearningScreen(onBack: () -> Unit) {
                         Icon(Icons.Default.Language, contentDescription = null, tint = colors.primary)
                         Spacer(Modifier.size(8.dp))
                         Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
-                            Text("یادگیری زبان چینی با یاجینگ چینی", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                            Text("یادگیری زبان چینی با یجینگ چاینیز", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                             Text("سایت و کانال‌های آموزشی", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
                         }
                     }
@@ -109,7 +109,7 @@ fun LearningScreen(onBack: () -> Unit) {
                     ) {
                         Icon(Icons.Default.Language, contentDescription = null)
                         Spacer(Modifier.size(6.dp))
-                        Text("وب‌سایت یاجینگ چینی")
+                        Text("وب‌سایت یجینگ چاینیز")
                     }
                     OutlinedButton(
                         onClick = { openUrl(TELEGRAM_URL) },
