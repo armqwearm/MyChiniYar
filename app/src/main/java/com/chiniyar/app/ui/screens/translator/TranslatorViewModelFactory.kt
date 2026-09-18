@@ -5,13 +5,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.chiniyar.app.di.AppContainer
 
 class TranslatorViewModelFactory(
-    private val container: AppContainer
+    private val appContainer: AppContainer
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(TranslatorViewModel::class.java)) {
-            "Unsupported ViewModel: ${modelClass.name}"
+        if (modelClass.isAssignableFrom(TranslatorViewModel::class.java)) {
+            return TranslatorViewModel(appContainer.translationManager) as T
         }
-        return TranslatorViewModel(container.translateTextUseCase) as T
+        throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
     }
 }

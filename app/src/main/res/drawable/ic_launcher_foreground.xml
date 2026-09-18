@@ -4,25 +4,10 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- Kept inside the adaptive-icon safe zone so the artwork remains visible after masking. -->
-    <path
-        android:fillColor="#1976A8"
-        android:pathData="M54,21A33,33 0,1 0,54 87A33,33 0,1 0,54 21Z" />
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#F5D27A"
-        android:strokeWidth="2.2"
-        android:pathData="M25,54C37,43 71,43 83,54M25,54C37,65 71,65 83,54M54,22C45,31 42,43 42,54C42,65 45,77 54,86M54,22C63,31 66,43 66,54C66,65 63,77 54,86" />
-
-    <!-- Compact Chinese travel gate emblem. -->
-    <path
-        android:fillColor="#C62828"
-        android:pathData="M34,49L54,34L74,49L70,53L54,41L38,53Z" />
-    <path
-        android:fillColor="#C62828"
-        android:pathData="M39,49H45V70H39ZM63,49H69V70H63ZM46,50H62V55H46ZM46,58H62V63H46ZM46,66H62V71H46Z" />
-    <path
-        android:fillColor="#F5D27A"
-        android:pathData="M54,28A4,4 0,1 0,54 36A4,4 0,1 0,54 28Z" />
+    <!-- Artwork is deliberately kept inside the adaptive-icon safe zone. -->
+    <path android:fillColor="#1976A8" android:pathData="M54,21A33,33 0,1 0,54 87A33,33 0,1 0,54 21Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#F5D27A" android:strokeWidth="2.2" android:pathData="M25,54C37,43 71,43 83,54M25,54C37,65 71,65 83,54M54,22C45,31 42,43 42,54C42,65 45,77 54,86M54,22C63,31 66,43 66,54C66,65 63,77 54,86" />
+    <path android:fillColor="#C62828" android:pathData="M34,49L54,34L74,49L70,53L54,41L38,53Z" />
+    <path android:fillColor="#C62828" android:pathData="M39,49H45V70H39ZM63,49H69V70H63ZM46,50H62V55H46ZM46,58H62V63H46ZM46,66H62V71H46Z" />
+    <path android:fillColor="#F5D27A" android:pathData="M54,28A4,4 0,1 0,54 36A4,4 0,1 0,54 28Z" />
 </vector>

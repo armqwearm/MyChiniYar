@@ -1,8 +1,13 @@
 package com.chiniyar.app.ui.screens.camera
 
+import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.ContentValues
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
-import android.provider.Settings
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -11,13 +16,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Image
@@ -33,17 +39,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.activity.result.ActivityResultLauncher
+import com.chiniyar.app.core.common.OnlineChinesePronunciationButton
+import com.chiniyar.app.data.analysis.AnalyzedWord
+import com.chiniyar.app.data.local.VocabularyDatabase
+import com.chiniyar.app.data.local.VocabularyEntry
+import com.chiniyar.app.domain.translation.CameraTranslationUseCase
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,24 +64,105 @@ import kotlinx.coroutines.launch
 fun CameraTranslatorScreen(
     viewModel: CameraTranslatorViewModel,
     onBack: () -> Unit,
-    onProcessImage: suspend (Context, Uri) -> Unit = { _, _ -> }
+    processor: CameraTranslationUseCase,
+    vocabularyDb: VocabularyDatabase
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbar = remember { SnackbarHostState() }
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) {
-            viewModel.setImage(uri)
-            viewModel.setProcessing(true)
-            scope.launch {
-                try {
-                    onProcessImage(context, uri)
-                } catch (e: Exception) {
-                    viewModel.setError(e.message ?: "پردازش تصویر ناموفق بود")
-                }
+    fun processUri(uri: Uri) {
+        viewModel.setImage(uri)
+        viewModel.setProcessing(true, "در حال استخراج متن چینی آفلاین...")
+        scope.launch {
+            val result = runCatching {
+                processor.execute(
+                    context = context,
+                    imageUri = uri,
+                    onStatus = { status -> viewModel.setProcessing(true, status) },
+                    onOcrResult = { text ->
+                        viewModel.setExtractedText(text)
+                        viewModel.setProcessing(true, "متن OCR آماده شد؛ در حال پردازش ادامه کار...")
+                    },
+                    onWordsResult = { words -> viewModel.setWords(words) }
+                )
+            }.getOrElse { error ->
+                kotlin.Result.failure<CameraTranslationUseCase.ResultData>(error)
             }
+            result.onSuccess { data ->
+                viewModel.setExtractedText(data.extractedText)
+                viewModel.setTranslatedText(data.translatedText)
+                viewModel.setWords(data.words)
+                viewModel.setProcessing(false)
+                viewModel.setError(data.translationError)
+            }.onFailure { error ->
+                viewModel.setProcessing(false)
+                viewModel.setError(error.message ?: "پردازش تصویر انجام نشد.")
+            }
+        }
+    }
+
+    val galleryPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) processUri(uri)
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        val uri = cameraUri
+        cameraUri = null
+        if (success && uri != null) processUri(uri)
+        else if (uri != null) context.contentResolver.delete(uri, null, null)
+    }
+
+    fun createCameraUri(): Uri? {
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "chiniyar_${System.currentTimeMillis()}.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyChiniYar")
+        }
+        return context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) {
+            val uri = createCameraUri()
+            if (uri == null) scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
+            else {
+                cameraUri = uri
+                cameraLauncher.launch(uri)
+            }
+        } else {
+            scope.launch { snackbar.showSnackbar("برای استفاده از دوربین، دسترسی دوربین را فعال کنید") }
+        }
+    }
+
+    fun openCamera() {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            return
+        }
+        val uri = createCameraUri()
+        if (uri == null) scope.launch { snackbar.showSnackbar("امکان آماده‌سازی دوربین وجود ندارد") }
+        else {
+            cameraUri = uri
+            cameraLauncher.launch(uri)
+        }
+    }
+
+    fun copyText(text: String, label: String) {
+        if (text.isBlank()) return
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText(label, text))
+        scope.launch { snackbar.showSnackbar("$label کپی شد") }
+    }
+
+    fun saveWord(word: AnalyzedWord) {
+        if (word.saved) return
+        scope.launch {
+            val inserted = vocabularyDb.add(VocabularyEntry(word.word, word.pinyin, word.meaning))
+            viewModel.setWordSaved(word.word, true)
+            snackbar.showSnackbar(if (inserted) "${word.word} به بانک لغات اضافه شد" else "${word.word} قبلاً در بانک لغات بود")
         }
     }
 
@@ -76,98 +170,89 @@ fun CameraTranslatorScreen(
         topBar = {
             TopAppBar(
                 title = { Text("مترجم تصویری") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
-                    }
-                },
-                actions = {
-                    if (state.imageUri != null) {
-                        IconButton(onClick = { viewModel.setImage(Uri.EMPTY) }) {
-                            Icon(Icons.Default.Clear, contentDescription = "پاک کردن")
-                        }
-                    }
-                }
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت") } },
+                actions = { if (state.imageUri != null) IconButton(onClick = { viewModel.clearResults() }) { Icon(Icons.Default.Clear, contentDescription = "پاک کردن") } }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbar) }
     ) { padding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Text(
-                "متن چینی داخل تصویر را استخراج و سپس ترجمه کنید.",
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = { picker.launch("image/*") }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.Image, contentDescription = null)
-                    Spacer(Modifier.padding(horizontal = 4.dp))
-                    Text("انتخاب تصویر")
+            Text("تصویر دارای متن چینی را انتخاب کنید.", style = MaterialTheme.typography.bodyLarge)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Button(onClick = { galleryPicker.launch("image/*") }, modifier = Modifier.weight(1f)) {
+                    Icon(Icons.Default.Image, null); Spacer(Modifier.padding(horizontal = 3.dp)); Text("گالری")
                 }
-                OutlinedButton(onClick = { picker.launch("image/*") }, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.CameraAlt, contentDescription = null)
-                    Spacer(Modifier.padding(horizontal = 4.dp))
-                    Text("دوربین")
+                OutlinedButton(onClick = { openCamera() }, modifier = Modifier.weight(1f)) {
+                    Icon(Icons.Default.CameraAlt, null); Spacer(Modifier.padding(horizontal = 3.dp)); Text("دوربین")
                 }
             }
-
             if (state.isProcessing) {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Row(modifier = Modifier.padding(20.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        CircularProgressIndicator()
-                        Text("در حال پردازش تصویر...", modifier = Modifier.padding(top = 8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    CircularProgressIndicator()
+                    Text(state.statusMessage.ifBlank { "در حال پردازش..." }, modifier = Modifier.padding(top = 8.dp))
+                }
+            }
+            state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            ResultCard("متن OCR شده", state.extractedText, "متن تشخیص‌داده‌شده اینجا نمایش داده می‌شود.", "کپی متن OCR") { copyText(state.extractedText, "متن OCR") }
+            ResultCard("ترجمه فارسی", state.translatedText, "ترجمه فارسی اینجا نمایش داده می‌شود.", "کپی ترجمه") { copyText(state.translatedText, "ترجمه") }
+            if (state.words.isNotEmpty()) {
+                Text("واژه‌های متن — ${state.words.size} مورد", style = MaterialTheme.typography.titleLarge)
+                Text("۴۰ واژه غیرتکراری اول؛ معنی واژه‌های موجود در فرهنگ داخلی بدون اینترنت انجام می‌شود.", style = MaterialTheme.typography.bodyMedium)
+                state.words.forEach { word -> WordCard(word) { saveWord(word) } }
+            }
+        }
+    }
+}
+
+private fun launchCamera(
+    context: Context,
+    launcher: ActivityResultLauncher<Uri>,
+    onFailure: () -> Unit
+) {
+    val values = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, "chiniyar_${System.currentTimeMillis()}.jpg")
+        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyChiniYar")
+    }
+    val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    if (uri == null) onFailure() else launcher.launch(uri)
+}
+
+@Composable
+private fun ResultCard(title: String, text: String, emptyText: String, copyLabel: String, onCopy: () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(if (text.isBlank()) emptyText else text)
+                if (text.isNotBlank()) {
+                    OutlinedButton(onClick = onCopy, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Default.ContentCopy, null); Spacer(Modifier.padding(horizontal = 4.dp)); Text(copyLabel)
                     }
                 }
             }
+        }
+    }
+}
 
-            state.error?.let { message ->
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("خطا", style = MaterialTheme.typography.titleMedium)
-                        Text(message)
-                        TextButton(onClick = viewModel::clearError) { Text("باشه") }
-                    }
-                }
+@Composable
+private fun WordCard(word: AnalyzedWord, onSave: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth().padding(14.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(word.word, style = MaterialTheme.typography.titleLarge)
+                Text(word.pinyin, style = MaterialTheme.typography.bodyMedium)
+                Text(word.meaning, style = MaterialTheme.typography.bodyLarge)
             }
-
-            Text("متن تشخیص‌داده‌شده", style = MaterialTheme.typography.titleMedium)
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    if (state.extractedText.isBlank()) {
-                        Text("پس از انتخاب تصویر، متن چینی اینجا نمایش داده می‌شود.", textAlign = TextAlign.Center)
-                    } else {
-                        Text(state.extractedText)
-                    }
-                }
-            }
-
-            Text("ترجمه فارسی", style = MaterialTheme.typography.titleMedium)
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    if (state.translatedText.isBlank()) {
-                        Text("ترجمه در این قسمت نمایش داده خواهد شد.", textAlign = TextAlign.Center)
-                    } else {
-                        Text(state.translatedText)
-                    }
-                }
-            }
-
-            if (state.extractedText.isNotBlank()) {
-                OutlinedButton(
-                    onClick = {
-                        val clipboard = context.getSystemService(android.content.ClipboardManager::class.java)
-                        clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("Chinese text", state.extractedText))
-                        scope.launch { snackbarHostState.showSnackbar("متن کپی شد") }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.ContentCopy, contentDescription = null)
-                    Spacer(Modifier.padding(horizontal = 4.dp))
-                    Text("کپی متن چینی")
-                }
+            OnlineChinesePronunciationButton(word.word)
+            IconButton(onClick = { if (!word.saved) onSave() }) {
+                Icon(
+                    if (word.saved) Icons.Default.Check else Icons.Default.Add,
+                    if (word.saved) "ذخیره شده" else "افزودن به بانک لغات"
+                )
             }
         }
     }

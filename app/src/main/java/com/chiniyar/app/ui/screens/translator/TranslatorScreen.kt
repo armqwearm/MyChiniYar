@@ -1,5 +1,9 @@
 package com.chiniyar.app.ui.screens.translator
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,70 +12,235 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.weight
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chiniyar.app.core.model.Language
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TranslatorScreen(
     viewModel: TranslatorViewModel,
     onBack: () -> Unit
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbar = remember { SnackbarHostState() }
+    val colors = MaterialTheme.colorScheme
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Text("مترجم", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
-            IconButton(onClick = viewModel::swapLanguages) {
-                Icon(Icons.Default.SwapHoriz, contentDescription = "جابجایی زبان‌ها")
-            }
-        }
+    fun copyText(text: String, label: String) {
+        if (text.isBlank()) return
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText(label, text))
+        scope.launch { snackbar.showSnackbar("$label کپی شد") }
+    }
 
-        Text("${state.source.code}  →  ${state.target.code}", style = MaterialTheme.typography.labelLarge)
-
-        OutlinedTextField(
-            value = state.input,
-            onValueChange = viewModel::setInput,
-            modifier = Modifier.fillMaxWidth().weight(1f),
-            label = { Text("متن برای ترجمه") },
-            minLines = 6,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-
-        Button(
-            onClick = viewModel::translate,
-            enabled = state.input.isNotBlank() && !state.isLoading,
-            modifier = Modifier.fillMaxWidth()
+    Scaffold(
+        containerColor = colors.background,
+        topBar = {
+            TopAppBar(
+                title = { Text("مترجم چینی ↔ فارسی", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = colors.background,
+                    titleContentColor = colors.onBackground
+                )
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbar) }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 18.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (state.isLoading) CircularProgressIndicator()
-            else Text("ترجمه")
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = colors.primaryContainer)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text("文", style = MaterialTheme.typography.headlineLarge, color = colors.primary)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("ترجمه سریع و کاربردی", fontWeight = FontWeight.Bold)
+                        Text("چینی ↔ فارسی • با پشتیبانی آفلاین", style = MaterialTheme.typography.bodySmall)
+                    }
+                    Text("🇨🇳", style = MaterialTheme.typography.titleLarge)
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text("زبان مبدأ", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
+                    Text(state.source.code, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                }
+                IconButton(
+                    onClick = viewModel::swapLanguages,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(colors.tertiaryContainer, RoundedCornerShape(16.dp))
+                ) {
+                    Icon(Icons.Default.SwapHoriz, contentDescription = "جابجایی زبان‌ها", tint = colors.onTertiaryContainer)
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text("زبان مقصد", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
+                    Text(state.target.code, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Text(
+                if (state.source == Language.CHINESE) "متن چینی" else "متن فارسی",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            OutlinedTextField(
+                value = state.input,
+                onValueChange = viewModel::setInput,
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 6,
+                maxLines = 12,
+                shape = RoundedCornerShape(20.dp),
+                placeholder = {
+                    Text(if (state.source == Language.CHINESE) "مثلاً: 你好，很高兴认识你。" else "متن فارسی را وارد کنید")
+                },
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    textAlign = TextAlign.Start,
+                    textDirection = if (state.source == Language.CHINESE) TextDirection.Ltr else TextDirection.Rtl
+                )
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Button(
+                    onClick = viewModel::translate,
+                    enabled = !state.isLoading && state.input.isNotBlank(),
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = colors.primary)
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text("ترجمه کن", fontWeight = FontWeight.Bold)
+                    }
+                }
+                OutlinedButton(
+                    onClick = { viewModel.setInput("") },
+                    enabled = !state.isLoading && state.input.isNotEmpty(),
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = null)
+                    Spacer(Modifier.size(5.dp))
+                    Text("پاک کردن")
+                }
+            }
+
+            state.statusMessage.takeIf { it.isNotBlank() }?.let {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer)
+                ) {
+                    Text(it, modifier = Modifier.padding(12.dp), style = MaterialTheme.typography.bodySmall)
+                }
+            }
+            state.error?.let {
+                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+                    Text(it, modifier = Modifier.padding(14.dp), color = colors.error)
+                }
+            }
+
+            Divider(color = colors.outline.copy(alpha = 0.35f))
+            Text("ترجمه", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(22.dp),
+                colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        state.output.ifBlank { "ترجمه اینجا نمایش داده می‌شود" },
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        color = if (state.output.isBlank()) colors.onSurfaceVariant else colors.onSurface,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            textDirection = if (state.target == Language.PERSIAN) TextDirection.Rtl else TextDirection.Ltr
+                        )
+                    )
+                    if (state.output.isNotBlank()) {
+                        OutlinedButton(
+                            onClick = { copyText(state.output, "ترجمه") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp)
+                        ) {
+                            Icon(Icons.Default.ContentCopy, contentDescription = null)
+                            Spacer(Modifier.size(5.dp))
+                            Text("کپی ترجمه")
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
         }
-
-        state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-
-        if (state.output.isNotBlank()) {
-            Text("نتیجه", style = MaterialTheme.typography.titleMedium)
-            Text(state.output, style = MaterialTheme.typography.bodyLarge)
-        }
-
-        Spacer(Modifier.height(8.dp))
-        Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("بازگشت") }
     }
 }

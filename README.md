@@ -1,231 +1,231 @@
 # MyChiniYar 🇨🇳
 
-**MyChiniYar (چینی‌یار)** is an Android application designed for Persian-speaking travelers and learners who need practical Chinese language tools while traveling in China.
+اپلیکیشن اندرویدی **MyChiniYar** یک دستیار کاربردی برای کاربران فارسی‌زبان علاقه‌مند به زبان چینی و سفر به چین است. هدف پروژه، ارائه ابزارهای ترجمه، OCR، یادگیری واژگان و اطلاعات سفر با تمرکز بر قابلیت‌های آفلاین و معماری قابل توسعه است.
 
-The **1.0.0** release combines text translation, image/OCR translation, travel phrases, vocabulary management, Chinese-learning content, city information, and urban-route guidance in one application.
+> **Release 1.0.0** — نسخه پایدار اولیه پروژه
 
-> **Release:** 1.0.0  
-> **Application ID:** `com.chiniyar.app`  
-> **Minimum Android version:** Android 6.0 (API 23)  
-> **Target SDK:** 36
+## ✨ قابلیت‌های اصلی
 
-## ✨ Features
+### 📷 مترجم تصویری
+- انتخاب تصویر از گالری
+- گرفتن تصویر مستقیم با دوربین
+- OCR متن چینی روی خود دستگاه
+- نمایش فوری متن OCR
+- امکان کپی جداگانه متن OCR
+- ترجمه متن استخراج‌شده به فارسی
+- امکان کپی جداگانه ترجمه
+- استخراج حداکثر **۴۰ واژه غیرتکراری** از متن
+- نمایش Pinyin برای واژه‌های چینی
+- تلفظ آنلاین واژه با دکمه 🔊 در کنار هر واژه
+- جست‌وجوی معنی از فرهنگ آفلاین و در صورت نبود معنی، استفاده از مسیر ترجمه موجود
+- امکان افزودن هر واژه به بانک لغات
 
-### 📝 Text Translator
-- Translate typed Chinese/travel-related text.
-- Designed for quick use while traveling.
-- Clear, readable translation interface.
+### 📝 مترجم متنی
+- ورود متن چندخطی
+- ترجمه چینی ↔ فارسی
+- رابط کاربری خوانا با پشتیبانی از جهت متن مناسب
+- نمایش وضعیت آماده‌سازی مدل و ترجمه
+- کپی ترجمه با یک لمس
+- پاک‌کردن سریع متن
 
-### 📷 Image Translator
-- Capture text with the camera or select an image from the gallery.
-- Offline/on-device Chinese OCR support through Google ML Kit.
-- Extracted text can be copied independently.
-- Translated text can be copied independently.
-- Recognized words can be added to the personal vocabulary bank.
+### 📚 بانک لغات
+- ذخیره واژه‌های انتخاب‌شده
+- نگهداری اطلاعات واژه به‌صورت محلی
+- مشاهده فهرست واژه‌های ذخیره‌شده
+- جست‌وجو و مدیریت واژه‌ها
+- تلفظ آنلاین هر واژه با دکمه 🔊
+- طراحی شده بر پایه Room برای توسعه‌های آینده
 
-### 🗣️ Travel Phrases
-A dedicated collection of **30 essential Chinese travel phrases**, including:
-- Chinese characters
-- Pinyin pronunciation
-- Persian meaning
-- A pronunciation/play button for each phrase
+### 🗣️ عبارات سفر
+۳۰ عبارت ضروری و پرکاربرد برای مسافران چین، همراه با:
+- عبارت چینی
+- Pinyin
+- معنی فارسی
+- دکمه 🔊 برای پخش تلفظ هر عبارت
+- پخش تلفظ با **Android TextToSpeech**؛ در صورت نصب بودن صدای چینی روی دستگاه، تلفظ می‌تواند بدون اینترنت انجام شود
 
-The application uses the Android **Text-to-Speech** engine for phrase pronunciation. Offline pronunciation depends on having a compatible Chinese TTS voice installed on the device; the application does not bundle a complete Chinese TTS engine.
+### 🗺️ شهرهای چین
+معرفی **۲۰ شهر معروف چین** با اطلاعات کاربردی مانند:
+- نام فارسی، چینی و Pinyin
+- منطقه/استان
+- جمعیت تقریبی
+- جاذبه‌های مهم
+- نکات کاربردی سفر
+- زمان مناسب سفر
 
-### 📚 My Vocabulary Bank
-- Save useful words while using the translator.
-- Review saved vocabulary in a dedicated section.
-- Uses the application's local data layer for persistent vocabulary storage.
+اطلاعات این بخش داخل برنامه قرار دارد و برای مشاهده آن به اینترنت نیاز نیست. نقشه چین نیز به‌صورت Asset محلی استفاده می‌شود.
 
-### 🈶 Chinese Learning
-- Learning-oriented content for users who want to build practical Chinese vocabulary and phrases.
-- Designed as a foundation for future learning modules.
+### 🚇 مسیرهای شهری
+بخش اختصاصی راهنمای مسیرهای شهری برای سفر به چین:
+- معرفی **MetroMan** به‌عنوان ابزار فعلی راهنمای مترو
+- دسترسی سریع به لینک نصب MetroMan از Google Play
+- آماده برای اضافه‌شدن راهنماهای مسیر بیشتر در نسخه‌های بعدی
 
-### 🏙️ China Cities
-- Offline-oriented information about major Chinese cities.
-- Useful information for travelers, including important places and travel context.
+### 🎓 یادگیری زبان چینی
+در این بخش یک معرفی آموزشی برای **یادگیری زبان چینی با یاجینگ چینی** قرار گرفته است:
 
-### 🚇 Urban Routes
-A dedicated section for practical urban navigation.
+- 🌐 [وب‌سایت یاجینگ چینی](https://yajingchinese.ir/)
+- ✈️ [کانال تلگرام](https://t.me/yajingchinese)
+- 💬 [کانال بله](https://ble.ir/Yajing_chinese)
 
-The initial version focuses on metro guidance and introduces **MetroMan** as a metro-guide application for travelers.
+## 📴 وضعیت آفلاین
 
-### 🎨 Travel-focused UI
-- Modern dark-blue/navy visual language.
-- China/travel-themed visual elements.
-- Optimized application icon.
-- Plus-style actions for adding words to the vocabulary bank.
-- Designed for fast access during travel.
+تمرکز Release 1 بر این است که قابلیت‌های محلی برنامه تا حد امکان بدون اتصال دائمی به اینترنت کار کنند.
 
-## 📴 Offline capabilities
-
-MyChiniYar is designed with offline use in mind, but different features have different requirements:
-
-| Feature | Offline behavior |
+| قابلیت | وضعیت آفلاین |
 |---|---|
-| Saved vocabulary | ✅ Local storage |
-| City information | ✅ Bundled/local content |
-| Travel phrases | ✅ Phrase content is local |
-| Phrase pronunciation | ⚠️ Depends on installed Chinese TTS voice |
-| Image OCR | ✅ On-device after the required ML Kit model/data is available |
-| Translation | ✅ On-device after the required translation model is downloaded |
-| Internet-based links/content | 🌐 Requires Internet |
+| OCR چینی | ✅ |
+| فرهنگ واژگان داخلی | ✅ |
+| تحلیل و استخراج واژه | ✅ |
+| بانک لغات | ✅ |
+| اطلاعات شهرهای چین | ✅ |
+| عبارات سفر | ✅ |
+| تلفظ عبارات سفر با صدای نصب‌شده روی دستگاه | ✅ مشروط به وجود صدای چینی در Android TTS |
+| تلفظ واژه‌های مترجم تصویری و بانک لغات | ❌ تلفظ فعلی آنلاین است |
+| ترجمه با مدل ML Kit پس از آماده‌سازی مدل | ✅ |
+| دریافت اولیه مدل ترجمه | نیازمند اینترنت |
 
-For the best offline experience, download the required ML Kit language models and make sure the device has a Chinese TTS voice installed before traveling.
+**نکته:** در اولین استفاده از ترجمه ML Kit ممکن است مدل زبان لازم باشد دریافت شود. پس از آماده‌شدن مدل، ترجمه می‌تواند روی دستگاه انجام شود.
 
-## 🛠️ Technology Stack
+## 🏗️ معماری پروژه
 
-- **Kotlin**
-- **Jetpack Compose**
-- **Material 3**
-- **AndroidX Navigation Compose**
-- **Android ViewModel / Lifecycle**
-- **DataStore**
-- **Room/local persistence**
-- **Google ML Kit**
-  - Chinese Text Recognition
-  - On-device Translation
-- **Pinyin4j**
-- **Android Text-to-Speech**
-- **Gradle / Kotlin DSL**
-- **R8 resource/code shrinking for release builds**
+ساختار پروژه با تفکیک لایه‌ها طراحی شده است تا افزودن قابلیت‌های جدید ساده باشد:
 
-## 🏗️ Project structure
+~~~text
+UI / Compose
+    ↓
+ViewModel
+    ↓
+Use Cases
+    ↓
+Managers / Repositories
+    ↓
+Local Data / ML Kit / Room
+~~~
 
-The project follows a modular UI/application structure intended to keep screens, navigation, data access, and application infrastructure maintainable.
+## 🔧 فناوری‌ها
 
-Typical areas include:
-
-- `app/` — Android application module
-- `app/src/main/java/` — Kotlin source code
-- `app/src/main/res/` — Android resources and application artwork
-- `.github/workflows/` — GitHub Actions CI/build configuration
-- `app/src/test/` — unit tests
-
-The application uses Compose-based screens with navigation destinations for the main travel and language-learning features.
-
-## 🔧 Build from source
-
-### Requirements
-
-- Android Studio with a recent Android SDK
-- JDK 17
+- Kotlin
 - Android SDK 36
-- Gradle wrapper supplied by the project
+- Jetpack Compose
+- Material 3
+- Navigation Compose
+- ViewModel + StateFlow
+- Room
+- DataStore
+- Google ML Kit Text Recognition
+- Google ML Kit Translation
+- Pinyin4j
+- Android TextToSpeech برای تلفظ عبارات سفر
+- Android MediaPlayer برای تلفظ آنلاین واژه‌ها
+- JUnit
+- GitHub Actions
 
-### Debug build
+## 🚀 ساخت پروژه
 
-From the project root:
+پیش‌نیازها:
 
-```bash
-./gradlew assembleDebug
-```
+- JDK 17
+- Android SDK مناسب پروژه
+- Gradle 8.13
+- Android Studio به‌روز
 
-The resulting APK is generated under:
+ساخت APK دیباگ:
 
-```text
-app/build/outputs/apk/debug/
-```
+~~~bash
+gradle --no-daemon :app:assembleDebug
+~~~
 
-### Release build
+اجرای Unit Testها:
 
-```bash
-./gradlew assembleRelease
-```
+~~~bash
+gradle --no-daemon :app:testDebugUnitTest
+~~~
 
-Release builds use R8/code and resource shrinking.
+ساخت نسخه Release:
 
-> **Important:** A locally generated release APK is not automatically a distributable signed release. A production APK must be signed with the project's release keystore.
+~~~bash
+gradle --no-daemon :app:assembleRelease
+~~~
 
-## 🤖 Continuous Integration
+> خروجی Release در CI فعلی **unsigned verification build** است و برای انتشار عمومی باید با کلید انتشار اختصاصی امضا شود.
 
-The repository uses **GitHub Actions** to automatically:
+## 🤖 CI/CD
 
-1. Set up JDK and Gradle.
-2. Build the debug APK.
-3. Run unit tests.
-4. Build the release APK.
-5. Verify APK outputs.
-6. Upload debug and release build artifacts.
+پروژه دارای GitHub Actions است و برای شاخه‌های توسعه و Release اجرا می‌شود.
 
-The CI release build is used for build verification unless a release signing configuration is explicitly provided.
+CI فعلی:
+- Build Debug
+- اجرای Unit Test
+- Build Release
+- بررسی وجود خروجی APK
+- ذخیره Artifactهای Debug و Release
 
-## 📦 Release 1.0.0
+## 📱 Release 1.0.0
 
-Version **1.0.0** is the first formal MyChiniYar release.
+نسخه 1.0.0 برای تثبیت هسته محصول و قابلیت‌های اصلی طراحی شده است.
 
-The release includes the core traveler-focused feature set:
+تمرکز این نسخه:
 
-- Text translation
-- Image/OCR translation
-- Personal vocabulary bank
-- 30 travel phrases
-- Phrase pronunciation support
-- China city information
-- Urban route/metro guidance
-- China travel-oriented visual redesign
-- Application icon refinement
-- Android CI build and test pipeline
+- OCR تصویری
+- دوربین و گالری
+- ترجمه چینی ↔ فارسی
+- استخراج و تحلیل واژه‌ها
+- فرهنگ و داده‌های آفلاین
+- بانک لغات
+- ۳۰ عبارت سفر با تلفظ
+- اطلاعات شهرهای چین
+- مسیرهای شهری و معرفی MetroMan
+- بخش آموزش و منابع
+- CI و تست خودکار
 
-### Release APK
+## 🧪 تست
 
-The official GitHub release page is:
+تست‌های Unit برای بخش‌هایی از منطق برنامه، از جمله تحلیل واژه و Dictionary و Use Caseهای ترجمه در پروژه قرار گرفته‌اند.
 
-https://github.com/armqwearm/MyChiniYar/releases/tag/v1.0.0
+قبل از انتشار نسخه جدید پیشنهاد می‌شود حداقل این دو فرمان با موفقیت کامل اجرا شوند:
 
-## 🧪 Testing
+~~~bash
+gradle --no-daemon :app:assembleDebug
+gradle --no-daemon :app:testDebugUnitTest
+~~~
 
-Before publishing a new version, the project should be checked on a physical Android device, especially:
+## 🛣️ مسیر توسعه آینده
 
-- Camera permission and camera launch
-- Gallery image selection
-- Chinese OCR accuracy
-- Translation model download and offline translation
-- Copying OCR and translated text independently
-- Adding/removing vocabulary
-- Travel phrase pronunciation
-- Chinese TTS voice availability
-- City and route screens
-- Navigation/back behavior
-- APK installation and upgrade behavior
+قابلیت‌های قابل توسعه برای نسخه‌های بعدی شامل موارد زیر هستند:
 
-Automated CI tests complement, but do not replace, real-device testing.
+- فرهنگ لغت بسیار بزرگ‌تر و ساختارمندتر
+- جست‌وجوی پیشرفته و فیلتر بانک لغات
+- فلش‌کارت و سیستم مرور فاصله‌دار (SRS)
+- دسته‌بندی واژه‌ها بر اساس HSK
+- تاریخچه ترجمه‌ها
+- بهبود تشخیص عبارات و segmentation
+- تست‌های UI و تست Instrumentation گسترده‌تر
+- افزودن صدای آفلاین مستقل و کنترل‌شده برای تلفظ واژه‌ها
+- انتشار APK امضاشده با کلید تولیدی
 
-## 🔐 Signing and distribution
+## 📄 مجوز
 
-Android release APKs intended for public distribution should be signed with a stable release key.
+مجوز پروژه در حال تعیین/تکمیل است. بخش‌های شخص ثالث پروژه تحت مجوزهای مربوط به خودشان استفاده می‌شوند.
 
-**Do not commit a keystore, passwords, or signing credentials to the repository.**
+## 👨‍💻 وضعیت پروژه
 
-For GitHub Actions, release signing credentials should be stored as protected GitHub Actions secrets and the signing configuration should be kept out of source control.
+**MyChiniYar 1.0.0** به‌عنوان نسخه پایدار اولیه هسته برنامه در شاخه Release نگهداری می‌شود و توسعه قابلیت‌های بعدی می‌تواند بر مبنای همین نسخه ادامه پیدا کند.
 
-Keeping the same signing key between versions is essential for normal Android app upgrades.
 
-## 📄 License
+## 📚 مستندات توسعه
 
-No open-source license has been declared for this repository yet.
+برای اینکه همکار جدید بدون نیاز به توضیح شفاهی یا سابقه گفتگو بتواند پروژه را ادامه دهد، مستندات اصلی داخل Git نگهداری می‌شوند:
 
-Until a license is added, the source code should not be assumed to be available for unrestricted reuse, redistribution, or commercial modification.
+- [Developer Handoff / Single Source of Truth](DEVELOPER_HANDOFF.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Test Plan](docs/TEST_PLAN.md)
+- [Release Process](docs/RELEASE_PROCESS.md)
+- [Project Status](docs/PROJECT_STATUS.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Release Notes](RELEASE_1.0.0.md)
 
-## 🤝 Contributing
+قاعده پروژه: هر تغییر مهم در رفتار، معماری، Build، تست یا Release باید مستندات مربوطه را نیز به‌روزرسانی کند.
 
-Development work should be performed through feature branches and pull requests.
-
-Recommended workflow:
-
-1. Create a feature branch.
-2. Implement the change.
-3. Run unit tests and a release build.
-4. Test important flows on a physical Android device.
-5. Open a pull request.
-6. Review and merge the change into the appropriate release/development branch.
-
-## 🌏 Project goal
-
-MyChiniYar aims to become a practical **Persian-to-Chinese travel companion**: a lightweight application that helps a traveler communicate, read Chinese signs and menus, save useful vocabulary, understand major Chinese cities, and navigate urban transportation.
-
-The architecture is intentionally kept extensible so future releases can add richer learning content, improved offline language capabilities, additional transportation guides, and more travel utilities.
-
----
-
-**MyChiniYar — چینی را برای سفر ساده‌تر کن. 🇨🇳**
+برای تحویل پروژه به یک همکار جدید، از DEVELOPER_HANDOFF.md شروع کنید.
