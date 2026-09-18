@@ -10,7 +10,9 @@ A release is complete only when the exact source, tested binary, signing identit
 
 Authoritative source branch:
 
-release/1.0.0
+`main`
+
+The former `release/1.0.0` branch has been merged into `main` and is no longer required for the 1.0.0 baseline.
 
 Current version configuration:
 
@@ -92,7 +94,7 @@ The Git tag must point at the source commit that produced the tested APK.
 
 The repository has an older GitHub Release/tag named v1.0.0 associated with historical main-branch code.
 
-Do not assume that historical asset is the current release/1.0.0 APK.
+Do not assume that historical asset is the current 1.0.0 APK or that it was built from the current `main` source.
 
 Before replacing or reusing the public v1.0.0 release, verify its tag target and asset checksum.
 
@@ -117,7 +119,7 @@ Known historical drivers include native ML/OCR/translation libraries and multipl
 
 ### Source
 
-- [ ] Release branch points to intended commit.
+- [ ] `main` points to the intended source commit.
 - [ ] No temporary files.
 - [ ] README matches actual behavior.
 - [ ] Release notes match actual behavior.
