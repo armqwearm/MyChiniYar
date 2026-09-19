@@ -20,10 +20,20 @@ android {
         }
     }
     buildFeatures { compose = true }
+    signingConfigs {
+        create("testRelease") {
+            val debugKeystore = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            storeFile = debugKeystore
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("testRelease")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
