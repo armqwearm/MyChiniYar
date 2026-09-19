@@ -49,7 +49,8 @@ private data class HomeFeature(
     val description: String,
     val icon: androidx.compose.ui.graphics.vector.ImageVector,
     val action: () -> Unit,
-    val accent: Color
+    val tint: Color,
+    val container: Color
 )
 
 private const val RoseKaboodUrl = "https://rosekabood.com"
@@ -67,62 +68,120 @@ fun HomeScreen(
     onUrbanRoutesClick: () -> Unit,
     onExhibitionsClick: () -> Unit
 ) {
-    val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
+    val blue = Color(0xFF1976A8)
+    val purple = Color(0xFF7652C7)
+    val red = Color(0xFFC62828)
+    val green = Color(0xFF2E8B68)
+    val gold = Color(0xFFB57900)
+    val teal = Color(0xFF147F86)
+
     val features = listOf(
-        HomeFeature("مترجم متنی", "چینی ↔ فارسی، سریع و آفلاین", Icons.Default.Translate, onTranslatorClick, colors.primary),
-        HomeFeature("عبارات سفر", "۳۰ عبارت ضروری + تلفظ صوتی", Icons.Default.FlightTakeoff, onTravelPhrasesClick, colors.tertiary),
-        HomeFeature("مترجم تصویری", "عکس بگیر، متن را استخراج و ترجمه کن", Icons.Default.CameraAlt, onCameraClick, colors.primary),
-        HomeFeature("بانک لغات من", "واژه‌های مورد علاقه را ذخیره کن", Icons.Default.Star, onVocabularyBankClick, colors.tertiary),
-        HomeFeature("یادگیری چینی", "واژگان، آموزش و منابع مفید", Icons.Default.Book, onLearningClick, colors.secondary),
-        HomeFeature("شهرهای چین", "۲۰ شهر معروف و راهنمای سفر", Icons.Default.LocationCity, onCitiesClick, colors.secondary),
-        HomeFeature("مسیرهای شهری", "راهنمای مترو و رفت‌وآمد در چین", Icons.Default.DirectionsSubway, onUrbanRoutesClick, colors.primary),
-        HomeFeature("نمایشگاه‌های چین", "تقویم نمایشگاه‌های مهم + راهنمای بازدید", Icons.Default.Event, onExhibitionsClick, colors.tertiary)
+        HomeFeature("مترجم متنی", "چینی ↔ فارسی، سریع و آفلاین", Icons.Default.Translate, onTranslatorClick, blue, Color(0xFFDCEFFF)),
+        HomeFeature("مترجم تصویری", "عکس بگیر، متن را استخراج و ترجمه کن", Icons.Default.CameraAlt, onCameraClick, purple, Color(0xFFEDE3FF)),
+        HomeFeature("عبارات سفر", "۳۰ عبارت ضروری + تلفظ صوتی", Icons.Default.FlightTakeoff, onTravelPhrasesClick, red, Color(0xFFFFE1E3)),
+        HomeFeature("بانک لغات من", "واژه‌های مورد علاقه را ذخیره کن", Icons.Default.Star, onVocabularyBankClick, green, Color(0xFFDDF7E8)),
+        HomeFeature("شهرهای چین", "۲۰ شهر معروف و راهنمای سفر", Icons.Default.LocationCity, onCitiesClick, gold, Color(0xFFFFEBC5)),
+        HomeFeature("مسیرهای شهری", "راهنمای مترو و رفت‌وآمد در چین", Icons.Default.DirectionsSubway, onUrbanRoutesClick, teal, Color(0xFFD9F4F3)),
+        HomeFeature("نمایشگاه‌های چین", "تقویم نمایشگاه‌های مهم + راهنمای بازدید", Icons.Default.Event, onExhibitionsClick, red, Color(0xFFFFE5D8)),
+        HomeFeature("یادگیری چینی", "واژگان، آموزش و منابع مفید", Icons.Default.Book, onLearningClick, blue, Color(0xFFE0F0FF))
     )
 
-    Box(modifier = Modifier.fillMaxSize().background(colors.background)) {
-        TravelBackground(modifier = Modifier.fillMaxSize(), alpha = 0.28f)
-        Box(modifier = Modifier.fillMaxSize().background(colors.background.copy(alpha = 0.18f)))
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Spacer(Modifier.height(14.dp))
-            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = colors.primaryContainer), elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)) {
-                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFFFFBF2))) {
+        TravelBackground(modifier = Modifier.fillMaxSize(), alpha = 0.52f)
+        Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.22f)))
+
+        Column(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Spacer(Modifier.height(12.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.84f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 13.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("چینی‌یار", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, color = colors.primary)
-                        Text("یادگیری چینی • سفر به چین • کشف بیشتر", style = MaterialTheme.typography.bodyMedium, color = colors.onPrimaryContainer)
+                        Text("Yajing", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, color = blue)
+                        Text("Go China Now • چینی‌یار", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF334A52))
                     }
                     Text("🏮", style = MaterialTheme.typography.headlineLarge)
                 }
             }
-            Text("همراه هوشمند شما برای چین", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Right)
-            Text("ترجمه، واژه‌ها و اطلاعات سفر؛ حتی وقتی اینترنت در دسترس نیست.", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Right)
-            LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.fillMaxWidth().weight(1f), contentPadding = PaddingValues(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+
+            Text(
+                "به چین خوش آمدید",
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color(0xFF123B52),
+                textAlign = TextAlign.Right
+            )
+            Text(
+                "با ما، سفر به چین آسان‌تر است",
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.titleMedium,
+                color = Color(0xFF47626B),
+                textAlign = TextAlign.Right
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                contentPadding = PaddingValues(vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 items(features) { feature ->
-                    Card(onClick = feature.action, modifier = Modifier.fillMaxWidth().border(1.dp, feature.accent.copy(alpha = 0.16f), RoundedCornerShape(22.dp)), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = colors.surface.copy(alpha = 0.60f)), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                        Column(modifier = Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Box(modifier = Modifier.size(42.dp).background(feature.accent.copy(alpha = 0.12f), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
-                                Icon(feature.icon, contentDescription = feature.title, tint = feature.accent, modifier = Modifier.size(23.dp))
+                    Card(
+                        onClick = feature.action,
+                        modifier = Modifier.fillMaxWidth().border(1.dp, feature.tint.copy(alpha = 0.14f), RoundedCornerShape(22.dp)),
+                        shape = RoundedCornerShape(22.dp),
+                        colors = CardDefaults.cardColors(containerColor = feature.container.copy(alpha = 0.84f)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Box(
+                                modifier = Modifier.size(42.dp).background(feature.tint.copy(alpha = 0.14f), RoundedCornerShape(14.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(feature.icon, contentDescription = feature.title, tint = feature.tint, modifier = Modifier.size(23.dp))
                             }
-                            Text(feature.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            Text(feature.description, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                            Text(feature.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color(0xFF173B4B))
+                            Text(feature.description, style = MaterialTheme.typography.bodySmall, color = Color(0xFF50656B))
                         }
                     }
                 }
             }
-            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer.copy(alpha = 0.68f))) {
-                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.82f))
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     Text("🌹", style = MaterialTheme.typography.titleLarge)
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("آماده سفر به چین هستی؟", fontWeight = FontWeight.Bold)
-                        Text("آژانس مسافرتی رز کبود • برنامه‌ریزی و خدمات سفر", style = MaterialTheme.typography.bodySmall)
-                        Text("rosekabood.com  ›", style = MaterialTheme.typography.labelMedium, color = colors.primary)
+                        Text("آماده سفر به چین هستی؟", fontWeight = FontWeight.Bold, color = Color(0xFF173B4B))
+                        Text("آژانس مسافرتی رز کبود • برنامه‌ریزی و خدمات سفر", style = MaterialTheme.typography.bodySmall, color = Color(0xFF50656B))
                     }
                     IconButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RoseKaboodUrl))) }) {
-                        Icon(Icons.Default.TravelExplore, contentDescription = "وب‌سایت رز کبود", tint = colors.primary)
+                        Icon(Icons.Default.TravelExplore, contentDescription = "وب‌سایت رز کبود", tint = blue)
                     }
                 }
             }
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(5.dp))
         }
     }
 }
