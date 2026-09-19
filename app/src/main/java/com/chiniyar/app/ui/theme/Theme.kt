@@ -8,15 +8,14 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-// MyChiniYar visual identity: Chinese red, warm gold, jade/teal and porcelain cream.
 private val Porcelain = Color(0xFFFFFBF2)
 private val PorcelainSurface = Color(0xFFFFF7E8)
 private val ChineseRed = Color(0xFFC62828)
 private val ChineseRedDark = Color(0xFF8E1B1B)
 private val ImperialGold = Color(0xFFD6A72C)
 private val Jade = Color(0xFF247C78)
-private val Ink = Color(0xFF1E2A2D)
-private val MutedInk = Color(0xFF5D6668)
+private val Ink = Color(0xFF173B4B)
+private val MutedInk = Color(0xFF5D6E73)
 private val DarkBackground = Color(0xFF171313)
 private val DarkSurface = Color(0xFF25201F)
 private val DarkCard = Color(0xFF302A28)
@@ -71,11 +70,10 @@ private val MyChiniYarTypography = Typography()
 
 @Composable
 fun MyChiniYarTheme(
-    // The product identity is intentionally light/porcelain by default; dark mode remains supported.
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) DarkColors else LightColors
+    val colors = if (darkTheme && isSystemInDarkTheme()) DarkColors else LightColors
     MaterialTheme(
         colorScheme = colors,
         typography = MyChiniYarTypography,
