@@ -112,9 +112,9 @@ fun TranslatorScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text("文", style = MaterialTheme.typography.headlineLarge, color = colors.primary)
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("ترجمه سریع و کاربردی", fontWeight = FontWeight.Bold)
-                        Text("چینی ↔ فارسی • با پشتیبانی آفلاین", style = MaterialTheme.typography.bodySmall)
+                    Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("ترجمه سریع و کاربردی", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                        Text("چینی ↔ فارسی • با پشتیبانی آفلاین", style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
                     }
                     Text("🇨🇳", style = MaterialTheme.typography.titleLarge)
                 }
@@ -125,9 +125,9 @@ fun TranslatorScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column {
-                    Text("زبان مبدأ", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
-                    Text(state.source.code, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("زبان مبدأ", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Center)
+                    Text(state.source.code, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                 }
                 IconButton(
                     onClick = viewModel::swapLanguages,
@@ -137,16 +137,18 @@ fun TranslatorScreen(
                 ) {
                     Icon(Icons.Default.SwapHoriz, contentDescription = "جابجایی زبان‌ها", tint = colors.onTertiaryContainer)
                 }
-                Column(horizontalAlignment = Alignment.End) {
-                    Text("زبان مقصد", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
-                    Text(state.target.code, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("زبان مقصد", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Center)
+                    Text(state.target.code, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                 }
             }
 
             Text(
                 if (state.source == Language.CHINESE) "متن چینی" else "متن فارسی",
+                modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
             OutlinedTextField(
                 value = state.input,
@@ -202,17 +204,27 @@ fun TranslatorScreen(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer)
                 ) {
-                    Text(it, modifier = Modifier.padding(12.dp), style = MaterialTheme.typography.bodySmall)
+                    Text(it, modifier = Modifier.fillMaxWidth().padding(12.dp), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
                 }
             }
             state.error?.let {
-                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
-                    Text(it, modifier = Modifier.padding(14.dp), color = colors.error)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = colors.errorContainer)
+                ) {
+                    Text(
+                        it,
+                        modifier = Modifier.fillMaxWidth().padding(14.dp),
+                        color = colors.onErrorContainer,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
 
             Divider(color = colors.outline.copy(alpha = 0.35f))
-            Text("ترجمه", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text("ترجمه", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
