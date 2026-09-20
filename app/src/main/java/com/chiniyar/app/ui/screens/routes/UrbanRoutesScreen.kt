@@ -80,7 +80,7 @@ fun UrbanRoutesScreen(onBack: () -> Unit) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(20.dp),
-                        horizontalAlignment = Alignment.End,
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Row(
@@ -96,16 +96,17 @@ fun UrbanRoutesScreen(onBack: () -> Unit) {
                             )
                             Text(
                                 "راهنمای مسیرهای شهری چین",
+                                modifier = Modifier.weight(1f),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = colors.primary,
-                                textAlign = TextAlign.Right
+                                textAlign = TextAlign.Center
                             )
                         }
                         Text(
                             "در این بخش راهنماهای رفت‌وآمد شهری را قرار می‌دهیم. در حال حاضر، راهنمای مترو فعال است و منابع دیگر در نسخه‌های بعدی اضافه می‌شوند.",
                             style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Right
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -117,7 +118,7 @@ fun UrbanRoutesScreen(onBack: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Right
+                    textAlign = TextAlign.Center
                 )
             }
 
