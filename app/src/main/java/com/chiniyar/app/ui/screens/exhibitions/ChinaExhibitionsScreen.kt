@@ -136,6 +136,7 @@ fun ChinaExhibitionsScreen(onBack: () -> Unit) {
                                 )
                                 Text(
                                     "تقویم نمایشگاه‌های پیش‌رو در چین",
+                                    modifier = Modifier.weight(1f),
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.primary,
@@ -146,14 +147,14 @@ fun ChinaExhibitionsScreen(onBack: () -> Unit) {
                                 "فهرستی کاربردی از نمایشگاه‌های مهم از سپتامبر ۲۰۲۶ تا سپتامبر ۲۰۲۷؛ با تمرکز بر خرید، تأمین کالا، فناوری، صنعت، پزشکی و تجارت بین‌الملل.",
                                 modifier = Modifier.fillMaxWidth(),
                                 style = MaterialTheme.typography.bodyLarge,
-                                textAlign = TextAlign.Right
+                                textAlign = TextAlign.Center
                             )
                             Text(
                                 "قبل از رزرو پرواز یا هتل، تاریخ و شرایط ورود را در سایت رسمی هر نمایشگاه دوباره بررسی کنید.",
                                 modifier = Modifier.fillMaxWidth(),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                textAlign = TextAlign.Right
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
