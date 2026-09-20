@@ -139,7 +139,7 @@ fun ChinaExhibitionsScreen(onBack: () -> Unit) {
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.primary,
-                                    textAlign = TextAlign.Right
+                                    textAlign = TextAlign.Center
                                 )
                             }
                             Text(
@@ -181,7 +181,7 @@ fun ChinaExhibitionsScreen(onBack: () -> Unit) {
                         modifier = Modifier.fillMaxWidth(),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.ExtraBold,
-                        textAlign = TextAlign.Right
+                        textAlign = TextAlign.Center
                     )
                 }
 
