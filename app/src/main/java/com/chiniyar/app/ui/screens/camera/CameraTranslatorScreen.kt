@@ -47,8 +47,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.activity.result.ActivityResultLauncher
@@ -169,7 +171,7 @@ fun CameraTranslatorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("مترجم تصویری") },
+                title = { Text("مترجم تصویری", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت") } },
                 actions = { if (state.imageUri != null) IconButton(onClick = { viewModel.clearResults() }) { Icon(Icons.Default.Clear, contentDescription = "پاک کردن") } }
             )
@@ -180,27 +182,32 @@ fun CameraTranslatorScreen(
             modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Text("تصویر دارای متن چینی را انتخاب کنید.", style = MaterialTheme.typography.bodyLarge)
+            Text("تصویر دارای متن چینی را انتخاب کنید.", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyLarge, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, textAlign = TextAlign.Center)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Button(onClick = { galleryPicker.launch("image/*") }, modifier = Modifier.weight(1f)) {
+                Button(onClick = { galleryPicker.launch("image/*") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp)) {
                     Icon(Icons.Default.Image, null); Spacer(Modifier.padding(horizontal = 3.dp)); Text("گالری")
                 }
-                OutlinedButton(onClick = { openCamera() }, modifier = Modifier.weight(1f)) {
+                OutlinedButton(onClick = { openCamera() }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp)) {
                     Icon(Icons.Default.CameraAlt, null); Spacer(Modifier.padding(horizontal = 3.dp)); Text("دوربین")
                 }
             }
             if (state.isProcessing) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CircularProgressIndicator()
-                    Text(state.statusMessage.ifBlank { "در حال پردازش..." }, modifier = Modifier.padding(top = 8.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.5.dp)
+                    Spacer(Modifier.size(10.dp))
+                    Text(state.statusMessage.ifBlank { "در حال پردازش..." }, style = MaterialTheme.typography.bodyMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Medium, textAlign = TextAlign.Center)
                 }
             }
-            state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            state.error?.let {
+                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
+                    Text(it, modifier = Modifier.fillMaxWidth().padding(14.dp), color = MaterialTheme.colorScheme.onErrorContainer, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+                }
+            }
             ResultCard("متن OCR شده", state.extractedText, "متن تشخیص‌داده‌شده اینجا نمایش داده می‌شود.", "کپی متن OCR") { copyText(state.extractedText, "متن OCR") }
             ResultCard("ترجمه فارسی", state.translatedText, "ترجمه فارسی اینجا نمایش داده می‌شود.", "کپی ترجمه") { copyText(state.translatedText, "ترجمه") }
             if (state.words.isNotEmpty()) {
-                Text("واژه‌های متن — ${state.words.size} مورد", style = MaterialTheme.typography.titleLarge)
-                Text("۴۰ واژه غیرتکراری اول؛ معنی واژه‌های موجود در فرهنگ داخلی بدون اینترنت انجام می‌شود.", style = MaterialTheme.typography.bodyMedium)
+                Text("واژه‌های متن — ${state.words.size} مورد", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleLarge, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, textAlign = TextAlign.Center)
+                Text("۴۰ واژه غیرتکراری اول؛ معنی واژه‌های موجود در فرهنگ داخلی بدون اینترنت انجام می‌شود.", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 state.words.forEach { word -> WordCard(word) { saveWord(word) } }
             }
         }
@@ -224,13 +231,13 @@ private fun launchCamera(
 @Composable
 private fun ResultCard(title: String, text: String, emptyText: String, copyLabel: String, onCopy: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(title, style = MaterialTheme.typography.titleMedium)
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(if (text.isBlank()) emptyText else text)
+        Text(title, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, textAlign = TextAlign.Center)
+        Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(if (text.isBlank()) emptyText else text, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyLarge, textAlign = if (text.isBlank()) TextAlign.Center else TextAlign.Start)
                 if (text.isNotBlank()) {
-                    OutlinedButton(onClick = onCopy, modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Default.ContentCopy, null); Spacer(Modifier.padding(horizontal = 4.dp)); Text(copyLabel)
+                    OutlinedButton(onClick = onCopy, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
+                        Icon(Icons.Default.ContentCopy, null); Spacer(Modifier.size(6.dp)); Text(copyLabel)
                     }
                 }
             }
