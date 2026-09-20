@@ -159,7 +159,7 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(20.dp),
-                        horizontalAlignment = Alignment.End,
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = colors.primary, modifier = Modifier.size(30.dp))
@@ -169,14 +169,14 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Right
+                            textAlign = TextAlign.Center
                         )
                         if (allEntries.isEmpty()) {
                             Text(
                                 "واژه‌های جدید را مستقیم به بانک شخصی‌ات اضافه کن.",
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Right
+                                textAlign = TextAlign.Center
                             )
                             OutlinedButton(onClick = ::openAddDialog, modifier = Modifier.fillMaxWidth()) {
                                 Icon(Icons.Default.Add, contentDescription = null)
