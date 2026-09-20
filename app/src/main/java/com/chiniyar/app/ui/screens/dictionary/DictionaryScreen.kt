@@ -59,7 +59,13 @@ fun DictionaryScreen(viewModel: DictionaryViewModel, onBack: () -> Unit) {
             modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("یاد بگیر، جست‌وجو کن، برای سفر آماده شو 🇨🇳", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(
+                "یاد بگیر، جست‌وجو کن، برای سفر آماده شو 🇨🇳",
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
             OutlinedTextField(
                 value = query,
                 onValueChange = viewModel::setQuery,
@@ -91,10 +97,10 @@ fun DictionaryScreen(viewModel: DictionaryViewModel, onBack: () -> Unit) {
                                 Text(entry.hanzi, style = MaterialTheme.typography.titleLarge, color = colors.primary, fontWeight = FontWeight.Bold)
                             }
                             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp), horizontalAlignment = Alignment.End) {
-                                Text(entry.pinyin, style = MaterialTheme.typography.titleMedium, color = colors.secondary)
-                                Text(entry.meaningFa, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium, textAlign = TextAlign.Right)
-                                entry.partOfSpeech?.let { Text(it, style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant) }
-                                entry.example?.let { Text(it, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Right) }
+                                Text(entry.pinyin, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium, color = colors.secondary, textAlign = TextAlign.Right)
+                                Text(entry.meaningFa, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium, textAlign = TextAlign.Right)
+                                entry.partOfSpeech?.let { Text(it, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Right) }
+                                entry.example?.let { Text(it, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Right) }
                             }
                         }
                     }
