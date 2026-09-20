@@ -1,194 +1,103 @@
 # Contributing to MyChiniYar
 
-## Project purpose
+## Project rules
 
-MyChiniYar is an Android application for Persian-speaking users who learn Chinese and/or travel to China.
+1. `main` is the authoritative branch.
+2. Feature branches are short-lived and based on current `main`.
+3. Release branches are temporary.
+4. CI must pass before a change is treated as release-ready.
+5. UI changes should be tested on a real Android device when possible.
+6. Documentation changes accompany behavior, architecture, build or release changes.
+7. Never commit signing credentials or private keys.
 
-Product principles:
+## Current baseline
 
-1. Important travel utility should work offline whenever practical.
-2. Chinese text should be presented with Pinyin and Persian meaning where appropriate.
-3. The codebase should remain easy to extend and test.
-4. APK size is a real product constraint.
-5. Functional changes must pass CI before being treated as release-ready.
+Version 1.1.0 / versionCode 3.
 
-Read DEVELOPER_HANDOFF.md before making non-trivial changes.
+Core functionality includes:
 
-## Current 1.0.0 scope
-
-- Chinese ↔ Persian text translation using on-device ML Kit after model preparation.
-- Image translation from gallery and camera.
-- Offline Chinese OCR.
-- Independent copy actions for OCR text and translated text.
-- Extraction of up to 40 unique Chinese words.
-- Pinyin and dictionary meaning for extracted words.
-- Local vocabulary bank backed by Room.
-- 30 travel phrases with Chinese, Pinyin, Persian meaning and pronunciation.
-- 20 offline Chinese city profiles.
-- Urban routes section with MetroMan as the current metro-guide reference.
-- Learning/resources section with Yajing Chinese links.
-- Travel-oriented home UI and custom app icon.
-
-## Repository
-
-https://github.com/armqwearm/MyChiniYar
-
-Branch policy:
-
-- main: authoritative current development and release source.
-- feature/*: focused, short-lived development branches based on `main`.
-- release/*: temporary release branches only when needed; merge the release result back into `main` before cleanup.
-
-The former `release/1.0.0` branch has already been merged into `main` and is no longer the authoritative source.
-
-Always inspect the target branch and current `main` HEAD before changing release-critical code.
+- Chinese ↔ Persian translation
+- gallery/camera OCR
+- up to 40 unique words
+- Pinyin and dictionary lookup
+- Room vocabulary bank
+- 30 travel phrases
+- 20 offline city profiles
+- urban routes / MetroMan
+- learning/resources
+- China exhibitions
+- Yajing travel-oriented Home theme
 
 ## Environment
 
-The project is configured for:
-
+- JDK 17
+- Gradle 8.13
 - compileSdk 36
 - targetSdk 36
 - minSdk 23
-- JDK 17
-- Gradle 8.13
-- Kotlin + Jetpack Compose + Material 3
-- Navigation Compose
-- Room
-- DataStore
-- Google ML Kit Chinese OCR
-- Google ML Kit Translation
-- Pinyin4j
-- JUnit
-- GitHub Actions
-
-The visible repository root does not contain a checked-in Gradle wrapper. CI installs Gradle 8.13 explicitly; local development therefore requires a compatible Gradle 8.13 installation unless a wrapper is added later.
+- Kotlin / Compose / Material 3
+- Room / DataStore
+- ML Kit OCR and Translation
 
 ## Build and test
 
-From repository root:
-
-~~~bash
+```bash
 gradle --no-daemon :app:assembleDebug
 gradle --no-daemon :app:testDebugUnitTest
 gradle --no-daemon :app:assembleRelease
-~~~
+```
 
-The current CI release build is an unsigned verification build, not the production APK.
+Installable test Release:
 
-## Code organization
+```bash
+gradle --no-daemon -PtestReleaseSigning=true :app:assembleRelease
+```
 
-~~~text
-UI / Compose
-    ↓
-ViewModel
-    ↓
-Use Cases
-    ↓
-Managers / Repositories
-    ↓
-Local Data / ML Kit / Room
-~~~
+## Architecture expectations
 
-Keep business logic outside composables where practical.
+Keep business logic outside composables.
 
-Keep Android-specific integrations such as camera, TextToSpeech and MediaPlayer isolated enough to remain testable.
+Prefer:
 
-## Feature rules
+```text
+UI → ViewModel → Use Case → Repository/Manager → Data/Service
+```
 
-### Image translator
-
-- Gallery and camera must remain separate working paths.
-- OCR is device-side.
-- OCR text and translated text need independent copy actions.
-- Current word-extraction limit is 40 unique words.
-- Word saving uses a plus (+) action; saved state can show a check.
-- Generic extracted-word pronunciation is currently online.
-
-### Travel phrases
-
-The user-facing name is "عبارات سفر", not "واژه‌نامه".
-
-There are 30 fixed phrases. Every phrase has:
-
-- Chinese
-- Pinyin
-- Persian meaning
-- pronunciation control
-
-Pronunciation uses Android TextToSpeech with simplified Chinese. It may work offline when suitable Chinese TTS data is installed. The app does not bundle its own TTS voice.
-
-### Vocabulary bank
-
-Persistence is local Room. Do not replace production persistence with in-memory state.
-
-### Cities
-
-Required city content should remain locally accessible.
-
-### Urban routes
-
-Current scope is MetroMan information plus a Google Play installation path. Keep the section extensible for future route guides.
+Do not introduce a second dependency container or a parallel persistence mechanism.
 
 ## APK size
 
-Do not add large dependencies without checking native library footprint and transitive dependencies.
+The application already contains significant ML/OCR native libraries.
+
+Before adding a dependency, check:
+
+- transitive dependencies
+- native libraries
+- ABI impact
+- R8/resource shrinking
+- APK size
 
 Current release ABI policy:
 
-~~~kotlin
-ndk {
-    abiFilters += listOf("arm64-v8a", "armeabi-v7a")
-}
-~~~
-
-Do not remove this restriction without measuring size and compatibility.
-
-## Testing expectations
-
-For every functional change:
-
-- CI build passes.
-- Unit tests pass.
-- New deterministic business logic gets tests where practical.
-- UI changes are checked on a real device when possible.
-- Release-only changes are tested using a release build.
-
-CI currently verifies Debug build, Unit Tests, Release build, output existence and artifact upload.
-
-CI success alone is not sufficient for device acceptance.
-
-## Pull requests
-
-A useful PR description should state:
-
-- what changed
-- why
-- affected files/components
-- tests executed
-- known limitations
-- whether real-device testing was done
-- release/signing impact
-
-Keep unrelated refactors out of feature PRs.
+```text
+arm64-v8a
+armeabi-v7a
+```
 
 ## Release safety
 
-Never treat an unsigned artifact as a production release.
+Never call an unsigned or test-signed APK a production release.
 
-Never commit:
+Production signing uses GitHub Actions Secrets documented in `docs/RELEASE_PROCESS.md`.
 
-- keystores
-- passwords
-- signing secrets
-- private keys
+## PR expectations
 
-Use secure GitHub Actions Secrets/Environments or a controlled release environment.
+A useful PR should state:
 
-See docs/RELEASE_PROCESS.md.
-
-## Documentation rule
-
-When behavior, architecture, build configuration or release procedure changes, update the relevant documentation in the same change.
-
-The goal is that a new contributor can work from Git contents alone.
+- what changed
+- why
+- affected areas
+- tests executed
+- device testing status
+- known limitations
+- release/signing impact

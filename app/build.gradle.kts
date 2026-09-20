@@ -14,22 +14,41 @@ android {
         minSdk = 23
         targetSdk = 36
         versionCode = 3
-        versionName = "1.0.2"
+        versionName = "1.1.0"
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
     }
+
     buildFeatures { compose = true }
+
+    val testReleaseSigning = providers.gradleProperty("testReleaseSigning").orNull == "true"
+    if (testReleaseSigning) {
+        signingConfigs {
+            create("testRelease") {
+                val debugKeystore = file(System.getProperty("user.home") + "/.android/debug.keystore")
+                storeFile = debugKeystore
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            if (testReleaseSigning) {
+                signingConfig = signingConfigs.getByName("testRelease")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

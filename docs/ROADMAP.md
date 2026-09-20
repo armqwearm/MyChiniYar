@@ -1,104 +1,82 @@
 # MyChiniYar Roadmap
 
-## Baseline
+## Current baseline — 1.1.0
 
-Release 1.0.0 is the first stable core of the current architecture.
+The 1.1.0 baseline combines the stable travel/translation core with the Yajing travel visual identity.
 
-Product direction:
+Completed:
 
-**Chinese utility + travel assistance + offline-first behavior + maintainable architecture**
-
-## Completed in 1.0.0 baseline
-
-- [x] Text translation foundation
-- [x] Chinese ↔ Persian translation flow
-- [x] Offline Chinese OCR
-- [x] Gallery image translation
-- [x] Camera image translation
-- [x] Separate OCR/translation copy actions
+- [x] Chinese ↔ Persian text translation
+- [x] Chinese image OCR from gallery
+- [x] Chinese image OCR from camera
+- [x] Independent OCR/translation copy actions
 - [x] Up to 40 unique extracted words
 - [x] Pinyin display
 - [x] Local dictionary lookup
 - [x] Room vocabulary bank
 - [x] 30 travel phrases
-- [x] Per-phrase pronunciation
+- [x] Travel phrase pronunciation
 - [x] 20 offline city profiles
-- [x] Urban routes section
-- [x] MetroMan reference
-- [x] Yajing Chinese learning links
-- [x] Travel-oriented Home background
-- [x] Custom app icon
-- [x] Release minification/resource shrinking
+- [x] Urban routes / MetroMan reference
+- [x] Learning/resources section
+- [x] Yajing-inspired Home theme
+- [x] Lightweight travel background asset
+- [x] China exhibitions entry point
+- [x] Release R8/resource shrinking
 - [x] ARM ABI filtering
 - [x] CI build and unit-test verification
+- [x] Installable test-release pipeline
 
-## Next engineering opportunities
+## Next engineering phase
 
 ### Language data
-
-- expand Chinese↔Persian dictionary coverage
-- improve segmentation and phrase analysis
+- expand dictionary coverage
+- improve segmentation
+- contextual meanings
 - HSK categorization
-- improve contextual meanings
 
 ### Learning
-
 - flashcards
 - spaced repetition
 - progress tracking
-- review/favorite states
-- structured learning levels
+- structured levels
 
 ### Translation
-
 - translation history
 - clearer model lifecycle UX
-- explicit offline-model management
-- graceful handling of unsupported inputs
+- explicit model management
+- graceful unsupported-input handling
 
 ### Pronunciation
-
-Current limitation:
-
-- generic word pronunciation is online
-- travel phrase pronunciation depends on installed Android Chinese TTS data
-
-Future direction:
-
 - evaluate independent offline pronunciation
-- compare prerecorded phrase audio against local TTS
-- control APK size
-- document licenses
+- compare bundled audio with local TTS
+- control APK-size impact
 
 ### Travel
-
-- more city data
+- richer city data
 - airport/railway phrase guides
 - richer metro information
 - curated route instructions
-- downloadable/offline route packs
+- downloadable offline route packs
 
 ### Quality
-
 - broader unit coverage
 - Compose UI tests
 - instrumentation tests
-- end-to-end device testing where practical
-- privacy-conscious crash/error reporting strategy
+- more systematic device smoke tests
+- APK size regression checks
 
 ### Release engineering
-
-- secure production signing
-- automated signed artifacts
-- checksum publication
-- release/tag consistency checks
-- APK size regression checks
+- verify permanent production signing secrets
+- production release test on real device
+- signed release/tag/checksum traceability
+- automated release verification
 
 ## Product constraints
 
 1. Offline usability is important.
-2. APK size must be controlled.
-3. The primary audience is Persian-speaking.
-4. Chinese, Pinyin and Persian must remain readable together where relevant.
-5. New features should not make the architecture harder to maintain.
-6. Signing material must stay outside source control.
+2. APK size must remain controlled.
+3. Primary audience is Persian-speaking users.
+4. Chinese, Pinyin and Persian must remain readable together.
+5. New features should preserve maintainable architecture.
+6. Signing material must remain outside source control.

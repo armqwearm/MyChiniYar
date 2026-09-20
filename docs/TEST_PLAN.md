@@ -2,33 +2,38 @@
 
 ## Purpose
 
-CI proves that code builds and automated tests pass. A travel application also needs device-level validation.
+CI validates compilation and automated tests. Real-device testing validates the actual travel experience.
 
 ## Automated CI
 
-Current workflow verifies:
+Current CI performs:
 
-~~~text
-Debug build
-   ↓
-Unit tests
-   ↓
-Release build
-   ↓
-APK output verification
-   ↓
-Artifact upload
-~~~
+1. Debug build
+2. Unit tests
+3. Ephemeral test-key preparation
+4. Installable test Release build
+5. APK output verification
+6. Artifact upload
 
 ## Device smoke test
 
 ### Launch and navigation
 
 - [ ] App launches without crash.
-- [ ] Home screen renders.
-- [ ] Every primary screen opens.
+- [ ] Home renders.
+- [ ] All primary cards open the correct destination.
 - [ ] Back navigation works.
-- [ ] No blank/error screen appears on a primary route.
+- [ ] No blank/error screen appears.
+
+### Home / 1.1.0 visual baseline
+
+- [ ] Yajing header renders.
+- [ ] Travel background is visible but does not reduce readability.
+- [ ] Cards have coherent colors and spacing.
+- [ ] Persian text is not clipped.
+- [ ] Chinese text is not clipped.
+- [ ] Exhibitions card is present.
+- [ ] Rose Kabood external-link action does not crash if no browser is available.
 
 ### Text translator
 
@@ -37,8 +42,8 @@ Artifact upload
 - [ ] Chinese ↔ Persian flow behaves as documented.
 - [ ] Multiline input is usable.
 - [ ] Model preparation state is understandable.
-- [ ] Copy copies only the intended output.
-- [ ] Clear resets the input/output state.
+- [ ] Copy copies only intended output.
+- [ ] Clear resets state.
 - [ ] Translation works after model preparation.
 
 ### Image translator
@@ -53,69 +58,64 @@ Test gallery and camera separately.
 - [ ] OCR copy copies only OCR text.
 - [ ] Translation result is displayed.
 - [ ] Translation copy copies only translated text.
-- [ ] Up to 40 unique words can appear.
+- [ ] Up to 40 unique words appear.
 - [ ] Duplicates are suppressed.
-- [ ] Pinyin is displayed where available.
+- [ ] Pinyin appears where available.
 - [ ] Dictionary meaning appears where available.
-- [ ] Missing dictionary meaning is handled clearly.
-- [ ] Plus action saves a word.
+- [ ] Missing meanings are handled clearly.
+- [ ] Plus saves a word.
 - [ ] Saved state is visible.
-- [ ] Pronunciation behavior is clear when online/offline.
+- [ ] Pronunciation behavior is clear.
 
 ### Vocabulary bank
 
 - [ ] Saved word appears.
-- [ ] Word remains after app restart.
-- [ ] Search/management actions work.
-- [ ] No accidental data loss after navigation.
+- [ ] Word survives app restart.
+- [ ] Search/management works.
+- [ ] No accidental data loss occurs.
+- [ ] Manual add-word flow works.
 - [ ] Pronunciation dependency is represented correctly.
 
 ### Travel phrases
 
-- [ ] Home uses the label عبارات سفر.
+- [ ] Home label is عبارات سفر.
 - [ ] Screen title is عبارات سفر.
 - [ ] Exactly 30 phrases are present.
-- [ ] Every phrase has Chinese text.
-- [ ] Every phrase has Pinyin.
-- [ ] Every phrase has Persian meaning.
-- [ ] Every phrase has a pronunciation control.
-- [ ] Chinese TTS speaks when Chinese voice data is installed.
-- [ ] Stop behavior works.
-- [ ] Missing Chinese TTS data gives an understandable message.
+- [ ] Every phrase has Chinese, Pinyin and Persian.
+- [ ] Every phrase has pronunciation control.
+- [ ] Chinese TTS speaks when suitable voice data is installed.
+- [ ] Missing TTS data is handled clearly.
 - [ ] List scrolls normally.
 
 ### Cities
 
 - [ ] 20 city entries are present.
-- [ ] City content renders without clipping.
-- [ ] Chinese, Pinyin and Persian text are readable.
+- [ ] Chinese, Pinyin and Persian are readable.
 - [ ] City content works without internet.
 
 ### Urban routes
 
 - [ ] Urban Routes opens.
 - [ ] MetroMan information is readable.
-- [ ] External Google Play action opens when supported.
-- [ ] External-link failure does not crash the app.
+- [ ] Google Play action opens when supported.
+- [ ] External-link failure does not crash.
+
+### China exhibitions
+
+- [ ] Exhibitions entry point opens.
+- [ ] Exhibition content renders correctly.
+- [ ] Dates/location text is readable.
+- [ ] External links, if present, fail gracefully.
 
 ### Learning
 
 - [ ] Learning screen opens.
 - [ ] Yajing links are displayed correctly.
-- [ ] External-link failure does not crash the app.
-
-### Visual regression
-
-- [ ] Travel background does not reduce text readability.
-- [ ] Icon is not cropped by launcher mask.
-- [ ] Chinese characters are not clipped.
-- [ ] Persian strings remain readable.
-- [ ] Cards/lists do not overflow.
-- [ ] Theme remains coherent.
+- [ ] External-link failure does not crash.
 
 ## Offline test
 
-Disconnect the device from the internet.
+Disconnect the device.
 
 Expected local behavior:
 
@@ -127,29 +127,25 @@ Expected local behavior:
 - city information
 - travel phrase content
 
-Travel-phrase pronunciation may still work if the device has suitable offline Chinese TTS data.
-
-Expected network dependency:
+Potential network dependencies:
 
 - first-time ML Kit model acquisition
 - current generic word pronunciation
 
+Travel phrase pronunciation may work offline when Android has suitable Chinese TTS data.
+
 ## Release APK validation
 
-For a production-signed APK:
+For production release:
 
 1. clean install on a real device
 2. launch
-3. run the primary smoke tests
-4. verify applicationId com.chiniyar.app
+3. run primary smoke tests
+4. verify applicationId `com.chiniyar.app`
 5. verify versionName/versionCode
 6. verify signature
 7. calculate SHA-256
 8. preserve the exact tested APK for publication
-
-## Release priority
-
-If test time is limited, verify installation/launch first, then gallery/camera OCR, translation, word extraction/save, travel phrases/pronunciation, navigation, cities, urban routes, learning links, and visual polish.
 
 ## Bug report format
 
@@ -168,13 +164,13 @@ Record:
 
 ## Release evidence
 
-A production release should have all of these:
+A production release should have:
 
-~~~text
+```text
 CI green
-+ signed APK
++ production-signed APK
 + successful installation
 + primary device smoke test
-+ checksum
-+ exact release/source mapping
-~~~
++ SHA-256
++ exact source/tag mapping
+```

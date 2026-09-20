@@ -1,171 +1,113 @@
 # MyChiniYar Release Process
 
-## Release principle
+## Current release line
 
-A build is not automatically a release.
+- Source branch: `main`
+- Current version: `1.1.0`
+- versionCode: `3`
+- Intended production tag: `v1.1.0`
 
-A release is complete only when the exact source, tested binary, signing identity and published asset can be tied together.
+A release must be traceable to one exact source commit and one exact APK.
 
-## Current 1.0.1 line
+## Verification sequence
 
-Authoritative source branch:
-
-`main`
-
-The former `release/1.0.0` branch has been merged into `main` and is no longer required for the 1.0.x baseline.
-
-Current version configuration:
-
-- versionCode 2
-- versionName 1.0.1
-- intended public tag v1.0.1
-
-## Current CI behavior
-
-.github/workflows/android.yml continues to provide general CI validation.
-
-.github/workflows/release.yml is the production release workflow. A commit on `main` whose message starts with `release:` runs the production sequence automatically; a matching `vX.Y.Z` tag can also start the same workflow.
-
-The production workflow builds, signs, verifies and publishes the APK using GitHub Actions Secrets.
-
-## Required production sequence
-
-~~~text
-Freeze source commit
-        ↓
+```text
+Freeze main commit
+      ↓
 Build Debug
-        ↓
+      ↓
 Run Unit Tests
-        ↓
+      ↓
 Build Release
-        ↓
-Sign APK
-        ↓
-Verify signature
-        ↓
+      ↓
+Production-sign
+      ↓
+Verify APK signature
+      ↓
 Install on real device
-        ↓
+      ↓
 Run smoke tests
-        ↓
+      ↓
 Calculate SHA-256
-        ↓
-Create/update release tag
-        ↓
-Publish exact tested APK
-~~~
+      ↓
+Create/update vX.Y.Z tag
+      ↓
+Publish the exact tested APK
+```
 
-## Signing security
+## CI modes
 
-Never commit:
+### General CI
 
-- .jks or .keystore files
-- keystore passwords
-- key passwords
-- private signing material
-- encoded private signing material disguised as source data
+`.github/workflows/android.yml`
 
-Use GitHub Actions Secrets/Environments or another secure release environment.
+It runs Debug build, Unit Tests, and an installable **test-signed** Release build using an ephemeral Android debug keystore.
 
-## Release identity
+The test key is created on the runner and is never committed.
 
-Before publishing, record:
+### Production release
 
-- source commit SHA
-- versionName
-- versionCode
-- APK filename
-- APK byte size
-- SHA-256
-- signing certificate fingerprint
-- device used for final install test
-- Android version used in the test
+`.github/workflows/release.yml`
 
-The Git tag must point at the source commit that produced the tested APK.
-
-## Historical v1.0.0 warning
-
-The repository has an older GitHub Release/tag named v1.0.0 associated with historical main-branch code.
-
-Do not assume that historical asset is the current 1.0.0 APK or that it was built from the current `main` source.
-
-Before replacing or reusing the public v1.0.0 release, verify its tag target and asset checksum.
-
-## APK size policy
-
-Release optimization currently uses:
-
-~~~kotlin
-isMinifyEnabled = true
-isShrinkResources = true
-
-ndk {
-    abiFilters += listOf("arm64-v8a", "armeabi-v7a")
-}
-~~~
-
-Size regressions should be investigated before publication.
-
-Known historical drivers include native ML/OCR/translation libraries and multiple ABIs.
-
-## Pre-release checklist
-
-### Source
-
-- [ ] `main` points to the intended source commit.
-- [ ] No temporary files.
-- [ ] README matches actual behavior.
-- [ ] Release notes match actual behavior.
-- [ ] No secrets are present.
-- [ ] Unrelated development work is excluded.
-
-### Build
-
-- [ ] Debug build succeeds.
-- [ ] Unit tests succeed.
-- [ ] Release build succeeds.
-- [ ] Release APK exists.
-- [ ] ABI policy is preserved.
-
-### Device
-
-- [ ] APK installs.
-- [ ] App launches.
-- [ ] Text translation works.
-- [ ] Gallery OCR works.
-- [ ] Camera OCR works.
-- [ ] Word extraction and saving work.
-- [ ] Travel phrases work.
-- [ ] TTS behavior is understandable.
-- [ ] Cities work.
-- [ ] Urban routes work.
-- [ ] Learning links work.
-- [ ] Back navigation works.
-
-### Distribution
-
-- [ ] APK is production-signed.
-- [ ] Signature is verified.
-- [ ] SHA-256 is recorded.
-- [ ] Tag points to exact source commit.
-- [ ] Published APK is the same binary that was tested.
-- [ ] Release notes include known limitations.
-
-## Automated signing
-
-The production workflow reads the Android release keystore and its credentials only from GitHub Actions Secrets:
+Production signing uses GitHub Actions Secrets:
 
 - `CHINIYAR_KEYSTORE_BASE64`
 - `CHINIYAR_KEYSTORE_PASSWORD`
 - `CHINIYAR_KEY_ALIAS`
 - `CHINIYAR_KEY_PASSWORD`
 
-The keystore is reconstructed only on the ephemeral GitHub Actions runner, used for signing, and never committed to the repository.
+The workflow reconstructs the keystore only on the ephemeral runner, signs the APK, verifies the certificate, calculates SHA-256 and publishes the release asset.
 
-## Rollback principle
+## Signing rules
 
-If a published release has a defect:
+Never commit:
 
-- preserve the original released artifact
-- do not rewrite release history casually
-- increment versionCode for a corrective release
-- document the defect and the new artifact checksum
+- `.jks`
+- `.keystore`
+- passwords
+- private keys
+- base64-encoded private signing material
+
+The test signing configuration is enabled only when Gradle property `testReleaseSigning=true` is explicitly supplied.
+
+## Required release metadata
+
+Record:
+
+- versionName
+- versionCode
+- source commit SHA
+- APK filename
+- APK byte size
+- APK SHA-256
+- signing certificate SHA-256
+- device and Android version used for final installation test
+
+## Device smoke tests
+
+At minimum verify:
+
+- launch
+- Home rendering
+- navigation/back behavior
+- text translation
+- gallery OCR
+- camera OCR
+- OCR/translation copy actions
+- word extraction
+- word saving
+- vocabulary persistence
+- travel phrases
+- pronunciation behavior
+- cities
+- urban routes
+- learning links
+- exhibitions entry point
+
+## Release safety
+
+A green CI run is not proof of production signing or real-device acceptance.
+
+Do not publish a test-signed APK as a production release.
+
+Do not reuse historical release assets without verifying their source commit and checksum.

@@ -7,19 +7,15 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
 
-// MyChiniYar visual identity: Chinese red, warm gold, jade/teal and porcelain cream.
 private val Porcelain = Color(0xFFFFFBF2)
 private val PorcelainSurface = Color(0xFFFFF7E8)
-private val WhiteSurface = Color(0xFFFFFEFA)
-private val SoftOutline = Color(0xFF7A6F62)
 private val ChineseRed = Color(0xFFC62828)
 private val ChineseRedDark = Color(0xFF8E1B1B)
 private val ImperialGold = Color(0xFFD6A72C)
 private val Jade = Color(0xFF247C78)
-private val Ink = Color(0xFF1E2A2D)
-private val MutedInk = Color(0xFF4F595B)
+private val Ink = Color(0xFF173B4B)
+private val MutedInk = Color(0xFF5D6E73)
 private val DarkBackground = Color(0xFF171313)
 private val DarkSurface = Color(0xFF25201F)
 private val DarkCard = Color(0xFF302A28)
@@ -41,11 +37,11 @@ private val LightColors = lightColorScheme(
     onTertiaryContainer = Color(0xFF251A00),
     background = Porcelain,
     onBackground = Ink,
-    surface = WhiteSurface,
+    surface = Porcelain,
     onSurface = Ink,
     surfaceVariant = PorcelainSurface,
     onSurfaceVariant = MutedInk,
-    outline = SoftOutline
+    outline = Color(0xFF9A8F80)
 )
 
 private val DarkColors = darkColorScheme(
@@ -70,28 +66,14 @@ private val DarkColors = darkColorScheme(
     outline = Color(0xFFA99B96)
 )
 
-private val BaseTypography = Typography()
-private val MyChiniYarTypography = BaseTypography.copy(
-    headlineMedium = BaseTypography.headlineMedium.copy(fontSize = 28.sp, lineHeight = 36.sp),
-    headlineSmall = BaseTypography.headlineSmall.copy(fontSize = 24.sp, lineHeight = 32.sp),
-    titleLarge = BaseTypography.titleLarge.copy(fontSize = 21.sp, lineHeight = 29.sp),
-    titleMedium = BaseTypography.titleMedium.copy(fontSize = 18.sp, lineHeight = 26.sp),
-    titleSmall = BaseTypography.titleSmall.copy(fontSize = 16.sp, lineHeight = 23.sp),
-    bodyLarge = BaseTypography.bodyLarge.copy(fontSize = 17.sp, lineHeight = 28.sp),
-    bodyMedium = BaseTypography.bodyMedium.copy(fontSize = 16.sp, lineHeight = 25.sp),
-    bodySmall = BaseTypography.bodySmall.copy(fontSize = 14.sp, lineHeight = 22.sp),
-    labelLarge = BaseTypography.labelLarge.copy(fontSize = 15.sp, lineHeight = 21.sp),
-    labelMedium = BaseTypography.labelMedium.copy(fontSize = 14.sp, lineHeight = 20.sp),
-    labelSmall = BaseTypography.labelSmall.copy(fontSize = 13.sp, lineHeight = 18.sp)
-)
+private val MyChiniYarTypography = Typography()
 
 @Composable
 fun MyChiniYarTheme(
-    // The product identity is intentionally light/porcelain by default; dark mode remains supported.
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) DarkColors else LightColors
+    val colors = if (darkTheme && isSystemInDarkTheme()) DarkColors else LightColors
     MaterialTheme(
         colorScheme = colors,
         typography = MyChiniYarTypography,

@@ -1,93 +1,80 @@
-# MyChiniYar — Project Status Snapshot
+# MyChiniYar — Project Status
 
-Date of this snapshot: 2026-09-18
+**Status date:** 2026-09-21  
+**Current development branch:** `main`  
+**Current product version:** `1.1.0`  
+**versionCode:** `3`
 
-## Authoritative release line
+## Current lifecycle state
 
-Repository: https://github.com/armqwearm/MyChiniYar
+The repository is now organized around a single authoritative branch: `main`.
 
-Branch: release/1.0.0
+Historical release branches `release/1.0.0` and earlier feature branches were already merged/retired from the active workflow. The remaining `feature/yajing-theme-v1.1.0` branch contains the Yajing visual redesign and test-release work and is being integrated into `main` as part of this lifecycle cleanup.
 
-At the time of this snapshot, release/1.0.0 points to commit:
+After this integration, new work must start from `main` and use short-lived `feature/*` branches.
 
-7cf09a03345796b233cefcef9bbf65f501d855a7
+## 1.1.0 product changes
 
-This commit is the latest documentation update at the time of this snapshot. Earlier commits on the same release branch contain the product implementation and UI changes.
+- Yajing/China-travel visual theme on the Home screen.
+- Lightweight vector travel background to avoid adding a large raster asset.
+- New porcelain / Chinese-red / imperial-gold / jade palette.
+- Eight primary Home feature cards.
+- China exhibitions entry point.
+- Rose Kabood travel-service entry point.
+- Existing OCR, translation, vocabulary, phrases, cities, routes and learning features retained.
+- Release CI can produce an installable test-signed APK without changing the production signing workflow.
 
-## Product state
+## Verification completed
 
-The current 1.0.0 release line includes:
+The 1.1.0 test build was produced from commit `3377a5da7bb3abec6e8dcc6ed43392a9bfb20110`.
 
-- Chinese ↔ Persian text translation.
-- Chinese image OCR from gallery and camera.
-- Separate OCR and translated-text copy actions.
-- Up to 40 unique extracted Chinese words.
-- Pinyin and local dictionary lookup.
-- Local Room vocabulary bank.
-- 30 travel phrases under the user-facing name عبارات سفر.
-- Per-phrase pronunciation using Android TextToSpeech.
-- 20 offline Chinese city profiles.
-- Urban Routes section with MetroMan guidance.
-- Learning/resources links.
-- Travel-oriented home background.
-- Custom app icon.
+CI run #275 / workflow run `35451274740` completed successfully:
 
-## CI state
+- Debug build: passed
+- Unit tests: passed
+- Test signing preparation: passed
+- Release build: passed
+- APK output verification: passed
+- Artifact upload: passed
 
+The test release APK was approximately 50.65 MB.
 
-The latest CI run for this snapshot was run 242 (workflow run 35289970110), triggered by the documentation update commit. Its build was still in progress when this snapshot was written.
+This is a **test-signed APK**, not the production-signed public release.
 
-The CI workflow is:
+## Production release status
 
-.github/workflows/android.yml
+The repository contains a production release workflow at `.github/workflows/release.yml`. It expects the permanent signing credentials to be configured as GitHub Actions Secrets.
 
-It currently performs:
+Required secrets:
 
-1. Debug APK build
-2. Unit tests
-3. Release APK build
-4. Output verification
-5. Artifact uploads
+- `CHINIYAR_KEYSTORE_BASE64`
+- `CHINIYAR_KEYSTORE_PASSWORD`
+- `CHINIYAR_KEY_ALIAS`
+- `CHINIYAR_KEY_PASSWORD`
 
-The Release APK produced by this workflow is unsigned and is therefore a verification artifact, not a production-signed release APK.
+Do not add signing material to Git.
 
-## Important release distinction
+## Known limitations
 
-A green CI run means the checked-in code built and automated tests passed.
-
-It does not by itself prove:
-
-- production signing
-- successful real-device installation
-- full UI acceptance
-- correct public release asset mapping
-
-## Historical release warning
-
-The repository contains an existing GitHub Release named v1.0.0 whose target is historical main-branch code.
-
-Do not use that existing asset as proof that it is the current release/1.0.0 binary.
-
-The current authoritative source line is release/1.0.0.
-
-## Current known limitations
-
-- Generic word pronunciation is currently online.
-- Travel-phrase pronunciation depends on the Android device having an appropriate Chinese TTS voice/data package.
-- Initial ML Kit translation-model acquisition may need internet.
-- Production signing has not been added to the repository CI workflow.
+- Generic extracted-word pronunciation currently uses an online provider.
+- Travel phrase pronunciation depends on Android Chinese TTS data being available on the device.
+- The first ML Kit translation-model acquisition may require internet access.
 - UI/instrumentation coverage is not comprehensive.
-- R8 keep rules are conservative.
+- The bundled dictionary is not guaranteed to contain every possible Chinese word.
+- The vector background is a lightweight visual implementation inspired by the approved travel theme; it is intentionally not a large raster image.
 
-## Developer entry point
+## Authoritative documentation
 
-A new collaborator should read, in this order:
+Start here:
 
-1. DEVELOPER_HANDOFF.md
-2. CONTRIBUTING.md
-3. docs/ARCHITECTURE.md
-4. docs/TEST_PLAN.md
-5. docs/RELEASE_PROCESS.md
-6. docs/ROADMAP.md
+1. `README.md`
+2. `DEVELOPER_HANDOFF.md`
+3. `CONTRIBUTING.md`
+4. `docs/DEVELOPER_QUICK_START.md`
+5. `docs/ARCHITECTURE.md`
+6. `docs/TEST_PLAN.md`
+7. `docs/RELEASE_PROCESS.md`
+8. `docs/BRANCH_AND_RELEASE_LIFECYCLE.md`
+9. `docs/ROADMAP.md`
 
-The intent is that prior conversation history is not required for project onboarding.
+The repository is intended to contain enough information for another developer to build, test and continue the project without relying on private chat history.

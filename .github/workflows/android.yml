@@ -34,17 +34,26 @@ jobs:
       - name: Run unit tests
         run: gradle --no-daemon :app:testDebugUnitTest
 
-      - name: Build release APK (unsigned verification)
-        run: gradle --no-daemon :app:assembleRelease
+      - name: Prepare ephemeral test signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair               -keystore "$HOME/.android/debug.keystore"               -storepass android               -keypass android               -alias androiddebugkey               -keyalg RSA               -keysize 2048               -validity 10000               -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Build release APK (installable test-signed)
+        run: gradle --no-daemon -PtestReleaseSigning=true :app:assembleRelease
 
       - name: Verify APK outputs
         shell: bash
         run: |
           set -euo pipefail
           test -s app/build/outputs/apk/debug/app-debug.apk
-          test -s app/build/outputs/apk/release/app-release-unsigned.apk
+          test -s app/build/outputs/apk/release/app-release.apk
           echo "Debug APK: $(stat -c%s app/build/outputs/apk/debug/app-debug.apk) bytes"
-          echo "Release APK: $(stat -c%s app/build/outputs/apk/release/app-release-unsigned.apk) bytes"
+          echo "Release APK: $(stat -c%s app/build/outputs/apk/release/app-release.apk) bytes"
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
