@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.sp
 // MyChiniYar visual identity: Chinese red, warm gold, jade/teal and porcelain cream.
 private val Porcelain = Color(0xFFFFFBF2)
 private val PorcelainSurface = Color(0xFFFFF7E8)
+private val WhiteSurface = Color(0xFFFFFEFA)
+private val SoftOutline = Color(0xFF7A6F62)
 private val ChineseRed = Color(0xFFC62828)
 private val ChineseRedDark = Color(0xFF8E1B1B)
 private val ImperialGold = Color(0xFFD6A72C)
@@ -39,11 +41,11 @@ private val LightColors = lightColorScheme(
     onTertiaryContainer = Color(0xFF251A00),
     background = Porcelain,
     onBackground = Ink,
-    surface = Porcelain,
+    surface = WhiteSurface,
     onSurface = Ink,
     surfaceVariant = PorcelainSurface,
     onSurfaceVariant = MutedInk,
-    outline = Color(0xFF7A6F62)
+    outline = SoftOutline
 )
 
 private val DarkColors = darkColorScheme(
