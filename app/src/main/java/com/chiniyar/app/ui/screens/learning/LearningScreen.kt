@@ -2,10 +2,8 @@ package com.chiniyar.app.ui.screens.learning
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +29,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,7 +41,7 @@ private const val BALE_URL = "https://ble.ir/Yajing_chinese"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LearningScreen(onBack: () -> Unit) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
 
     fun openUrl(url: String) {
@@ -64,7 +63,10 @@ fun LearningScreen(onBack: () -> Unit) {
         }
     ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(18.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Card(
@@ -72,29 +74,63 @@ fun LearningScreen(onBack: () -> Unit) {
                 shape = RoundedCornerShape(26.dp),
                 colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer)
             ) {
-                Column(modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
                     Text("🎓", style = MaterialTheme.typography.headlineMedium)
-                    Text("مسیر یادگیری چینی", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    Text(
+                        "مسیر یادگیری چینی",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.Center
+                    )
                     Text(
                         "یجینگ چاینیز با استفاده از جدیدترین متدهای آموزش زبان چینی، از جمله گیمیفیکیشن و هوش مصنوعی، به کودکان و بزرگسالان کمک می‌کند چینی را جذاب‌تر و کاربردی‌تر یاد بگیرند.",
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center
                     )
                 }
             }
 
-            Text("منابع آموزشی", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            Text(
+                "منابع آموزشی",
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = colors.surface)
             ) {
-                Column(modifier = Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.Language, contentDescription = null, tint = colors.primary, modifier = Modifier.size(30.dp))
-                    Text("یادگیری زبان چینی با یجینگ چاینیز", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                    Text("سایت و کانال‌های آموزشی", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Center)
-                }
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(18.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Default.Language,
+                        contentDescription = null,
+                        tint = colors.primary,
+                        modifier = Modifier.size(30.dp)
+                    )
+                    Text(
+                        "یادگیری زبان چینی با یجینگ چاینیز",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        "سایت و کانال‌های آموزشی",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
                     Button(
                         onClick = { openUrl(WEBSITE_URL) },
                         modifier = Modifier.fillMaxWidth(),
