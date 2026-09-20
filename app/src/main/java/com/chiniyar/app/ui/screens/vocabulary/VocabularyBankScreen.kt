@@ -133,13 +133,11 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                 shape = RoundedCornerShape(22.dp),
                 colors = CardDefaults.cardColors(containerColor = colors.tertiaryContainer)
             ) {
-                Row(modifier = Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Icon(Icons.Default.Add, contentDescription = null, tint = colors.tertiary, modifier = Modifier.size(30.dp))
-                    Column(modifier = Modifier.weight(1f).padding(start = 10.dp), horizontalAlignment = Alignment.End) {
-                        Text("واژه‌های منتخب من", fontWeight = FontWeight.Bold)
-                        Text("واژه‌های مهمت را ذخیره و هر زمان مرور کن", style = MaterialTheme.typography.bodySmall)
-                        Text("می‌توانی واژه را مستقیم و دستی هم اضافه کنی.", style = MaterialTheme.typography.labelMedium, color = colors.tertiary)
-                    }
+                    Text("واژه‌های منتخب من", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    Text("واژه‌های مهمت را ذخیره و هر زمان مرور کن", style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+                    Text("می‌توانی واژه را مستقیم و دستی هم اضافه کنی.", style = MaterialTheme.typography.labelMedium, color = colors.tertiary, textAlign = TextAlign.Center)
                 }
             }
             OutlinedTextField(
@@ -152,7 +150,7 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                 placeholder = { Text("Hanzi، Pinyin یا معنی") },
                 shape = RoundedCornerShape(18.dp)
             )
-            Text("${filtered.size} لغت", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text("${filtered.size} لغت", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             if (filtered.isEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -205,9 +203,9 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
         AlertDialog(
             onDismissRequest = { showAddDialog = false },
             title = {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("افزودن واژه جدید", fontWeight = FontWeight.ExtraBold)
-                    Text("یک واژه را برای بانک شخصی خودت ثبت کن.", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("افزودن واژه جدید", fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    Text("یک واژه را برای بانک شخصی خودت ثبت کن.", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant, textAlign = TextAlign.Center)
                 }
             },
             text = {
@@ -316,9 +314,9 @@ private fun VocabularyCard(entry: VocabularyEntry, onDelete: () -> Unit) {
             ) {
                 Text(entry.word, style = MaterialTheme.typography.titleLarge, color = colors.tertiary, fontWeight = FontWeight.Bold)
             }
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp), horizontalAlignment = Alignment.End) {
-                Text(entry.pinyin, style = MaterialTheme.typography.titleMedium, color = colors.secondary)
-                Text(entry.meaning, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Right)
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(entry.pinyin, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium, color = colors.secondary, textAlign = TextAlign.Center)
+                Text(entry.meaning, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
             }
             OnlineChinesePronunciationButton(entry.word)
             IconButton(onClick = onDelete) {
