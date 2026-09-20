@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -81,41 +82,86 @@ fun HomeScreen(
     )
 
     Box(modifier = Modifier.fillMaxSize().background(colors.background)) {
-        TravelBackground(modifier = Modifier.fillMaxSize(), alpha = 0.28f)
-        Box(modifier = Modifier.fillMaxSize().background(colors.background.copy(alpha = 0.18f)))
+        TravelBackground(modifier = Modifier.fillMaxSize(), alpha = 0.22f)
+        Box(modifier = Modifier.fillMaxSize().background(colors.background.copy(alpha = 0.34f)))
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Spacer(Modifier.height(14.dp))
             Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = colors.primaryContainer), elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)) {
-                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("چینی‌یار", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, color = colors.primary)
-                        Text("یادگیری چینی • سفر به چین • کشف بیشتر", style = MaterialTheme.typography.bodyMedium, color = colors.onPrimaryContainer)
-                    }
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(3.dp)
+                ) {
                     Text("🏮", style = MaterialTheme.typography.headlineLarge)
+                    Text(
+                        "چینی‌یار",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = colors.primary,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        "یادگیری چینی • سفر به چین • کشف بیشتر",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.onPrimaryContainer,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
             Text("همراه هوشمند شما برای چین", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Right)
             Text("ترجمه، واژه‌ها و اطلاعات سفر؛ حتی وقتی اینترنت در دسترس نیست.", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Right)
             LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.fillMaxWidth().weight(1f), contentPadding = PaddingValues(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 items(features) { feature ->
-                    Card(onClick = feature.action, modifier = Modifier.fillMaxWidth().border(1.dp, feature.accent.copy(alpha = 0.16f), RoundedCornerShape(22.dp)), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = colors.surface.copy(alpha = 0.60f)), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                        Column(modifier = Modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Box(modifier = Modifier.size(42.dp).background(feature.accent.copy(alpha = 0.12f), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
+                    Card(
+                        onClick = feature.action,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 150.dp)
+                            .border(1.dp, feature.accent.copy(alpha = 0.18f), RoundedCornerShape(22.dp)),
+                        shape = RoundedCornerShape(22.dp),
+                        colors = CardDefaults.cardColors(containerColor = colors.surface.copy(alpha = 0.90f)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(15.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier.size(42.dp).background(feature.accent.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Icon(feature.icon, contentDescription = feature.title, tint = feature.accent, modifier = Modifier.size(23.dp))
                             }
-                            Text(feature.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            Text(feature.description, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                            Text(
+                                feature.title,
+                                modifier = Modifier.fillMaxWidth(),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                            Text(
+                                feature.description,
+                                modifier = Modifier.fillMaxWidth(),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = colors.onSurfaceVariant,
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
                 }
             }
-            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer.copy(alpha = 0.68f))) {
+            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer.copy(alpha = 0.90f))) {
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text("🌹", style = MaterialTheme.typography.titleLarge)
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("آماده سفر به چین هستی؟", fontWeight = FontWeight.Bold)
-                        Text("آژانس مسافرتی رز کبود • برنامه‌ریزی و خدمات سفر", style = MaterialTheme.typography.bodySmall)
-                        Text("rosekabood.com  ›", style = MaterialTheme.typography.labelMedium, color = colors.primary)
+                    Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("آماده سفر به چین هستی؟", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                        Text(
+                            "آژانس مسافرتی رز کبود • برنامه‌ریزی و خدمات سفر",
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center
+                        )
+                        Text("rosekabood.com  ›", style = MaterialTheme.typography.labelMedium, color = colors.primary, textAlign = TextAlign.Center)
                     }
                     IconButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RoseKaboodUrl))) }) {
                         Icon(Icons.Default.TravelExplore, contentDescription = "وب‌سایت رز کبود", tint = colors.primary)
