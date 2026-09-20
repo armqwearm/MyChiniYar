@@ -91,19 +91,19 @@ fun CitiesScreen(onBack: () -> Unit) {
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Text("🏯", style = MaterialTheme.typography.headlineMedium)
-                            Column(modifier = Modifier.weight(1f)) {
+                            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     "راهنمای سفر به ۲۰ شهر چین",
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = colors.primary,
-                                    textAlign = TextAlign.Right
+                                    textAlign = TextAlign.Center
                                 )
                                 Text(
                                     "اطلاعات شهرها داخل برنامه ذخیره شده و آفلاین قابل مشاهده است.",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = colors.onPrimaryContainer,
-                                    textAlign = TextAlign.Right
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
@@ -126,13 +126,13 @@ private fun CityCard(city: ChinaCity) {
         colors = CardDefaults.cardColors(containerColor = colors.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 BoxedCityIcon()
                 Spacer(Modifier.size(10.dp))
-                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
-                    Text(city.nameFa, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
-                    Text("${city.nameZh}  •  ${city.pinyin}", style = MaterialTheme.typography.bodyMedium, color = colors.secondary)
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(city.nameFa, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    Text("${city.nameZh}  •  ${city.pinyin}", style = MaterialTheme.typography.bodyMedium, color = colors.secondary, textAlign = TextAlign.Center)
                 }
             }
 
