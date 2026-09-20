@@ -114,24 +114,29 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
     }) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = colors.primaryContainer)) {
-                Column(modifier = Modifier.fillMaxWidth().padding(18.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("۳۰ عبارت ضروری سفر به چین", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold)
-                    Text("برای هر عبارت روی آیکون 🔊 بزنید تا تلفظ چینی پخش شود.", style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Right)
+                Column(modifier = Modifier.fillMaxWidth().padding(18.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                    Text("۳۰ عبارت ضروری سفر به چین", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    Text("برای هر عبارت روی آیکون 🔊 بزنید تا تلفظ چینی پخش شود.", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
                 }
             }
-            if (ttsError) Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = colors.errorContainer), shape = RoundedCornerShape(16.dp)) { Text("تلفظ چینی روی دستگاه در دسترس نیست. بسته صدای زبان چینی را در تنظیمات Text-to-Speech دستگاه نصب یا فعال کنید.", modifier = Modifier.padding(12.dp), color = colors.onErrorContainer, textAlign = TextAlign.Right) }
+            if (ttsError) Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = colors.errorContainer), shape = RoundedCornerShape(16.dp)) {
+                Text("تلفظ چینی روی دستگاه در دسترس نیست. بسته صدای زبان چینی را در تنظیمات Text-to-Speech دستگاه نصب یا فعال کنید.", modifier = Modifier.fillMaxWidth().padding(14.dp), style = MaterialTheme.typography.bodyMedium, color = colors.onErrorContainer, textAlign = TextAlign.Center)
+            }
             if (isSpeaking) Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer), shape = RoundedCornerShape(16.dp)) {
-                Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) { Text("در حال پخش تلفظ…", fontWeight = FontWeight.Bold); IconButton(onClick = ::stopSpeaking) { Icon(Icons.Default.Stop, contentDescription = "توقف پخش") } }
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("در حال پخش تلفظ…", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    IconButton(onClick = ::stopSpeaking) { Icon(Icons.Default.Stop, contentDescription = "توقف پخش") }
+                }
             }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().weight(1f)) {
                 items(travelPhrases) { phrase ->
                     Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = colors.surface), elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)) {
                         Row(modifier = Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             IconButton(onClick = { if (speakingPhrase == phrase.chinese) stopSpeaking() else speak(phrase) }, modifier = Modifier.size(46.dp).background(colors.primaryContainer, RoundedCornerShape(14.dp))) { Icon(if (speakingPhrase == phrase.chinese) Icons.Default.Stop else Icons.Default.VolumeUp, contentDescription = if (speakingPhrase == phrase.chinese) "توقف تلفظ" else "پخش تلفظ", tint = colors.primary) }
-                            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                                Text(phrase.chinese, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Right)
-                                Text(phrase.pinyin, style = MaterialTheme.typography.bodyMedium, color = colors.secondary, textAlign = TextAlign.Right)
-                                Text(phrase.persian, style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant, textAlign = TextAlign.Right)
+                            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                                Text(phrase.chinese, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                Text(phrase.pinyin, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium, color = colors.secondary, textAlign = TextAlign.Center)
+                                Text(phrase.persian, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant, textAlign = TextAlign.Center)
                             }
                         }
                     }
