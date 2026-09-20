@@ -83,7 +83,7 @@ fun RoutesScreen(onBack: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.ExtraBold,
-                textAlign = TextAlign.Right
+                textAlign = TextAlign.Center
             )
             Text(
                 "برای پیدا کردن مسیر مترو، زمان سفر و ایستگاه‌های مناسب، فعلاً MetroMan را به‌عنوان راهنمای مترو معرفی می‌کنیم.",
@@ -113,9 +113,9 @@ fun RoutesScreen(onBack: () -> Unit) {
                             tint = colors.primary,
                             modifier = Modifier.size(42.dp)
                         )
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("MetroMan China", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
-                            Text("راهنمای مترو چین", style = MaterialTheme.typography.bodyMedium, color = colors.onPrimaryContainer)
+                        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("MetroMan China", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                            Text("راهنمای مترو چین", style = MaterialTheme.typography.bodyMedium, color = colors.onPrimaryContainer, textAlign = TextAlign.Center)
                         }
                     }
 
@@ -158,7 +158,7 @@ fun RoutesScreen(onBack: () -> Unit) {
                     modifier = Modifier.padding(15.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.onSurfaceVariant,
-                    textAlign = TextAlign.Right
+                    textAlign = TextAlign.Center
                 )
             }
         }
