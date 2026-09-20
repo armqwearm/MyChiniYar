@@ -72,36 +72,29 @@ fun LearningScreen(onBack: () -> Unit) {
                 shape = RoundedCornerShape(26.dp),
                 colors = CardDefaults.cardColors(containerColor = colors.secondaryContainer)
             ) {
-                Column(modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.End) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("🎓", style = MaterialTheme.typography.headlineMedium)
-                        Spacer(Modifier.size(10.dp))
-                        Text("مسیر یادگیری چینی", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold)
-                    }
+                Column(modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("🎓", style = MaterialTheme.typography.headlineMedium)
+                    Text("مسیر یادگیری چینی", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
                     Text(
                         "یجینگ چاینیز با استفاده از جدیدترین متدهای آموزش زبان چینی، از جمله گیمیفیکیشن و هوش مصنوعی، به کودکان و بزرگسالان کمک می‌کند چینی را جذاب‌تر و کاربردی‌تر یاد بگیرند.",
                         modifier = Modifier.padding(top = 8.dp),
                         style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Right
+                        textAlign = TextAlign.Center
                     )
                 }
             }
 
-            Text("منابع آموزشی", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text("منابع آموزشی", modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = colors.surface)
             ) {
-                Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Language, contentDescription = null, tint = colors.primary)
-                        Spacer(Modifier.size(8.dp))
-                        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
-                            Text("یادگیری زبان چینی با یجینگ چاینیز", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                            Text("سایت و کانال‌های آموزشی", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
-                        }
-                    }
+                Column(modifier = Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Default.Language, contentDescription = null, tint = colors.primary, modifier = Modifier.size(30.dp))
+                    Text("یادگیری زبان چینی با یجینگ چاینیز", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    Text("سایت و کانال‌های آموزشی", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant, textAlign = TextAlign.Center)
+                }
                     Button(
                         onClick = { openUrl(WEBSITE_URL) },
                         modifier = Modifier.fillMaxWidth(),
