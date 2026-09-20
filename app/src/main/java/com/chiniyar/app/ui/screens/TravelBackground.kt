@@ -13,7 +13,7 @@ fun TravelBackground(
     alpha: Float = 0.28f
 ) {
     Image(
-        painter = painterResource(R.drawable.yajing_travel_background),
+        painter = painterResource(R.drawable.yajing_travel_background_actual),
         contentDescription = null,
         modifier = modifier,
         contentScale = ContentScale.Crop,
