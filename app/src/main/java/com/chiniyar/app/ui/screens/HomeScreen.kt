@@ -88,8 +88,8 @@ fun HomeScreen(
     )
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFFFFBF2))) {
-        TravelBackground(modifier = Modifier.fillMaxSize(), alpha = 0.52f)
-        Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.22f)))
+        TravelBackground(modifier = Modifier.fillMaxSize(), alpha = 0.84f)
+        Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.08f)))
 
         Column(
             modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp),
