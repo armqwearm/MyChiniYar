@@ -10,7 +10,7 @@ import com.chiniyar.app.R
 @Composable
 fun TravelBackground(
     modifier: Modifier = Modifier,
-    alpha: Float = 0.52f
+    alpha: Float = 0.84f
 ) {
     Image(
         painter = painterResource(R.drawable.yajing_travel_background),
