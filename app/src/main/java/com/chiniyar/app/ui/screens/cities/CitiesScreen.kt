@@ -49,7 +49,7 @@ fun CitiesScreen(onBack: () -> Unit) {
     val colors = MaterialTheme.colorScheme
     val cities = ChinaCitiesData.cities
     Scaffold(
-        containerColor = colors.background,
+        containerColor = colors.background.copy(alpha = 0f),
         topBar = {
             TopAppBar(
                 title = { Text("شهرهای چین", fontWeight = FontWeight.Bold) },
@@ -59,7 +59,7 @@ fun CitiesScreen(onBack: () -> Unit) {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.background,
+                    containerColor = colors.background.copy(alpha = 0f),
                     titleContentColor = colors.onBackground
                 )
             )
