@@ -104,7 +104,7 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
     }
 
     Scaffold(
-        containerColor = colors.background,
+        containerColor = colors.background.copy(alpha = 0f),
         topBar = {
             TopAppBar(
                 title = { Text("بانک لغات من", fontWeight = FontWeight.Bold) },
@@ -113,7 +113,7 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f))
             )
         },
         floatingActionButton = {
