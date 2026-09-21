@@ -50,7 +50,7 @@ fun UrbanRoutesScreen(onBack: () -> Unit) {
     }
 
     Scaffold(
-        containerColor = colors.background,
+        containerColor = colors.background.copy(alpha = 0f),
         topBar = {
             TopAppBar(
                 title = { Text("مسیرهای شهری", fontWeight = FontWeight.Bold) },
@@ -59,7 +59,7 @@ fun UrbanRoutesScreen(onBack: () -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f))
             )
         }
     ) { padding ->
@@ -215,7 +215,7 @@ fun UrbanRoutesScreen(onBack: () -> Unit) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(colors.background),
+                        ,
                     shape = RoundedCornerShape(18.dp),
                     colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant)
                 ) {
