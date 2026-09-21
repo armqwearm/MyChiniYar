@@ -42,7 +42,7 @@ fun DictionaryScreen(viewModel: DictionaryViewModel, onBack: () -> Unit) {
     val colors = MaterialTheme.colorScheme
 
     Scaffold(
-        containerColor = colors.background,
+        containerColor = colors.background.copy(alpha = 0f),
         topBar = {
             TopAppBar(
                 title = { Text("واژه‌نامه چینی", fontWeight = FontWeight.Bold) },
@@ -51,7 +51,7 @@ fun DictionaryScreen(viewModel: DictionaryViewModel, onBack: () -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f))
             )
         }
     ) { padding ->
