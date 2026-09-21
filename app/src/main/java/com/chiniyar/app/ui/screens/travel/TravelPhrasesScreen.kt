@@ -109,8 +109,8 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
 
     fun stopSpeaking() { pendingPhrase = null; tts?.stop(); isSpeaking = false; speakingPhrase = null }
 
-    Scaffold(containerColor = colors.background, topBar = {
-        TopAppBar(title = { Text("عبارات سفر", fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت") } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background))
+    Scaffold(containerColor = colors.background.copy(alpha = 0f), topBar = {
+        TopAppBar(title = { Text("عبارات سفر", fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت") } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f)))
     }) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = colors.primaryContainer)) {
