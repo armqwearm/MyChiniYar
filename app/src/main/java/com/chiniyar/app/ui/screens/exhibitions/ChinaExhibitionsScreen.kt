@@ -83,7 +83,7 @@ fun ChinaExhibitionsScreen(onBack: () -> Unit) {
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         Scaffold(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f),
             topBar = {
                 TopAppBar(
                     title = { Text("نمایشگاه‌های چین", fontWeight = FontWeight.Bold) },
@@ -96,7 +96,7 @@ fun ChinaExhibitionsScreen(onBack: () -> Unit) {
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background
+                        containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f)
                     )
                 )
             }
