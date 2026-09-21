@@ -71,7 +71,7 @@ fun RoutesScreen(onBack: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colors.background)
+                
                 .padding(padding)
                 .padding(horizontal = 18.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
