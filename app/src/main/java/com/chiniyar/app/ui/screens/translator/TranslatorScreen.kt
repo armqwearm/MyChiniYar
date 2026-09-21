@@ -76,7 +76,7 @@ fun TranslatorScreen(
     }
 
     Scaffold(
-        containerColor = colors.background,
+        containerColor = colors.background.copy(alpha = 0f),
         topBar = {
             TopAppBar(
                 title = { Text("مترجم چینی ↔ فارسی", fontWeight = FontWeight.Bold) },
@@ -86,7 +86,7 @@ fun TranslatorScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.background,
+                    containerColor = colors.background.copy(alpha = 0f),
                     titleContentColor = colors.onBackground
                 )
             )
