@@ -49,7 +49,7 @@ fun LearningScreen(onBack: () -> Unit) {
     }
 
     Scaffold(
-        containerColor = colors.background,
+        containerColor = colors.background.copy(alpha = 0f),
         topBar = {
             TopAppBar(
                 title = { Text("یادگیری زبان چینی", fontWeight = FontWeight.Bold) },
@@ -58,7 +58,7 @@ fun LearningScreen(onBack: () -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f))
             )
         }
     ) { padding ->
