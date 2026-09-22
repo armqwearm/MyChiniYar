@@ -27,13 +27,24 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val app = application as ChiniYarApplication
+        val onboardingPreferences = OnboardingPreferences(this)
 
         setContent {
             MyChiniYarTheme {
                 var onboardingCompleted by remember { mutableStateOf<Boolean?>(null) }
 
                 LaunchedEffect(Unit) {
-                    onboardingCompleted = OnboardingPreferences(this@MainActivity).isCompleted()
+                    val packageInfo = packageManager.getPackageInfo(packageName, 0)
+                    val isFreshInstall = packageInfo.firstInstallTime == packageInfo.lastUpdateTime
+                    val completed = onboardingPreferences.isCompleted()
+
+                    // Existing installs/upgrades should not be interrupted by new onboarding.
+                    if (!completed && !isFreshInstall) {
+                        onboardingPreferences.markCompleted()
+                        onboardingCompleted = true
+                    } else {
+                        onboardingCompleted = completed
+                    }
                 }
 
                 CompositionLocalProvider(
@@ -51,7 +62,7 @@ class MainActivity : ComponentActivity() {
                                 navController = rememberNavController(),
                                 appContainer = app.appContainer,
                                 showOnboarding = onboardingCompleted == false,
-                                onboardingPreferences = OnboardingPreferences(this@MainActivity)
+                                onboardingPreferences = onboardingPreferences
                             )
                         }
                     }
