@@ -1,12 +1,4 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <path android:fillColor="#F7F2E8" android:pathData="M54,2A52,52 0,1 0,54 106A52,52 0,1 0,54 2" />
-    <path android:fillColor="#1976A8" android:pathData="M54,19A35,35 0,1 0,54 89A35,35 0,1 0,54 19" />
-    <path android:fillColor="#FFFFFF" android:pathData="M34,42H74V48H34Z" />
-    <path android:fillColor="#FFFFFF" android:pathData="M39,48H69V76H39Z" />
-    <path android:fillColor="#D32F2F" android:pathData="M47,54H61V76H47Z" />
-    <path android:fillColor="#FBC02D" android:pathData="M54,27A6,6 0,1 0,54 39A6,6 0,1 0,54 27" />
-</vector>
+<?xml version="1.0" encoding="utf-8"?>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/chiniyar_icon"
+    android:inset="0dp" />
