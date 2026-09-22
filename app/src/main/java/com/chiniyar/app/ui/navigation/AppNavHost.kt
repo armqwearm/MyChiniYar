@@ -6,8 +6,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.chiniyar.app.data.preferences.OnboardingPreferences
 import com.chiniyar.app.di.AppContainer
 import com.chiniyar.app.ui.screens.HomeScreen
+import com.chiniyar.app.ui.screens.WelcomeScreen
 import com.chiniyar.app.ui.screens.camera.CameraTranslatorScreen
 import com.chiniyar.app.ui.screens.camera.CameraTranslatorViewModel
 import com.chiniyar.app.ui.screens.cities.CitiesScreen
@@ -26,8 +28,30 @@ import com.chiniyar.app.ui.screens.vocabulary.VocabularyBankScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
-    NavHost(navController = navController, startDestination = AppDestination.Home.route) {
+fun AppNavHost(
+    navController: NavHostController,
+    appContainer: AppContainer,
+    showOnboarding: Boolean,
+    onboardingPreferences: OnboardingPreferences
+) {
+    val startDestination = if (showOnboarding) {
+        AppDestination.Onboarding.route
+    } else {
+        AppDestination.Home.route
+    }
+
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable(AppDestination.Onboarding.route) {
+            WelcomeScreen(
+                preferences = onboardingPreferences,
+                onFinished = {
+                    navController.navigate(AppDestination.Home.route) {
+                        popUpTo(AppDestination.Onboarding.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
         composable(AppDestination.Home.route) {
             HomeScreen(
                 onTranslatorClick = { navController.navigate(AppDestination.Translator.route) },

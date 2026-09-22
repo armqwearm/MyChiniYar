@@ -3,6 +3,7 @@ package com.chiniyar.app.ui.navigation
 sealed interface AppDestination {
     val route: String
 
+    data object Onboarding : AppDestination { override val route = "onboarding" }
     data object Home : AppDestination { override val route = "home" }
     data object Translator : AppDestination { override val route = "translator" }
     data object Dictionary : AppDestination { override val route = "dictionary" }
