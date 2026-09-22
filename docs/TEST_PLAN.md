@@ -20,10 +20,26 @@ Current CI performs:
 ### Launch and navigation
 
 - [ ] App launches without crash.
+- [ ] On a fresh install, the onboarding appears before Home.
+- [ ] Onboarding can be completed and then opens Home.
+- [ ] Onboarding can be skipped and then opens Home.
+- [ ] After onboarding is completed, restarting the app opens Home directly.
 - [ ] Home renders.
 - [ ] All primary cards open the correct destination.
 - [ ] Back navigation works.
 - [ ] No blank/error screen appears.
+
+### RTL / Persian BiDi
+
+- [ ] App UI is globally RTL for Persian content.
+- [ ] Titles, descriptions, buttons, forms and cards align correctly from the right.
+- [ ] Start/End spacing is used instead of Left/Right where direction-aware layout is required.
+- [ ] Arabic/Persian text does not reorder or clip unexpectedly.
+- [ ] Chinese + Persian combinations render in the intended visual order.
+- [ ] Pinyin + Persian combinations render in the intended visual order.
+- [ ] English/Chinese words embedded in Persian remain readable.
+- [ ] Numbers, dates, prices and version strings do not visually scramble.
+- [ ] Back/navigation affordances follow RTL expectations without breaking navigation semantics.
 
 ### Home / 1.1.0 visual baseline
 
