@@ -22,9 +22,6 @@ android {
 
     buildFeatures { compose = true }
 
-    androidResources {
-        cruncherEnabled = false
-    }
 
     val testReleaseSigning = providers.gradleProperty("testReleaseSigning").orNull == "true"
     if (testReleaseSigning) {
@@ -42,7 +39,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            isShrinkResources = true
+            isShrinkResources = !testReleaseSigning
             if (testReleaseSigning) {
                 signingConfig = signingConfigs.getByName("testRelease")
             }
