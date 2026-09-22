@@ -18,8 +18,6 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.TravelExplore
-import androidx.compose.ui.res.painterResource
-import com.chiniyar.app.R
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -143,11 +141,7 @@ fun WelcomeScreen(
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            androidx.compose.foundation.Image(
-                                painter = painterResource(R.drawable.chiniyar_icon_final),
-                                contentDescription = "آیکن چینی‌یار",
-                                modifier = Modifier.size(74.dp)
-                            )
+                            Icon(imageVector = pages[pageIndex].icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(50.dp))
                         }
 
                         Spacer(Modifier.height(28.dp))
