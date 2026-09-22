@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import com.chiniyar.app.data.preferences.OnboardingPreferences
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -59,7 +58,7 @@ fun WelcomeScreen(
     onFinished: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var pageIndex by rememberSaveable { mutableIntStateOf(0) }
+    var pageIndex by remember { mutableIntStateOf(0) }
 
     val pages = listOf(
         WelcomePage(
