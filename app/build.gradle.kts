@@ -22,6 +22,10 @@ android {
 
     buildFeatures { compose = true }
 
+    androidResources {
+        cruncherEnabled = false
+    }
+
     val testReleaseSigning = providers.gradleProperty("testReleaseSigning").orNull == "true"
     if (testReleaseSigning) {
         signingConfigs {
