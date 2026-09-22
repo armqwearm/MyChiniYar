@@ -35,6 +35,13 @@ Current CI performs:
 - [ ] Exhibitions card is present.
 - [ ] Rose Kabood external-link action does not crash if no browser is available.
 
+### Home navigation / first-use friction
+
+- [ ] Every primary Home feature has a visible entry point.
+- [ ] فرهنگ لغت is directly reachable from Home.
+- [ ] Home cards have clear, non-duplicated labels and descriptions.
+- [ ] The first two high-frequency actions (text and image translation) are immediately discoverable.
+
 ### Text translator
 
 - [ ] Chinese input works.
