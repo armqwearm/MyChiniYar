@@ -7,6 +7,7 @@ sealed interface AppDestination {
     data object Home : AppDestination { override val route = "home" }
     data object Translator : AppDestination { override val route = "translator" }
     data object Dictionary : AppDestination { override val route = "dictionary" }
+    data object Culture : AppDestination { override val route = "culture" }
     data object CameraTranslator : AppDestination { override val route = "camera_translator" }
     data object VocabularyBank : AppDestination { override val route = "vocabulary_bank" }
     data object TravelPhrases : AppDestination { override val route = "travel_phrases" }
