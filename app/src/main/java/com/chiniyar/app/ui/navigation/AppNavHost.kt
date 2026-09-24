@@ -15,6 +15,7 @@ import com.chiniyar.app.ui.screens.camera.CameraTranslatorViewModel
 import com.chiniyar.app.ui.screens.cities.CitiesScreen
 import com.chiniyar.app.ui.screens.exhibitions.ChinaExhibitionsScreen
 import com.chiniyar.app.ui.screens.dictionary.DictionaryScreen
+import com.chiniyar.app.ui.screens.culture.CultureScreen
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModel
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModelFactory
 import com.chiniyar.app.ui.screens.learning.LearningScreen
@@ -55,7 +56,7 @@ fun AppNavHost(
         composable(AppDestination.Home.route) {
             HomeScreen(
                 onTranslatorClick = { navController.navigate(AppDestination.Translator.route) },
-                onDictionaryClick = { navController.navigate(AppDestination.Dictionary.route) },
+                onCultureClick = { navController.navigate(AppDestination.Culture.route) },
                 onCameraClick = { navController.navigate(AppDestination.CameraTranslator.route) },
                 onVocabularyBankClick = { navController.navigate(AppDestination.VocabularyBank.route) },
                 onTravelPhrasesClick = { navController.navigate(AppDestination.TravelPhrases.route) },
@@ -70,7 +71,7 @@ fun AppNavHost(
             val vm: TranslatorViewModel = viewModel(factory = TranslatorViewModelFactory(appContainer))
             TranslatorScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
-        composable(AppDestination.Dictionary.route) {
+        composable(AppDestination.Culture.route) { CultureScreen(onBack = { navController.popBackStack() }) }\n        composable(AppDestination.Dictionary.route) {
             val vm: DictionaryViewModel = viewModel(factory = DictionaryViewModelFactory(appContainer.searchDictionaryUseCase))
             DictionaryScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
