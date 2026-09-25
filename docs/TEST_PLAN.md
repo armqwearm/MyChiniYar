@@ -160,6 +160,8 @@ Travel phrase pronunciation may work offline when Android has suitable Chinese T
 
 ## Release APK validation
 
+Target production release: v1.2.0 (versionCode 4).
+
 For production release:
 
 1. clean install on a real device
