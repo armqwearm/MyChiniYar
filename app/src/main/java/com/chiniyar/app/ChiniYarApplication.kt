@@ -1,7 +1,6 @@
 package com.chiniyar.app
 
 import android.app.Application
-import com.chiniyar.app.data.analysis.OfflineChineseDictionary
 import com.chiniyar.app.di.AppContainer
 
 class ChiniYarApplication : Application() {
@@ -9,6 +8,7 @@ class ChiniYarApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        OfflineChineseDictionary.initialize(this)
+        // Keep Application startup lightweight. The offline dictionary is loaded
+        // lazily by ChineseWordAnalyzer when the camera translation feature is used.
     }
 }
