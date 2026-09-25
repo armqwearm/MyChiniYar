@@ -192,4 +192,4 @@ jobs:
             gh release create "$RELEASE_TAG"               app/build/outputs/apk/release/app-release.apk               release-metadata.txt               --title "MyChiniYar $RELEASE_TAG"               --generate-notes
           fi
 
-# Release trigger: publish the current verified main source as the signed 1.1.0 release.
+# Release trigger: publish the current verified main source as the signed semantic version release.
