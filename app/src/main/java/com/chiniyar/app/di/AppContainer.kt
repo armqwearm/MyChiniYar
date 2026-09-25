@@ -27,7 +27,7 @@ class AppContainer(context: Context) {
     private val cameraTranslator = OfflineChinesePersianTranslator()
     val translationManager = TranslationManager(cameraTranslator)
     val vocabularyDatabase = VocabularyDatabase.getInstance(appContext)
-    val chineseWordAnalyzer = ChineseWordAnalyzer()
+    val chineseWordAnalyzer = ChineseWordAnalyzer(appContext)
     val chineseOcrProcessor = ChineseOcrProcessor()
 
     val cameraTranslationUseCase = CameraTranslationUseCase(
