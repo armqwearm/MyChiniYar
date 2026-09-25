@@ -120,6 +120,16 @@ jobs:
 
           echo "Keystore, alias and passwords are valid."
 
+      - name: Align unsigned APK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BUILD_TOOLS="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n1)"
+          "$BUILD_TOOLS/zipalign" -P 16 -f -v 4             app/build/outputs/apk/release/app-release-unsigned.apk             app/build/outputs/apk/release/app-release-unsigned-aligned.apk
+
+          "$BUILD_TOOLS/zipalign" -c -P 16 -v 4             app/build/outputs/apk/release/app-release-unsigned-aligned.apk
+
       - name: Sign APK
         env:
           KEYSTORE_PASSWORD: ${{ secrets.CHINIYAR_KEYSTORE_PASSWORD }}
@@ -131,7 +141,7 @@ jobs:
 
           BUILD_TOOLS="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n1)"
 
-          "$BUILD_TOOLS/apksigner" sign             --ks "$RUNNER_TEMP/chiniyar-release.jks"             --ks-key-alias "$KEY_ALIAS"             --ks-pass "env:KEYSTORE_PASSWORD"             --key-pass "env:KEY_PASSWORD"             --out app/build/outputs/apk/release/app-release.apk             app/build/outputs/apk/release/app-release-unsigned.apk
+          "$BUILD_TOOLS/apksigner" sign             --ks "$RUNNER_TEMP/chiniyar-release.jks"             --ks-key-alias "$KEY_ALIAS"             --ks-pass "env:KEYSTORE_PASSWORD"             --key-pass "env:KEY_PASSWORD"             --out app/build/outputs/apk/release/app-release.apk             app/build/outputs/apk/release/app-release-unsigned-aligned.apk
 
           test -s app/build/outputs/apk/release/app-release.apk
 
@@ -143,6 +153,18 @@ jobs:
           BUILD_TOOLS="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n1)"
 
           "$BUILD_TOOLS/apksigner" verify             --verbose             --print-certs             app/build/outputs/apk/release/app-release.apk             | tee "$RUNNER_TEMP/apk-signature.txt"
+
+      - name: Validate final APK package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          apk="app/build/outputs/apk/release/app-release.apk"
+          BUILD_TOOLS="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n1)"
+
+          "$BUILD_TOOLS/zipalign" -c -P 16 -v 4 "$apk"
+          "$BUILD_TOOLS/aapt2" dump badging "$apk" | grep -q "package: name='com.chiniyar.app'"
+          unzip -t "$apk" >/dev/null
 
       - name: Calculate release metadata
         id: metadata
