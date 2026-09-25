@@ -6,15 +6,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.chiniyar.app.data.preferences.OnboardingPreferences
 import com.chiniyar.app.di.AppContainer
 import com.chiniyar.app.ui.screens.HomeScreen
+import com.chiniyar.app.ui.screens.WelcomeScreen
 import com.chiniyar.app.ui.screens.camera.CameraTranslatorScreen
 import com.chiniyar.app.ui.screens.camera.CameraTranslatorViewModel
 import com.chiniyar.app.ui.screens.cities.CitiesScreen
-import com.chiniyar.app.ui.screens.exhibitions.ChinaExhibitionsScreen
+import com.chiniyar.app.ui.screens.culture.CultureScreen
 import com.chiniyar.app.ui.screens.dictionary.DictionaryScreen
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModel
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModelFactory
+import com.chiniyar.app.ui.screens.exhibitions.ChinaExhibitionsScreen
 import com.chiniyar.app.ui.screens.learning.LearningScreen
 import com.chiniyar.app.ui.screens.routes.RoutesScreen
 import com.chiniyar.app.ui.screens.routes.UrbanRoutesScreen
@@ -26,12 +29,35 @@ import com.chiniyar.app.ui.screens.vocabulary.VocabularyBankScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
-    NavHost(navController = navController, startDestination = AppDestination.Home.route) {
+fun AppNavHost(
+    navController: NavHostController,
+    appContainer: AppContainer,
+    showOnboarding: Boolean,
+    onboardingPreferences: OnboardingPreferences
+) {
+    val startDestination = if (showOnboarding) {
+        AppDestination.Onboarding.route
+    } else {
+        AppDestination.Home.route
+    }
+
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable(AppDestination.Onboarding.route) {
+            WelcomeScreen(
+                preferences = onboardingPreferences,
+                onFinished = {
+                    navController.navigate(AppDestination.Home.route) {
+                        popUpTo(AppDestination.Onboarding.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
         composable(AppDestination.Home.route) {
             HomeScreen(
                 onTranslatorClick = { navController.navigate(AppDestination.Translator.route) },
-                onDictionaryClick = { navController.navigate(AppDestination.Dictionary.route) },
+                onCultureClick = { navController.navigate(AppDestination.Culture.route) },
                 onCameraClick = { navController.navigate(AppDestination.CameraTranslator.route) },
                 onVocabularyBankClick = { navController.navigate(AppDestination.VocabularyBank.route) },
                 onTravelPhrasesClick = { navController.navigate(AppDestination.TravelPhrases.route) },
@@ -42,14 +68,22 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
                 onExhibitionsClick = { navController.navigate(AppDestination.Exhibitions.route) }
             )
         }
+
         composable(AppDestination.Translator.route) {
             val vm: TranslatorViewModel = viewModel(factory = TranslatorViewModelFactory(appContainer))
             TranslatorScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
+
+        composable(AppDestination.Culture.route) {
+            CultureScreen(onBack = { navController.popBackStack() })
+        }
+
         composable(AppDestination.Dictionary.route) {
-            val vm: DictionaryViewModel = viewModel(factory = DictionaryViewModelFactory(appContainer.searchDictionaryUseCase))
+            val vm: DictionaryViewModel =
+                viewModel(factory = DictionaryViewModelFactory(appContainer.searchDictionaryUseCase))
             DictionaryScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
+
         composable(AppDestination.CameraTranslator.route) {
             val vm: CameraTranslatorViewModel = viewModel()
             CameraTranslatorScreen(
@@ -59,24 +93,31 @@ fun AppNavHost(navController: NavHostController, appContainer: AppContainer) {
                 vocabularyDb = appContainer.vocabularyDatabase
             )
         }
+
         composable(AppDestination.VocabularyBank.route) {
             VocabularyBankScreen(onBack = { navController.popBackStack() })
         }
+
         composable(AppDestination.TravelPhrases.route) {
             TravelPhrasesScreen(onBack = { navController.popBackStack() })
         }
+
         composable(AppDestination.Learning.route) {
             LearningScreen(onBack = { navController.popBackStack() })
         }
+
         composable(AppDestination.Cities.route) {
             CitiesScreen(onBack = { navController.popBackStack() })
         }
+
         composable(AppDestination.Routes.route) {
             RoutesScreen(onBack = { navController.popBackStack() })
         }
+
         composable(AppDestination.UrbanRoutes.route) {
             UrbanRoutesScreen(onBack = { navController.popBackStack() })
         }
+
         composable(AppDestination.Exhibitions.route) {
             ChinaExhibitionsScreen(onBack = { navController.popBackStack() })
         }
