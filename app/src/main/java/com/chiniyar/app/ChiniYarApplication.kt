@@ -9,6 +9,6 @@ class ChiniYarApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         // Keep Application startup lightweight. The offline dictionary is loaded
-        // lazily by ChineseWordAnalyzer when the camera translation feature is used.
+        // lazily when the camera translation feature is first used.
     }
 }
