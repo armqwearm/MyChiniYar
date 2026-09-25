@@ -62,7 +62,7 @@ fun WelcomeScreen(
         WelcomePage(
             Icons.Default.TravelExplore,
             "چینی‌یار، همراه شما در سفر به چین",
-            "ترجمه، عبارات کاربردی، فرهنگ لغت و ابزارهای سفر؛ همه در یک برنامه."
+            "ترجمه، عبارات کاربردی، آداب و فرهنگ و ابزارهای سفر؛ همه در یک برنامه."
         ),
         WelcomePage(
             Icons.Default.CameraAlt,
