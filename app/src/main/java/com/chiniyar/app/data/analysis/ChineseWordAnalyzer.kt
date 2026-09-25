@@ -46,7 +46,6 @@ class ChineseWordAnalyzer(context: Context) {
         return result.take(MAX_WORDS)
     }
 
-    /** Returns numeric-tone pinyin, e.g. 学习 -> xue2 xi2. */
     fun pinyin(word: String): String = buildString {
         word.forEachIndexed { index, char ->
             if (index > 0) append(' ')
@@ -59,9 +58,6 @@ class ChineseWordAnalyzer(context: Context) {
 
     companion object {
         private const val MAX_WORDS = 40
-
-        private val FALLBACK_LEXICON = setOf(
-            "喜欢", "学习", "中文", "今天", "学校"
-        )
+        private val FALLBACK_LEXICON = setOf("喜欢", "学习", "中文", "今天", "学校")
     }
 }
