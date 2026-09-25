@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.DirectionsSubway
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.LocationCity
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.TravelExplore
@@ -58,7 +59,7 @@ private const val RoseKaboodUrl = "https://rosekabood.com"
 @Composable
 fun HomeScreen(
     onTranslatorClick: () -> Unit,
-    onDictionaryClick: () -> Unit,
+    onCultureClick: () -> Unit,
     onCameraClick: () -> Unit,
     onVocabularyBankClick: () -> Unit,
     onTravelPhrasesClick: () -> Unit,
@@ -80,7 +81,8 @@ fun HomeScreen(
         HomeFeature("مترجم متنی", "چینی ↔ فارسی، سریع و آفلاین", Icons.Default.Translate, onTranslatorClick, blue, Color(0xFFDCEFFF)),
         HomeFeature("مترجم تصویری", "عکس بگیر، متن را استخراج و ترجمه کن", Icons.Default.CameraAlt, onCameraClick, purple, Color(0xFFEDE3FF)),
         HomeFeature("عبارات سفر", "۳۰ عبارت ضروری + تلفظ صوتی", Icons.Default.FlightTakeoff, onTravelPhrasesClick, red, Color(0xFFFFE1E3)),
-        HomeFeature("بانک لغات من", "واژه‌های مورد علاقه را ذخیره کن", Icons.Default.Star, onVocabularyBankClick, green, Color(0xFFDDF7E8)),
+        HomeFeature("بانک لغات من", "واژه‌های ذخیره‌شده و شخصی", Icons.Default.Star, onVocabularyBankClick, green, Color(0xFFDDF7E8)),
+        HomeFeature("آداب و فرهنگ", "جشن‌ها، غذاها و رفتار مردم چین", Icons.Default.MenuBook, onCultureClick, purple, Color(0xFFEDE3FF)),
         HomeFeature("شهرهای چین", "۲۰ شهر معروف و راهنمای سفر", Icons.Default.LocationCity, onCitiesClick, gold, Color(0xFFFFEBC5)),
         HomeFeature("مسیرهای شهری", "راهنمای مترو و رفت‌وآمد در چین", Icons.Default.DirectionsSubway, onUrbanRoutesClick, teal, Color(0xFFD9F4F3)),
         HomeFeature("نمایشگاه‌های چین", "تقویم نمایشگاه‌های مهم + راهنمای بازدید", Icons.Default.Event, onExhibitionsClick, red, Color(0xFFFFE5D8)),
@@ -176,7 +178,11 @@ fun HomeScreen(
                         Text("آماده سفر به چین هستی؟", fontWeight = FontWeight.Bold, color = Color(0xFF173B4B))
                         Text("آژانس مسافرتی رز کبود • برنامه‌ریزی و خدمات سفر", style = MaterialTheme.typography.bodySmall, color = Color(0xFF50656B))
                     }
-                    IconButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RoseKaboodUrl))) }) {
+                    IconButton(onClick = {
+                        runCatching {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RoseKaboodUrl)))
+                        }
+                    }) {
                         Icon(Icons.Default.TravelExplore, contentDescription = "وب‌سایت رز کبود", tint = blue)
                     }
                 }
