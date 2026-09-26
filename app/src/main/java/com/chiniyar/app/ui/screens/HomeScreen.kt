@@ -119,14 +119,6 @@ fun HomeScreen(
             }
 
             Text(
-                "به چین خوش آمدید",
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF123B52),
-                textAlign = TextAlign.Right
-            )
-            Text(
                 "با ما، سفر به چین آسان‌تر است",
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium,
