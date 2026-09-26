@@ -3,6 +3,7 @@ package com.chiniyar.app.di
 import android.content.Context
 import com.chiniyar.app.data.analysis.ChineseWordAnalyzer
 import com.chiniyar.app.data.local.VocabularyDatabase
+import com.chiniyar.app.data.local.LocationDatabase
 import com.chiniyar.app.data.preferences.UserPreferencesRepository
 import com.chiniyar.app.data.repository.InMemoryDictionaryRepository
 import com.chiniyar.app.data.repository.InMemoryTranslationRepository
@@ -28,6 +29,7 @@ class AppContainer(context: Context) {
     private val cameraTranslator by lazy { OfflineChinesePersianTranslator() }
     val translationManager by lazy { TranslationManager(cameraTranslator) }
     val vocabularyDatabase by lazy { VocabularyDatabase.getInstance(appContext) }
+    val locationDatabase by lazy { LocationDatabase.getInstance(appContext) }
     val chineseWordAnalyzer by lazy { ChineseWordAnalyzer(appContext) }
     val chineseOcrProcessor by lazy { ChineseOcrProcessor() }
 
