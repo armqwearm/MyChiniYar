@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
                             recreate()
                         },
                         onCopy = {
-                            LocalClipboardManager.current.setText(AnnotatedString(previousCrash))
+                            clipboardManager.setText(AnnotatedString(previousCrash))
                         }
                     )
                 }
@@ -133,6 +133,7 @@ private fun StartupCrashScreen(
     onCopy: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val clipboardManager = LocalClipboardManager.current
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         Column(
