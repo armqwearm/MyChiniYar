@@ -8,17 +8,18 @@ import net.sourceforge.pinyin4j.PinyinHelper
  * The dictionary is initialized lazily so Application startup never depends on
  * asset parsing.
  */
-class ChineseWordAnalyzer(context: Context) {
-    private val appContext = context.applicationContext
+class ChineseWordAnalyzer(context: Context? = null) {
+    private val appContext = context?.applicationContext
 
     fun segment(text: String): List<String> {
-        OfflineChineseDictionary.initialize(appContext)
+        appContext?.let { OfflineChineseDictionary.initialize(it) }
 
         val result = LinkedHashSet<String>()
         val normalized = text.trim()
         if (normalized.isEmpty()) return emptyList()
 
-        val lexicon = (OfflineChineseDictionary.words() + FALLBACK_LEXICON)
+        val dictionaryWords = appContext?.let { OfflineChineseDictionary.words() }.orEmpty()
+        val lexicon = (dictionaryWords + FALLBACK_LEXICON)
             .filter { it.isNotEmpty() }
             .sortedByDescending { it.length }
 
