@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -52,6 +51,7 @@ class MainActivity : ComponentActivity() {
 
         val crashPrefs = getSharedPreferences(ChiniYarApplication.CRASH_PREFS, MODE_PRIVATE)
         val previousCrash = crashPrefs.getString(ChiniYarApplication.CRASH_TRACE_KEY, null)
+        val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
 
         if (previousCrash != null) {
             setContent {
@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
                             recreate()
                         },
                         onCopy = {
-                            clipboardManager.setText(AnnotatedString(previousCrash))
+                            clipboardManager?.setPrimaryClip(android.content.ClipData.newPlainText("ChiniYar crash report", previousCrash))
                         }
                     )
                 }
@@ -133,8 +133,6 @@ private fun StartupCrashScreen(
     onCopy: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val clipboardManager = LocalClipboardManager.current
-
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         Column(
             modifier = Modifier
