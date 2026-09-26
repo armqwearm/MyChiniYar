@@ -6,6 +6,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+// v1.2.6 startup diagnostics
 android {
     namespace = "com.chiniyar.app"
     compileSdk = 36
