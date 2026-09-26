@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.DirectionsSubway
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.LocationCity
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Translate
@@ -67,7 +68,8 @@ fun HomeScreen(
     onCitiesClick: () -> Unit,
     onRoutesClick: () -> Unit,
     onUrbanRoutesClick: () -> Unit,
-    onExhibitionsClick: () -> Unit
+    onExhibitionsClick: () -> Unit,
+    onLocationsClick: () -> Unit
 ) {
     val context = LocalContext.current
     val blue = Color(0xFF1976A8)
@@ -86,6 +88,7 @@ fun HomeScreen(
         HomeFeature("شهرهای چین", "۲۰ شهر معروف و راهنمای سفر", Icons.Default.LocationCity, onCitiesClick, gold, Color(0xFFFFEBC5)),
         HomeFeature("مسیرهای شهری", "راهنمای مترو و رفت‌وآمد در چین", Icons.Default.DirectionsSubway, onUrbanRoutesClick, teal, Color(0xFFD9F4F3)),
         HomeFeature("نمایشگاه‌های چین", "تقویم نمایشگاه‌های مهم + راهنمای بازدید", Icons.Default.Event, onExhibitionsClick, red, Color(0xFFFFE5D8)),
+        HomeFeature("مکان‌های من", "هتل، مکان‌های مهم و اشتراک‌گذاری گروهی", Icons.Default.LocationOn, onLocationsClick, teal, Color(0xFFDDF4F1)),
         HomeFeature("یادگیری چینی", "واژگان، آموزش و منابع مفید", Icons.Default.Book, onLearningClick, blue, Color(0xFFE0F0FF))
     )
 
