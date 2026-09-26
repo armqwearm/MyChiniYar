@@ -19,6 +19,7 @@ import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModel
 import com.chiniyar.app.ui.screens.dictionary.DictionaryViewModelFactory
 import com.chiniyar.app.ui.screens.exhibitions.ChinaExhibitionsScreen
 import com.chiniyar.app.ui.screens.learning.LearningScreen
+import com.chiniyar.app.ui.screens.locations.LocationsScreen
 import com.chiniyar.app.ui.screens.routes.RoutesScreen
 import com.chiniyar.app.ui.screens.routes.UrbanRoutesScreen
 import com.chiniyar.app.ui.screens.travel.TravelPhrasesScreen
@@ -65,7 +66,8 @@ fun AppNavHost(
                 onCitiesClick = { navController.navigate(AppDestination.Cities.route) },
                 onRoutesClick = { navController.navigate(AppDestination.Routes.route) },
                 onUrbanRoutesClick = { navController.navigate(AppDestination.UrbanRoutes.route) },
-                onExhibitionsClick = { navController.navigate(AppDestination.Exhibitions.route) }
+                onExhibitionsClick = { navController.navigate(AppDestination.Exhibitions.route) },
+                onLocationsClick = { navController.navigate(AppDestination.Locations.route) }
             )
         }
 
@@ -120,6 +122,13 @@ fun AppNavHost(
 
         composable(AppDestination.Exhibitions.route) {
             ChinaExhibitionsScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(AppDestination.Locations.route) {
+            LocationsScreen(
+                database = appContainer.locationDatabase,
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }
