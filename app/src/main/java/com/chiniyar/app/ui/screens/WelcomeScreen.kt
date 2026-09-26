@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.TravelExplore
@@ -27,28 +26,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.chiniyar.app.data.preferences.OnboardingPreferences
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.platform.LocalLayoutDirection
-
-private data class WelcomePage(
-    val icon: androidx.compose.ui.graphics.vector.ImageVector,
-    val title: String,
-    val description: String
-)
 
 @Composable
 fun WelcomeScreen(
@@ -56,25 +45,6 @@ fun WelcomeScreen(
     onFinished: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var pageIndex by remember { mutableIntStateOf(0) }
-
-    val pages = listOf(
-        WelcomePage(
-            Icons.Default.TravelExplore,
-            "چینی‌یار، همراه شما در سفر به چین",
-            "ترجمه، عبارات کاربردی، آداب و فرهنگ و ابزارهای سفر؛ همه در یک برنامه."
-        ),
-        WelcomePage(
-            Icons.Default.CameraAlt,
-            "ترجمه را همیشه همراهت داشته باش",
-            "با مترجم متنی و تصویری، متن‌های چینی را حتی در سفر و در حالت آفلاین ترجمه کن."
-        ),
-        WelcomePage(
-            Icons.Default.AutoAwesome,
-            "چینی را بهتر یاد بگیر",
-            "عبارات سفر، تلفظ، بانک لغات و منابع یادگیری کمک می‌کنند بعد از سفر هم از برنامه استفاده کنی."
-        )
-    )
 
     fun finish() {
         scope.launch {
@@ -85,7 +55,10 @@ fun WelcomeScreen(
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         Box(modifier = Modifier.fillMaxSize()) {
-            TravelBackground(modifier = Modifier.fillMaxSize(), alpha = 0.72f)
+            TravelBackground(
+                modifier = Modifier.fillMaxSize(),
+                alpha = 0.72f
+            )
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -95,31 +68,33 @@ fun WelcomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 22.dp, vertical = 28.dp),
+                    .padding(horizontal = 22.dp, vertical = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(Modifier.height(18.dp))
 
                 Text(
-                    "چینی‌یار",
+                    "چینی‌یار 🇨🇳",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF173B4B)
+                    color = Color(0xFF173B4B),
+                    textAlign = TextAlign.Center
                 )
+                Spacer(Modifier.height(6.dp))
                 Text(
-                    "همراه هوشمند سفر به چین 🇨🇳",
+                    "همراه ساده و کاربردی برای سفر و یادگیری چین",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color(0xFF4B6269),
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(Modifier.height(30.dp))
+                Spacer(Modifier.height(22.dp))
 
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    shape = RoundedCornerShape(30.dp),
+                    shape = RoundedCornerShape(28.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White.copy(alpha = 0.90f)
                     ),
@@ -128,68 +103,73 @@ fun WelcomeScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 24.dp, vertical = 30.dp),
+                            .padding(horizontal = 22.dp, vertical = 26.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(92.dp)
+                                .size(82.dp)
                                 .background(
                                     MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
                                     CircleShape
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(imageVector = pages[pageIndex].icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(50.dp))
+                            Icon(
+                                imageVector = Icons.Default.TravelExplore,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(46.dp)
+                            )
                         }
 
-                        Spacer(Modifier.height(28.dp))
+                        Spacer(Modifier.height(20.dp))
 
                         Text(
-                            pages[pageIndex].title,
+                            "همه‌چیز برای یک سفر راحت‌تر",
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color(0xFF173B4B),
                             textAlign = TextAlign.Center
                         )
 
-                        Spacer(Modifier.height(14.dp))
+                        Spacer(Modifier.height(10.dp))
 
                         Text(
-                            pages[pageIndex].description,
+                            "مترجم چینی↔فارسی، مترجم تصویری، عبارات ضروری سفر، آداب و فرهنگ چین، شهرها و منابع یادگیری؛ همه در یک برنامه.",
                             style = MaterialTheme.typography.bodyLarge,
                             color = Color(0xFF50656B),
                             textAlign = TextAlign.Center
                         )
 
-                        Spacer(Modifier.height(26.dp))
+                        Spacer(Modifier.height(20.dp))
 
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            pages.indices.forEach { index ->
-                                Box(
-                                    modifier = Modifier
-                                        .size(if (index == pageIndex) 22.dp else 8.dp)
-                                        .background(
-                                            if (index == pageIndex) MaterialTheme.colorScheme.primary
-                                            else Color(0xFFB7C5C9),
-                                            CircleShape
-                                        )
-                                )
-                            }
+                            WelcomeFeature(
+                                icon = Icons.Default.Translate,
+                                label = "مترجم"
+                            )
+                            WelcomeFeature(
+                                icon = Icons.Default.CameraAlt,
+                                label = "ترجمه تصویری"
+                            )
+                            WelcomeFeature(
+                                icon = Icons.Default.TravelExplore,
+                                label = "راهنمای سفر"
+                            )
                         }
                     }
                 }
 
-                Spacer(Modifier.height(18.dp))
+                Spacer(Modifier.height(16.dp))
 
                 Button(
-                    onClick = {
-                        if (pageIndex < pages.lastIndex) pageIndex++ else finish()
-                    },
+                    onClick = ::finish,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
@@ -199,19 +179,39 @@ fun WelcomeScreen(
                     )
                 ) {
                     Text(
-                        if (pageIndex < pages.lastIndex) "ادامه" else "شروع کنیم",
+                        "شروع استفاده",
                         fontWeight = FontWeight.Bold
                     )
                 }
 
-                if (pageIndex < pages.lastIndex) {
-                    TextButton(onClick = { finish() }) {
-                        Text("فعلاً رد کن")
-                    }
-                } else {
-                    Spacer(Modifier.height(36.dp))
+                TextButton(onClick = ::finish) {
+                    Text("رد کردن معرفی")
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun WelcomeFeature(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(24.dp)
+        )
+        Text(
+            label,
+            style = MaterialTheme.typography.labelMedium,
+            color = Color(0xFF50656B),
+            textAlign = TextAlign.Center
+        )
     }
 }
