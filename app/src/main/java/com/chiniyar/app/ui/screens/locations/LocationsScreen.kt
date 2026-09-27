@@ -3,6 +3,8 @@ package com.chiniyar.app.ui.screens.locations
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -268,7 +270,7 @@ fun LocationsScreen(
                             style = MaterialTheme.typography.bodySmall
                         )
                         Text(
-                            "ثبت مکان با Google Maps: لینک Share را از Google Maps کپی و در فرم Paste کن.",
+                            "موقعیت را روی نقشه آنلاین انتخاب کن یا لینک Share از Google Maps را Paste کن.",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -321,7 +323,7 @@ fun LocationsScreen(
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                "اولین مکان را با لینک Google Maps ثبت کنید.",
+                                "برای ثبت مکان، تعیین موقعیت روی نقشه الزامی است؛ لینک Google Maps اختیاری است.",
                                 textAlign = TextAlign.Center,
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -547,15 +549,27 @@ private fun LocationEditorDialog(
     onDismiss: () -> Unit,
     onSave: (SavedLocation) -> Unit
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     var name by remember(initial) { mutableStateOf(initial?.name.orEmpty()) }
     var description by remember(initial) { mutableStateOf(initial?.description.orEmpty()) }
     var category by remember(initial) { mutableStateOf(initial?.category ?: "شخصی") }
     var mapsUrl by remember(initial) { mutableStateOf(initial?.mapsUrl.orEmpty()) }
     var address by remember(initial) { mutableStateOf(initial?.address.orEmpty()) }
+    var latitude by remember(initial) { mutableStateOf(initial?.latitude) }
+    var longitude by remember(initial) { mutableStateOf(initial?.longitude) }
     var error by remember(initial) { mutableStateOf<String?>(null) }
+    var showMapPicker by remember { mutableStateOf(false) }
+    var saving by remember { mutableStateOf(false) }
+
+    val hasValidCoordinates =
+        latitude != null && longitude != null &&
+            latitude in -90.0..90.0 &&
+            longitude in -180.0..180.0
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!saving) onDismiss() },
         title = {
             Text(
                 if (initial == null) "افزودن مکان" else "ویرایش مکان",
@@ -576,7 +590,8 @@ private fun LocationEditorDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("نام مکان *") },
-                    placeholder = { Text("مثلاً هتل من") }
+                    placeholder = { Text("مثلاً هتل من") },
+                    enabled = !saving
                 )
 
                 OutlinedTextField(
@@ -585,7 +600,8 @@ private fun LocationEditorDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("نوع مکان") },
-                    placeholder = { Text(LocationCategories.joinToString("، ")) }
+                    placeholder = { Text(LocationCategories.joinToString("، ")) },
+                    enabled = !saving
                 )
 
                 OutlinedTextField(
@@ -595,7 +611,8 @@ private fun LocationEditorDialog(
                     minLines = 2,
                     maxLines = 4,
                     label = { Text("توضیحات") },
-                    placeholder = { Text("مثلاً نزدیک ورودی جنوبی نمایشگاه") }
+                    placeholder = { Text("مثلاً نزدیک ورودی جنوبی نمایشگاه") },
+                    enabled = !saving
                 )
 
                 OutlinedTextField(
@@ -604,26 +621,79 @@ private fun LocationEditorDialog(
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 1,
                     maxLines = 2,
-                    label = { Text("آدرس، در صورت نیاز") }
+                    label = { Text("آدرس، در صورت نیاز") },
+                    enabled = !saving
                 )
+
+                OutlinedButton(
+                    onClick = {
+                        if (isOnline(context)) {
+                            error = null
+                            showMapPicker = true
+                        } else {
+                            error = "برای انتخاب موقعیت روی نقشه، اتصال اینترنت لازم است."
+                        }
+                    },
+                    enabled = !saving,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Map, contentDescription = null)
+                    Spacer(Modifier.size(6.dp))
+                    Text(
+                        if (hasValidCoordinates) {
+                            "تغییر موقعیت روی نقشه"
+                        } else {
+                            "انتخاب موقعیت روی نقشه *"
+                        }
+                    )
+                }
+
+                if (hasValidCoordinates) {
+                    Text(
+                        String.format(
+                            Locale.US,
+                            "موقعیت ثبت‌شده: %.6f, %.6f",
+                            latitude,
+                            longitude
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                } else {
+                    Text(
+                        "تعیین موقعیت روی نقشه برای ذخیره این مکان الزامی است.",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Right,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
 
                 OutlinedTextField(
                     value = mapsUrl,
                     onValueChange = {
                         mapsUrl = it
                         error = null
+
+                        LocationShareCodec.extractCoordinates(it)?.let { coordinates ->
+                            latitude = coordinates.first
+                            longitude = coordinates.second
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 1,
                     maxLines = 3,
-                    label = { Text("لینک Google Maps *") },
+                    label = { Text("لینک Google Maps (اختیاری)") },
                     placeholder = {
-                        Text("لینک Share از Google Maps را Paste کنید")
-                    }
+                        Text("در صورت داشتن لینک Share می‌توانید اینجا Paste کنید")
+                    },
+                    enabled = !saving
                 )
 
                 Text(
-                    "Google Maps → Share → Copy link → اینجا Paste",
+                    "اگر لینک را وارد نکنی، چینی‌یار بعد از انتخاب موقعیت لینک Google Maps را خودکار می‌سازد.",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -643,17 +713,73 @@ private fun LocationEditorDialog(
                     val cleanName = name.trim()
                     val cleanUrl = LocationShareCodec.cleanMapsUrl(mapsUrl)
 
-                    error = when {
-                        cleanName.isBlank() -> "نام مکان را وارد کنید."
-                        cleanUrl.isBlank() -> "لینک Google Maps را وارد کنید."
-                        !LocationShareCodec.isHttpUrl(cleanUrl) ->
-                            "لینک Google Maps باید یک لینک معتبر http یا https باشد."
-                        else -> null
+                    when {
+                        cleanName.isBlank() -> {
+                            error = "نام مکان را وارد کنید."
+                            return@Button
+                        }
+
+                        cleanUrl.isNotBlank() &&
+                            !LocationShareCodec.isHttpUrl(cleanUrl) -> {
+                            error = "لینک Google Maps باید یک لینک معتبر http یا https باشد."
+                            return@Button
+                        }
+
+                        else -> Unit
                     }
 
-                    if (error == null) {
-                        val coordinates =
+                    val directCoordinates =
+                        if (hasValidCoordinates) {
+                            latitude!! to longitude!!
+                        } else {
                             LocationShareCodec.extractCoordinates(cleanUrl)
+                        }
+
+                    if (directCoordinates != null) {
+                        val finalUrl = cleanUrl.ifBlank {
+                            LocationShareCodec.buildMapsUrl(
+                                directCoordinates.first,
+                                directCoordinates.second
+                            )
+                        }
+
+                        saving = true
+                        onSave(
+                            SavedLocation(
+                                id = initial?.id ?: UUID.randomUUID().toString(),
+                                name = cleanName,
+                                description = description.trim(),
+                                category = category.trim().ifBlank { "شخصی" },
+                                mapsUrl = finalUrl,
+                                address = address.trim(),
+                                latitude = directCoordinates.first,
+                                longitude = directCoordinates.second,
+                                createdAt = initial?.createdAt
+                                    ?: System.currentTimeMillis(),
+                                updatedAt = System.currentTimeMillis()
+                            )
+                        )
+                        return@Button
+                    }
+
+                    if (cleanUrl.isBlank()) {
+                        error = "ابتدا موقعیت را روی نقشه انتخاب کنید."
+                        return@Button
+                    }
+
+                    saving = true
+                    scope.launch {
+                        val resolvedUrl = withContext(Dispatchers.IO) {
+                            GoogleMapsUrlResolver.resolve(cleanUrl)
+                        }
+                        val resolvedCoordinates =
+                            LocationShareCodec.extractCoordinates(resolvedUrl)
+
+                        if (resolvedCoordinates == null) {
+                            saving = false
+                            error = "مختصات این لینک قابل تشخیص نیست. موقعیت را روی نقشه انتخاب و تأیید کنید."
+                            return@launch
+                        }
 
                         onSave(
                             SavedLocation(
@@ -663,25 +789,59 @@ private fun LocationEditorDialog(
                                 category = category.trim().ifBlank { "شخصی" },
                                 mapsUrl = cleanUrl,
                                 address = address.trim(),
-                                latitude = coordinates?.first,
-                                longitude = coordinates?.second,
+                                latitude = resolvedCoordinates.first,
+                                longitude = resolvedCoordinates.second,
                                 createdAt = initial?.createdAt
                                     ?: System.currentTimeMillis(),
                                 updatedAt = System.currentTimeMillis()
                             )
                         )
                     }
-                }
+                },
+                enabled = !saving
             ) {
-                Text("ذخیره")
+                Text(if (saving) "در حال ذخیره…" else "ذخیره")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !saving
+            ) {
                 Text("انصراف")
             }
         }
     )
+
+    if (showMapPicker) {
+        MapPickerDialog(
+            initialLatitude = latitude,
+            initialLongitude = longitude,
+            onDismiss = { showMapPicker = false },
+            onConfirm = { selectedLatitude, selectedLongitude ->
+                latitude = selectedLatitude
+                longitude = selectedLongitude
+                mapsUrl = LocationShareCodec.buildMapsUrl(
+                    selectedLatitude,
+                    selectedLongitude
+                )
+                error = null
+                showMapPicker = false
+            }
+        )
+    }
+}
+
+private fun isOnline(context: Context): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+            ?: return false
+
+    val network = connectivityManager.activeNetwork ?: return false
+    val capabilities =
+        connectivityManager.getNetworkCapabilities(network) ?: return false
+
+    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 }
 
 @Composable
