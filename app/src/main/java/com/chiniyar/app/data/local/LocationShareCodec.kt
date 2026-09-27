@@ -72,6 +72,23 @@ object LocationShareCodec {
         }
     }
 
+    fun cleanMapsUrl(rawUrl: String): String =
+        rawUrl
+            .replace("\u200B", "")
+            .replace("\u200C", "")
+            .replace("\u200D", "")
+            .replace("\uFEFF", "")
+            .replace("\r", "")
+            .replace("\n", "")
+            .trim()
+            .filterNot { it.isWhitespace() }
+
+    fun isHttpUrl(rawUrl: String): Boolean {
+        val clean = cleanMapsUrl(rawUrl)
+        val uri = runCatching { Uri.parse(clean) }.getOrNull()
+        return uri != null && uri.scheme?.lowercase() in setOf("http", "https") && !uri.host.isNullOrBlank()
+    }
+
     fun import(text: String): ImportResult {
         val start = text.indexOf(START_MARKER)
         val end = text.indexOf(END_MARKER)
@@ -137,7 +154,7 @@ object LocationShareCodec {
     }
 
     fun extractCoordinates(mapsUrl: String): Pair<Double, Double>? {
-        val url = mapsUrl.trim()
+        val url = cleanMapsUrl(mapsUrl)
         if (url.isBlank()) return null
 
         val uri = runCatching { Uri.parse(url) }.getOrNull()
