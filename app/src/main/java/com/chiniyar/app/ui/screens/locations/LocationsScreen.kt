@@ -62,10 +62,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.chiniyar.app.data.local.GoogleMapsUrlResolver
 import com.chiniyar.app.data.local.LocationDatabase
 import com.chiniyar.app.data.local.LocationShareCodec
 import com.chiniyar.app.data.local.SavedLocation
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 private val LocationCategories = listOf(
@@ -117,23 +120,43 @@ fun LocationsScreen(
     }
 
     fun openMaps(location: SavedLocation) {
-        val target = location.mapsUrl.ifBlank {
-            if (location.latitude != null && location.longitude != null) {
-                LocationShareCodec.buildMapsUrl(location.latitude, location.longitude)
-            } else {
-                ""
+        val original = LocationShareCodec.cleanMapsUrl(
+            location.mapsUrl.ifBlank {
+                if (location.latitude != null && location.longitude != null) {
+                    LocationShareCodec.buildMapsUrl(location.latitude, location.longitude)
+                } else {
+                    ""
+                }
             }
-        }
+        )
 
-        if (target.isBlank()) {
+        if (original.isBlank()) {
             statusMessage = "برای این مکان لینک نقشه‌ای ثبت نشده است."
             return
         }
 
-        runCatching {
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(target)))
-        }.onFailure {
-            statusMessage = "برنامه‌ای برای باز کردن این لینک پیدا نشد."
+        scope.launch {
+            statusMessage = "در حال آماده‌سازی نقشه..."
+            val target = withContext(Dispatchers.IO) {
+                GoogleMapsUrlResolver.resolve(original)
+            }
+
+            runCatching {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(target)))
+                statusMessage = null
+            }.onFailure {
+                runCatching {
+                    context.startActivity(
+                        Intent.createChooser(
+                            Intent(Intent.ACTION_VIEW, Uri.parse(target)),
+                            "باز کردن مکان"
+                        )
+                    )
+                    statusMessage = null
+                }.onFailure {
+                    statusMessage = "لینک مکان باز نشد. لینک اصلی را می‌توانید کپی کنید."
+                }
+            }
         }
     }
 
@@ -146,7 +169,7 @@ fun LocationsScreen(
                         Column {
                             Text("مکان‌های من", fontWeight = FontWeight.Bold)
                             Text(
-                                "§{locations.size} مکان ذخیره شده",
+                                "${locations.size} مکان ذخیره شده",
                                 style = MaterialTheme.typography.labelMedium
                             )
                         }
@@ -402,8 +425,8 @@ fun LocationsScreen(
                         selected.isEmpty() -> "هیچ مکانی انتخاب نشد."
                         inserted == 0 -> "همه‌ی مکان‌های انتخاب‌شده قبلاً ثبت شده بودند."
                         inserted < selected.size ->
-                            "§{inserted} مکان جدید اضافه شد؛ موارد تکراری نادیده گرفته شدند."
-                        else -> "§{inserted} مکان با موفقیت اضافه شد."
+                            "${inserted} مکان جدید اضافه شد؛ موارد تکراری نادیده گرفته شدند."
+                        else -> "${inserted} مکان با موفقیت اضافه شد."
                     }
                 }
             }
@@ -618,15 +641,13 @@ private fun LocationEditorDialog(
             Button(
                 onClick = {
                     val cleanName = name.trim()
-                    val cleanUrl = mapsUrl.trim()
-                    val uri = runCatching { Uri.parse(cleanUrl) }.getOrNull()
-                    val validUrl =
-                        uri != null && uri.scheme?.lowercase() in setOf("http", "https")
+                    val cleanUrl = LocationShareCodec.cleanMapsUrl(mapsUrl)
 
                     error = when {
                         cleanName.isBlank() -> "نام مکان را وارد کنید."
                         cleanUrl.isBlank() -> "لینک Google Maps را وارد کنید."
-                        !validUrl -> "لینک Google Maps باید یک لینک http یا https باشد."
+                        !LocationShareCodec.isHttpUrl(cleanUrl) ->
+                            "لینک Google Maps باید یک لینک معتبر http یا https باشد."
                         else -> null
                     }
 
@@ -686,7 +707,7 @@ private fun ImportLocationsDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                "§{locations.size} مکان دریافت شد",
+                "${locations.size} مکان دریافت شد",
                 fontWeight = FontWeight.Bold
             )
         },
@@ -743,7 +764,7 @@ private fun ImportLocationsDialog(
             Button(
                 onClick = { onConfirm(selected.toList()) }
             ) {
-                Text("افزودن §{selected.size} مکان")
+                Text("افزودن ${selected.size} مکان")
             }
         },
         dismissButton = {
@@ -755,4 +776,4 @@ private fun ImportLocationsDialog(
 }
 
 private fun SavedLocation.identityKey(): String =
-    "§{name.trim().lowercase()}|§{mapsUrl.trim().lowercase()}"
+    "${name.trim().lowercase()}|${mapsUrl.trim().lowercase()}"
