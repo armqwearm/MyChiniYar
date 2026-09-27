@@ -564,10 +564,12 @@ private fun LocationEditorDialog(
     var showMapPicker by remember { mutableStateOf(false) }
     var saving by remember { mutableStateOf(false) }
 
+    val currentLatitude = latitude
+    val currentLongitude = longitude
     val hasValidCoordinates =
-        latitude != null && longitude != null &&
-            latitude in -90.0..90.0 &&
-            longitude in -180.0..180.0
+        currentLatitude != null && currentLongitude != null &&
+            currentLatitude in -90.0..90.0 &&
+            currentLongitude in -180.0..180.0
 
     AlertDialog(
         onDismissRequest = { if (!saving) onDismiss() },
@@ -654,8 +656,8 @@ private fun LocationEditorDialog(
                         String.format(
                             Locale.US,
                             "موقعیت ثبت‌شده: %.6f, %.6f",
-                            latitude,
-                            longitude
+                            currentLatitude,
+                            currentLongitude
                         ),
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
