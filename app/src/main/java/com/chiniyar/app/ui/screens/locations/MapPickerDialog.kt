@@ -420,6 +420,8 @@ private fun buildMapHtml(latitude: Double, longitude: Double): String {
             let dragStart = null;
             let dragMoved = false;
             let renderTimer = null;
+            let tileLoaded = false;
+            let initialTileWatch = null;
 
             function clampLat(lat) {
                 return Math.max(-85.05112878, Math.min(85.05112878, lat));
@@ -474,7 +476,10 @@ private fun buildMapHtml(latitude: Double, longitude: Double): String {
                         const img = document.createElement('img');
                         img.className = 'tile';
                         img.draggable = false;
-                        img.src = 'https://tile.openstreetmap.org/' + zoom + '/' + wrappedX + '/' + ty + '.png';
+                        const hosts = ['a', 'b', 'c'];
+                        const host = hosts[Math.abs(wrappedX + ty) % hosts.length];
+                        img.onload = function() { tileLoaded = true; };
+                        img.src = 'https://' + host + '.tile.openstreetmap.org/' + zoom + '/' + wrappedX + '/' + ty + '.png';
                         img.style.left = (tx * TILE - cx + w / 2) + 'px';
                         img.style.top = (ty * TILE - cy + h / 2) + 'px';
                         img.onerror = function() {
@@ -550,6 +555,13 @@ private fun buildMapHtml(latitude: Double, longitude: Double): String {
 
             window.addEventListener('resize', render);
             render();
+            if (initialTileWatch === null) {
+                initialTileWatch = setTimeout(function() {
+                    if (!tileLoaded && window.Android) {
+                        window.Android.onError();
+                    }
+                }, 3500);
+            }
             setTimeout(function() {
                 if (window.Android) window.Android.onReady();
             }, 120);
