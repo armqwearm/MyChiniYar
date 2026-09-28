@@ -6,6 +6,9 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.Color
 
 private val Porcelain = Color(0xFFFFFBF2)
@@ -74,9 +77,11 @@ fun MyChiniYarTheme(
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme && isSystemInDarkTheme()) DarkColors else LightColors
-    MaterialTheme(
-        colorScheme = colors,
-        typography = MyChiniYarTypography,
-        content = content
-    )
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        MaterialTheme(
+            colorScheme = colors,
+            typography = MyChiniYarTypography,
+            content = content
+        )
+    }
 }
