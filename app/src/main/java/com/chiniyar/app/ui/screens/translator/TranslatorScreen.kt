@@ -161,7 +161,7 @@ fun TranslatorScreen(
                     Text(if (state.source == Language.CHINESE) "مثلاً: 你好，很高兴认识你。" else "متن فارسی را وارد کنید")
                 },
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
-                    textAlign = TextAlign.End,
+                    textAlign = if (state.source == Language.CHINESE) TextAlign.Start else TextAlign.End,
                     textDirection = if (state.source == Language.CHINESE) TextDirection.Ltr else TextDirection.Rtl
                 )
             )
@@ -238,7 +238,7 @@ fun TranslatorScreen(
                     Text(
                         state.output.ifBlank { "ترجمه اینجا نمایش داده می‌شود" },
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Start,
+                        textAlign = if (state.target == Language.PERSIAN) TextAlign.End else TextAlign.Start,
                         color = if (state.output.isBlank()) colors.onSurfaceVariant else colors.onSurface,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             textDirection = if (state.target == Language.PERSIAN) TextDirection.Rtl else TextDirection.Ltr
