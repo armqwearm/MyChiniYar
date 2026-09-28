@@ -2,6 +2,9 @@ package com.chiniyar.app.ui.screens.cities
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -119,7 +123,21 @@ fun CitiesScreen(onBack: () -> Unit) {
 
 @Composable
 private fun CityCard(city: ChinaCity) {
+    val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
+
+    fun openCityInBrowser() {
+        val latitude = city.latitude ?: return
+        val longitude = city.longitude ?: return
+        val url = "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude"
+        runCatching {
+            context.startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                    addCategory(Intent.CATEGORY_BROWSABLE)
+                }
+            )
+        }
+    }
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -128,7 +146,7 @@ private fun CityCard(city: ChinaCity) {
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                BoxedCityIcon()
+                BoxedCityIcon(onClick = ::openCityInBrowser)
                 Spacer(Modifier.size(10.dp))
                 Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(city.nameFa, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
@@ -146,15 +164,17 @@ private fun CityCard(city: ChinaCity) {
 }
 
 @Composable
-private fun BoxedCityIcon() {
+private fun BoxedCityIcon(onClick: () -> Unit) {
     val colors = MaterialTheme.colorScheme
-    Box(
-        modifier = Modifier
-            .size(46.dp)
-            .background(colors.primary.copy(alpha = 0.10f), RoundedCornerShape(15.dp)),
-        contentAlignment = Alignment.Center
-    ) {
+    IconButton(onClick = onClick) {
+        Box(
+            modifier = Modifier
+                .size(46.dp)
+                .background(colors.primary.copy(alpha = 0.10f), RoundedCornerShape(15.dp)),
+            contentAlignment = Alignment.Center
+        ) {
         Icon(Icons.Default.LocationOn, contentDescription = null, tint = colors.primary, modifier = Modifier.size(25.dp))
+        }
     }
 }
 
