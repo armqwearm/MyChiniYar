@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -173,7 +172,7 @@ private fun BoxedCityIcon(onClick: () -> Unit) {
                 .background(colors.primary.copy(alpha = 0.10f), RoundedCornerShape(15.dp)),
             contentAlignment = Alignment.Center
         ) {
-        Icon(Icons.Default.LocationOn, contentDescription = null, tint = colors.primary, modifier = Modifier.size(25.dp))
+        Icon(Icons.Default.LocationOn, contentDescription = "باز کردن موقعیت شهر در Google Maps", tint = colors.primary, modifier = Modifier.size(25.dp))
         }
     }
 }
