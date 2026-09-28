@@ -237,7 +237,7 @@ private fun ResultCard(title: String, text: String, emptyText: String, copyLabel
         Text(title, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, textAlign = TextAlign.Center)
         Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(if (text.isBlank()) emptyText else text, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyLarge, textAlign = if (text.isBlank()) TextAlign.Center else TextAlign.Start)
+                Text(if (text.isBlank()) emptyText else text, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyLarge, textAlign = if (text.isBlank()) TextAlign.Center else TextAlign.End)
                 if (text.isNotBlank()) {
                     OutlinedButton(onClick = onCopy, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
                         Icon(Icons.Default.ContentCopy, null); Spacer(Modifier.size(6.dp)); Text(copyLabel)
