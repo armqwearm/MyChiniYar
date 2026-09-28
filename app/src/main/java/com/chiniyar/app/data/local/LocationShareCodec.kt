@@ -51,18 +51,18 @@ object LocationShareCodec {
             appendLine("📍 مکان‌های من در چینی‌یار")
             appendLine()
             locations.forEachIndexed { index, location ->
-                appendLine("\${index + 1}. \${location.name}")
-                appendLine("نوع: \${location.category}")
+                appendLine("${index + 1}. ${location.name}")
+                appendLine("نوع: ${location.category}")
                 if (location.description.isNotBlank()) {
-                    appendLine("توضیحات: \${location.description}")
+                    appendLine("توضیحات: ${location.description}")
                 }
                 if (location.address.isNotBlank()) {
-                    appendLine("آدرس: \${location.address}")
+                    appendLine("آدرس: ${location.address}")
                 }
-                appendLine("🗺️ \${location.mapsUrl}")
+                appendLine("🗺️ ${location.mapsUrl}")
                 appendLine()
             }
-            appendLine("تعداد مکان‌ها: \${locations.size}")
+            appendLine("تعداد مکان‌ها: ${locations.size}")
             appendLine()
             appendLine("برای وارد کردن این مکان‌ها در چینی‌یار، کل این متن را کپی و در بخش «دریافت مکان‌ها» Paste کنید.")
             appendLine()
