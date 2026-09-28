@@ -54,8 +54,8 @@ class LocationDatabase private constructor(context: Context) :
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
 
     suspend fun add(location: SavedLocation): Boolean = withContext(Dispatchers.IO) {
-        val normalized = location.normalized().withCoordinatesFromUrl()
-        if (!normalized.hasValidCoordinates() || normalized.name.isBlank() || normalized.mapsUrl.isBlank()) return@withContext false
+        val normalized = location.normalized()
+        if (normalized.name.isBlank()) return@withContext false
 
         val inserted = writableDatabase.insertWithOnConflict(
             "locations",
@@ -69,8 +69,8 @@ class LocationDatabase private constructor(context: Context) :
     }
 
     suspend fun update(location: SavedLocation): Boolean = withContext(Dispatchers.IO) {
-        val normalized = location.copy(updatedAt = System.currentTimeMillis()).normalized().withCoordinatesFromUrl()
-        if (!normalized.hasValidCoordinates() || normalized.name.isBlank() || normalized.mapsUrl.isBlank()) return@withContext false
+        val normalized = location.copy(updatedAt = System.currentTimeMillis()).normalized()
+        if (normalized.name.isBlank()) return@withContext false
 
         val updated = writableDatabase.update(
             "locations",
@@ -100,9 +100,9 @@ class LocationDatabase private constructor(context: Context) :
                     id = UUID.randomUUID().toString(),
                     createdAt = System.currentTimeMillis(),
                     updatedAt = System.currentTimeMillis()
-                ).normalized().withCoordinatesFromUrl()
+                ).normalized()
 
-                if (!normalized.hasValidCoordinates() || normalized.name.isBlank() || normalized.mapsUrl.isBlank()) return@forEach
+                if (normalized.name.isBlank()) return@forEach
 
                 val rowId = writableDatabase.insertWithOnConflict(
                     "locations",
@@ -176,16 +176,6 @@ class LocationDatabase private constructor(context: Context) :
             mapsUrl = mapsUrl.trim(),
             address = address.trim()
         )
-
-    private fun SavedLocation.withCoordinatesFromUrl(): SavedLocation {
-        if (hasValidCoordinates()) return this
-        val coordinates = LocationShareCodec.extractCoordinates(mapsUrl) ?: return this
-        return copy(latitude = coordinates.first, longitude = coordinates.second)
-    }
-
-    private fun SavedLocation.hasValidCoordinates(): Boolean =
-        latitude != null && longitude != null &&
-            latitude in -90.0..90.0 && longitude in -180.0..180.0
 
     private fun Cursor.getDoubleOrNull(index: Int): Double? =
         if (isNull(index)) null else getDouble(index)
