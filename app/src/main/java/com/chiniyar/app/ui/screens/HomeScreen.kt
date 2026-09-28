@@ -115,7 +115,7 @@ fun HomeScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text("Yajing", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold, color = blue)
-                        Text("Go China Now • چینی‌یار", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF334A52))
+                        Text("چینی‌یار", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF334A52))
                     }
                     Text("🏮", style = MaterialTheme.typography.headlineLarge)
                 }
