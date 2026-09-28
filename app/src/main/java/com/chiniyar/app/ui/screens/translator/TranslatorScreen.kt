@@ -161,7 +161,7 @@ fun TranslatorScreen(
                     Text(if (state.source == Language.CHINESE) "مثلاً: 你好，很高兴认识你。" else "متن فارسی را وارد کنید")
                 },
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
-                    textAlign = TextAlign.Start,
+                    textAlign = TextAlign.End,
                     textDirection = if (state.source == Language.CHINESE) TextDirection.Ltr else TextDirection.Rtl
                 )
             )
