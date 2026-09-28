@@ -127,7 +127,8 @@ object LocationShareCodec {
                     val item = jsonLocations.optJSONObject(index) ?: continue
                     val name = item.optString("name").trim()
                     val mapsUrl = cleanMapsUrl(item.optString("mapsUrl").trim())
-                    if (name.isBlank() || mapsUrl.isBlank() || !isHttpUrl(mapsUrl)) continue
+                    if (name.isBlank()) continue
+                    if (mapsUrl.isNotBlank() && !isHttpUrl(mapsUrl)) continue
 
                     val explicitCoordinates =
                         item.optNullableDouble("latitude") to item.optNullableDouble("longitude")
@@ -138,8 +139,6 @@ object LocationShareCodec {
                             extractCoordinates(mapsUrl)
                         }
 
-                    if (coordinates == null) continue
-
                     add(
                         SavedLocation(
                             name = name,
@@ -147,8 +146,8 @@ object LocationShareCodec {
                             category = item.optString("category").trim().ifBlank { "شخصی" },
                             mapsUrl = mapsUrl,
                             address = item.optString("address").trim(),
-                            latitude = coordinates.first,
-                            longitude = coordinates.second
+                            latitude = coordinates?.first,
+                            longitude = coordinates?.second
                         )
                     )
                 }
