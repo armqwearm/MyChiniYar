@@ -59,8 +59,8 @@ fun UrbanRoutesScreen(onBack: () -> Unit) {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت")
                     }
-                }
-                actions = { SectionHelpButton("مسیرهای شهری", "این بخش راهنمای رفت‌وآمد شهری و MetroMan را معرفی می‌کند. برای باز کردن منبع یا برنامه مرتبط، روی دکمه مربوطه بزنید.") },,
+                },
+                actions = { SectionHelpButton("مسیرهای شهری", "در این صفحه راهنماهای رفت‌وآمد شهری و منابع مترو قرار می‌گیرند. برای دریافت اطلاعات بیشتر یا نصب MetroMan از دکمه‌های صفحه استفاده کنید.") },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f))
             )
         }
