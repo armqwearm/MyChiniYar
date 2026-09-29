@@ -1,5 +1,7 @@
 package com.chiniyar.app.ui.screens.learning
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
+
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
@@ -58,6 +60,7 @@ fun LearningScreen(onBack: () -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت")
                     }
                 },
+                actions = { SectionHelpButton("یادگیری زبان چینی", "منابع آموزشی و راه‌های ارتباط با یجینگ چاینیز در این بخش قرار دارند. از دکمه‌های سایت و کانال‌ها برای باز کردن منبع موردنظر استفاده کنید.") },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f))
             )
         }
