@@ -118,6 +118,7 @@ fun HomeScreen(
                         Text("چینی‌یار", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF334A52))
                     }
                     Text("🏮", style = MaterialTheme.typography.headlineLarge)
+                    SectionHelpButton("صفحه اصلی", "از این صفحه وارد بخش‌های مختلف چینی‌یار شوید. هر کارت شما را به یک ابزار یا راهنمای مشخص می‌برد. برای توضیح کاربرد هر بخش، روی علامت ? بزنید.")
                 }
             }
 
