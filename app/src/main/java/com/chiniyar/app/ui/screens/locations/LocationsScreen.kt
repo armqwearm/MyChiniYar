@@ -182,9 +182,10 @@ fun LocationsScreen(
                         IconButton(onClick = onBack) {
                             Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
                         }
-                    }
-                actions = { SectionHelpButton("مکان‌های من", "نام مکان تنها مورد الزامی است. می‌توانید هتل یا مکان‌های مهم دیگر را ثبت کنید، در صورت آنلاین بودن روی نقشه نقطه انتخاب کنید، مکان‌ها را ویرایش یا حذف کنید و چند مکان را به‌صورت متن برای دیگران ارسال یا وارد کنید.") },,
+                    },
                     actions = {
+                        SectionHelpButton("مکان‌های من", "نام مکان تنها مورد الزامی است. می‌توانید هتل یا مکان‌های مهم دیگر را ثبت کنید، در صورت آنلاین بودن روی نقشه نقطه انتخاب کنید، مکان‌ها را ویرایش یا حذف کنید و چند مکان را به‌صورت متن برای دیگران ارسال یا وارد کنید.")
+                    },
                         IconButton(
                             onClick = {
                                 val result = LocationShareCodec.import(readClipboard())
