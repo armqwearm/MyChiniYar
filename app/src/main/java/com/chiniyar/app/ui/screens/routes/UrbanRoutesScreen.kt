@@ -1,5 +1,6 @@
 package com.chiniyar.app.ui.screens.routes
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -58,7 +59,8 @@ fun UrbanRoutesScreen(onBack: () -> Unit) {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت")
                     }
-                },
+                }
+                actions = { SectionHelpButton("مسیرهای شهری", "این بخش راهنمای رفت‌وآمد شهری و MetroMan را معرفی می‌کند. برای باز کردن منبع یا برنامه مرتبط، روی دکمه مربوطه بزنید.") },,
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f))
             )
         }
