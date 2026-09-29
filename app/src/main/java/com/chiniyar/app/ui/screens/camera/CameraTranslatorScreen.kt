@@ -178,8 +178,14 @@ fun CameraTranslatorScreen(
             TopAppBar(
                 title = { Text("مترجم تصویری", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت") } },
-                actions = { SectionHelpButton("مترجم تصویری", "از متن چینی عکس بگیرید یا تصویر را از گالری انتخاب کنید. برنامه متن را با OCR استخراج و در صورت نیاز ترجمه می‌کند؛ واژه‌های شناسایی‌شده را هم می‌توانید ذخیره کنید.") },
-                actions = { if (state.imageUri != null) IconButton(onClick = { viewModel.clearResults() }) { Icon(Icons.Default.Clear, contentDescription = "پاک کردن") } }
+                actions = {
+                    SectionHelpButton("مترجم تصویری", "از متن چینی عکس بگیرید یا تصویر را از گالری انتخاب کنید. برنامه متن را با OCR استخراج و در صورت نیاز ترجمه می‌کند؛ واژه‌های شناسایی‌شده را هم می‌توانید ذخیره کنید.")
+                    if (state.imageUri != null) {
+                        IconButton(onClick = { viewModel.clearResults() }) {
+                            Icon(Icons.Default.Clear, contentDescription = "پاک کردن")
+                        }
+                    }
+                }
             )
         },
         snackbarHost = { SnackbarHost(snackbar) }
