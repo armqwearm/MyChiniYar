@@ -1,5 +1,7 @@
 package com.chiniyar.app.ui.screens.translator
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -85,6 +87,7 @@ fun TranslatorScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
                     }
                 },
+                actions = { SectionHelpButton("مترجم متنی", "متن فارسی یا چینی را وارد کنید، زبان‌ها را جابه‌جا کنید و ترجمه را دریافت کنید. کپی‌کردن نتیجه و پاک‌کردن متن هم از همین صفحه انجام می‌شود.") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = colors.background.copy(alpha = 0f),
                     titleContentColor = colors.onBackground
