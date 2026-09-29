@@ -1,5 +1,6 @@
 package com.chiniyar.app.ui.screens.routes
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -65,6 +66,7 @@ fun RoutesScreen(onBack: () -> Unit) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
                     }
                 }
+                actions = { SectionHelpButton("مسیرهای شهری", "این بخش راهنمای رفت‌وآمد شهری و MetroMan را معرفی می‌کند. برای باز کردن منبع یا برنامه مرتبط، روی دکمه مربوطه بزنید.") },
             )
         }
     ) { padding ->
