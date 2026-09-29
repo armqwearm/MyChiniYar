@@ -1,5 +1,7 @@
 package com.chiniyar.app.ui.screens.culture
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -68,6 +70,7 @@ fun CultureScreen(onBack: () -> Unit) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت")
                         }
                     },
+                actions = { SectionHelpButton("آداب و فرهنگ چین", "درباره آداب، جشن‌ها، غذاها و نکات فرهنگی چین مطالعه کنید. با دسته‌بندی‌ها و جست‌وجو می‌توانید موضوع موردنظر را سریع‌تر پیدا کنید.") },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f))
                 )
             }
