@@ -1,5 +1,6 @@
 package com.chiniyar.app.ui.screens.locations
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
 import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
@@ -59,16 +60,10 @@ fun MapPickerDialog(
     val defaultLongitude = initialLongitude ?: 104.1954
 
     var center by remember(initialLatitude, initialLongitude) {
-        mutableStateOf(
-            if (initialLatitude != null && initialLongitude != null) {
-                initialLatitude to initialLongitude
-            } else {
-                null
-            }
-        )
+        mutableStateOf(defaultLatitude to defaultLongitude)
     }
     var picked by remember(initialLatitude, initialLongitude) {
-        mutableStateOf<Pair<Double, Double>?>(center)
+        mutableStateOf(center)
     }
     var mapReady by remember { mutableStateOf(false) }
     var mapError by remember { mutableStateOf<String?>(null) }
@@ -108,6 +103,7 @@ fun MapPickerDialog(
                     IconButton(onClick = onDismiss) {
                         Icon(Icons.Default.Close, contentDescription = "بستن")
                     }
+                    SectionHelpButton("انتخاب موقعیت روی نقشه","نقشه به‌صورت آنلاین نمایش داده می‌شود. نقشه را جابه‌جا کنید تا نقطه دلخواه زیر علامت وسط قرار بگیرد و سپس «تأیید موقعیت» را بزنید.")
                 }
 
                 Box(
@@ -117,7 +113,7 @@ fun MapPickerDialog(
                     contentAlignment = Alignment.Center
                 ) {
                     AndroidView(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxSize(),
                         factory = {
                             createMapWebView(
                                 context = it,
@@ -277,6 +273,14 @@ private fun createMapWebView(
     }
 
     webView.webViewClient = object : WebViewClient() {
+        override fun onPageFinished(view: WebView, url: String) {
+            super.onPageFinished(view, url)
+            view.evaluateJavascript(
+                "if (typeof reportCenter === 'function') { reportCenter(); }",
+                null
+            )
+        }
+
         override fun onReceivedError(
             view: WebView,
             request: WebResourceRequest,
@@ -451,6 +455,7 @@ private fun buildMapHtml(latitude: Double, longitude: Double): String {
             let dragMoved = false;
             let renderTimer = null;
             let tileLoaded = false;
+            let readyReported = false;
             let initialTileWatch = null;
 
             function clampLat(lat) {
@@ -506,7 +511,13 @@ private fun buildMapHtml(latitude: Double, longitude: Double): String {
                         const img = document.createElement('img');
                         img.className = 'tile';
                         img.draggable = false;
-                                    img.onload = function() { tileLoaded = true; };
+                                    img.onload = function() {
+                    tileLoaded = true;
+                    if (!readyReported && window.Android) {
+                        readyReported = true;
+                        window.Android.onReady();
+                    }
+                };
                         img.src = 'https://tile.openstreetmap.org/' + zoom + '/' + wrappedX + '/' + ty + '.png';
                         img.style.left = (tx * TILE - cx + w / 2) + 'px';
                         img.style.top = (ty * TILE - cy + h / 2) + 'px';
