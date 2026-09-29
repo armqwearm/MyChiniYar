@@ -7,6 +7,8 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import android.webkit.WebChromeClient
+import android.webkit.ConsoleMessage
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -257,6 +259,22 @@ private fun createMapWebView(
     webView.settings.allowContentAccess = false
     webView.settings.loadWithOverviewMode = false
     webView.settings.useWideViewPort = false
+    webView.settings.cacheMode = android.webkit.WebSettings.LOAD_DEFAULT
+    webView.settings.userAgentString =
+        "ChiniYar/1.2.13 (Android; map picker; OpenStreetMap)"
+
+    webView.webChromeClient = object : WebChromeClient() {
+        override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+            if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
+                mainHandler.post {
+                    onError(
+                        "خطای نقشه: ${consoleMessage.message()}"
+                    )
+                }
+            }
+            return true
+        }
+    }
 
     webView.webViewClient = object : WebViewClient() {
         override fun onReceivedError(
@@ -302,12 +320,24 @@ private fun createMapWebView(
     )
 
     webView.loadDataWithBaseURL(
-        "https://tile.openstreetmap.org/",
+        "https://appassets.androidplatform.net/",
         buildMapHtml(latitude, longitude),
         "text/html",
         "UTF-8",
         null
     )
+
+    mainHandler.postDelayed({
+        if (!webView.isAttachedToWindow) return@postDelayed
+        webView.evaluateJavascript(
+            "(typeof window.Android !== 'undefined' && document.readyState !== 'loading')"
+        ) { result ->
+            if (result != "true") {
+                onError("WebView نقشه اجرا نشد. لطفاً WebView سیستم و اتصال اینترنت را بررسی کنید.")
+            }
+        }
+    }, 5000)
+
     return webView
 }
 
@@ -476,10 +506,8 @@ private fun buildMapHtml(latitude: Double, longitude: Double): String {
                         const img = document.createElement('img');
                         img.className = 'tile';
                         img.draggable = false;
-                        const hosts = ['a', 'b', 'c'];
-                        const host = hosts[Math.abs(wrappedX + ty) % hosts.length];
-                        img.onload = function() { tileLoaded = true; };
-                        img.src = 'https://' + host + '.tile.openstreetmap.org/' + zoom + '/' + wrappedX + '/' + ty + '.png';
+                                    img.onload = function() { tileLoaded = true; };
+                        img.src = 'https://tile.openstreetmap.org/' + zoom + '/' + wrappedX + '/' + ty + '.png';
                         img.style.left = (tx * TILE - cx + w / 2) + 'px';
                         img.style.top = (ty * TILE - cy + h / 2) + 'px';
                         img.onerror = function() {
@@ -560,11 +588,9 @@ private fun buildMapHtml(latitude: Double, longitude: Double): String {
                     if (!tileLoaded && window.Android) {
                         window.Android.onError();
                     }
-                }, 3500);
+                }, 6000);
             }
-            setTimeout(function() {
-                if (window.Android) window.Android.onReady();
-            }, 120);
+            if (window.Android) window.Android.onReady();
     </script>
     </body>
     </html>
