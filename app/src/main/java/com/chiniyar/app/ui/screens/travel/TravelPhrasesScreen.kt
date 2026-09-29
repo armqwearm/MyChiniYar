@@ -1,5 +1,7 @@
 package com.chiniyar.app.ui.screens.travel
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
+
 import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
@@ -110,7 +112,8 @@ fun TravelPhrasesScreen(onBack: () -> Unit) {
     fun stopSpeaking() { pendingPhrase = null; tts?.stop(); isSpeaking = false; speakingPhrase = null }
 
     Scaffold(containerColor = colors.background.copy(alpha = 0f), topBar = {
-        TopAppBar(title = { Text("عبارات سفر", fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت") } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f)))
+        TopAppBar(title = { Text("عبارات سفر", fontWeight = FontWeight.Bold) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت") } },
+                actions = { SectionHelpButton("عبارات سفر", "عبارت‌های کاربردی سفر را ببینید و با زدن روی بلندگو تلفظ چینی را پخش کنید. در صورت آماده نبودن صدای چینی، بسته زبان چینی Text-to-Speech دستگاه را فعال کنید.") }, colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f)))
     }) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = colors.primaryContainer)) {
