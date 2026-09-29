@@ -1,5 +1,7 @@
 package com.chiniyar.app.ui.screens.vocabulary
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -113,6 +115,7 @@ fun VocabularyBankScreen(onBack: () -> Unit) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
                     }
                 },
+                actions = { SectionHelpButton("بانک لغات من", "واژه‌های موردنیازتان را دستی اضافه کنید، جست‌وجو و مرور کنید و موارد غیرضروری را حذف کنید. برای هر واژه می‌توانید Pinyin و معنی را هم ثبت کنید.") },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f))
             )
         },
