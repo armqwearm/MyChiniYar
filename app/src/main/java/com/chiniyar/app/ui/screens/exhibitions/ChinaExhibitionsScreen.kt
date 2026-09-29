@@ -1,5 +1,7 @@
 package com.chiniyar.app.ui.screens.exhibitions
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
+
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
@@ -95,6 +97,7 @@ fun ChinaExhibitionsScreen(onBack: () -> Unit) {
                             )
                         }
                     },
+                actions = { SectionHelpButton("نمایشگاه‌های چین", "نمایشگاه‌ها را بر اساس حوزه فیلتر کنید و اطلاعات رویداد را ببینید. لینک هر رویداد در صورت وجود از طریق مرورگر باز می‌شود.") },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f)
                     )
