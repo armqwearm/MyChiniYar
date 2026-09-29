@@ -1,5 +1,7 @@
 package com.chiniyar.app.ui.screens.dictionary
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,6 +53,7 @@ fun DictionaryScreen(viewModel: DictionaryViewModel, onBack: () -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "بازگشت")
                     }
                 },
+                actions = { SectionHelpButton("واژه‌نامه", "واژه را با Hanzi، Pinyin یا معنی فارسی جست‌وجو کنید و جزئیات آن را ببینید. این بخش برای پیدا کردن سریع واژه‌های رایج طراحی شده است.") },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.background.copy(alpha = 0f))
             )
         }
