@@ -1,5 +1,7 @@
 package com.chiniyar.app.ui.screens.cities
 
+import com.chiniyar.app.ui.screens.SectionHelpButton
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import android.content.Intent
@@ -61,6 +63,7 @@ fun CitiesScreen(onBack: () -> Unit) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "بازگشت")
                     }
                 },
+                actions = { SectionHelpButton("شهرهای چین", "۲۰ شهر منتخب چین را بررسی کنید، اطلاعات سفر و زمان مناسب را ببینید و با لمس علامت موقعیت، موقعیت شهر را در Google Maps در مرورگر پیش‌فرض باز کنید.") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = colors.background.copy(alpha = 0f),
                     titleContentColor = colors.onBackground
