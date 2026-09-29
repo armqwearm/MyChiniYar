@@ -275,10 +275,13 @@ private fun createMapWebView(
     webView.webViewClient = object : WebViewClient() {
         override fun onPageFinished(view: WebView, url: String) {
             super.onPageFinished(view, url)
-            view.evaluateJavascript(
-                "if (typeof reportCenter === 'function') { reportCenter(); }",
-                null
-            )
+            mainHandler.post {
+                onReady()
+                view.evaluateJavascript(
+                    "if (typeof reportCenter === 'function') { reportCenter(); }",
+                    null
+                )
+            }
         }
 
         override fun onReceivedError(
