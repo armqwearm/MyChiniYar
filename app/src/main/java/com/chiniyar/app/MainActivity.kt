@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         TravelBackground(
                             modifier = Modifier.fillMaxSize(),
-                            alpha = 0.84f
+                            alpha = 0.25f
                         )
                         Box(
                             modifier = Modifier
