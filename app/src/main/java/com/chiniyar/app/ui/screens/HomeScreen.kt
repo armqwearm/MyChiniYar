@@ -2,7 +2,6 @@ package com.chiniyar.app.ui.screens
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -92,10 +91,7 @@ fun HomeScreen(
         HomeFeature("یادگیری چینی", "واژگان، آموزش و منابع مفید", Icons.Default.Book, onLearningClick, blue, Color(0xFFE0F0FF))
     )
 
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFFFFBF2))) {
-        TravelBackground(modifier = Modifier.fillMaxSize(), alpha = 0.84f)
-        Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.08f)))
-
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
