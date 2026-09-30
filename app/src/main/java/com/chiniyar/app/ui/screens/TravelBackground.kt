@@ -1,9 +1,9 @@
 package com.chiniyar.app.ui.screens
 
 import android.graphics.BitmapFactory
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -15,26 +15,27 @@ import androidx.compose.ui.platform.LocalContext
 import com.chiniyar.app.R
 
 /**
- * Renders the travel background when the device can decode the bundled WebP.
- * A safe Compose-only gradient fallback is used when decoding fails, so a
- * broken/unsupported bitmap can never crash application startup.
+ * Safe bundled travel background.
+ *
+ * The image is decoded directly with BitmapFactory instead of painterResource,
+ * avoiding BitmapDrawable casts and resource-resolution crashes.
  */
 @Composable
 fun TravelBackground(
     modifier: Modifier = Modifier,
-    alpha: Float = 0.84f
+    alpha: Float = 0.25f
 ) {
     val context = LocalContext.current
     val bitmap = remember(context) {
         runCatching {
             BitmapFactory.decodeResource(
                 context.resources,
-                R.drawable.yajing_travel_background_final
+                R.drawable.yajing_travel_background_actual
             )?.takeIf { !it.isRecycled }?.asImageBitmap()
         }.getOrNull()
     }
 
-    BoxWithConstraints(
+    Box(
         modifier = modifier.background(
             Brush.verticalGradient(
                 colors = listOf(
