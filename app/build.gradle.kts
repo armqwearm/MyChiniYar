@@ -14,8 +14,8 @@ android {
         applicationId = "com.chiniyar.app"
         minSdk = 23
         targetSdk = 36
-        versionCode = 22
-        versionName = "1.2.17" // RELEASE 1.2.17 - EXACT SUPPLIED CUSTOMER ICON FIX
+        versionCode = 23
+        versionName = "1.2.18" // RELEASE 1.2.18 - EXACT SUPPLIED CUSTOMER ICON FIX
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
