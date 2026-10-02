@@ -6,8 +6,8 @@
     <application
         android:name=".ChiniYarApplication"
         android:allowBackup="true"
-        android:icon="@drawable/chiniyar_customer_icon"
-        android:roundIcon="@drawable/chiniyar_customer_icon"
+        android:icon="@drawable/chiniyar_app_icon"
+        android:roundIcon="@drawable/chiniyar_app_icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyChiniYar">

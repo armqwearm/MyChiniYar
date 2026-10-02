@@ -14,8 +14,8 @@ android {
         applicationId = "com.chiniyar.app"
         minSdk = 23
         targetSdk = 36
-        versionCode = 23
-        versionName = "1.2.18" // RELEASE 1.2.18 - EXACT SUPPLIED CUSTOMER ICON FIX
+        versionCode = 24
+        versionName = "1.2.19" // RELEASE 1.2.19 - DIRECT SUPPLIED LAUNCHER ARTWORK
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
@@ -38,9 +38,6 @@ android {
 
     buildTypes {
         release {
-            // Keep the production build conservative until the release path is fully validated.
-            // Shrinking/obfuscation is intentionally disabled to avoid release-only R8 failures
-            // while preserving all runtime features.
             isMinifyEnabled = false
             isShrinkResources = false
             if (testReleaseSigning) {
