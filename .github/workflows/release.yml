@@ -163,7 +163,13 @@ jobs:
           BUILD_TOOLS="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n1)"
 
           "$BUILD_TOOLS/zipalign" -c -P 16 -v 4 "$apk"
-          "$BUILD_TOOLS/aapt2" dump badging "$apk" | grep -q "package: name='com.chiniyar.app'"
+          badging="$("$BUILD_TOOLS/aapt2" dump badging "$apk")"
+          printf '%s\n' "$badging" | grep -q "package: name='com.chiniyar.app'"
+          printf '%s\n' "$badging" | grep -q "application-icon.*chiniyar_launcher_final\\.png" || {
+            echo "APK does not expose the expected raster launcher icon."
+            printf '%s\n' "$badging"
+            exit 1
+          }
           unzip -t "$apk" >/dev/null
 
       - name: Calculate release metadata

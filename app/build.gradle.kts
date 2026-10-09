@@ -14,8 +14,8 @@ android {
         applicationId = "com.chiniyar.app"
         minSdk = 23
         targetSdk = 36
-        versionCode = 26
-        versionName = "1.2.21" // RELEASE 1.2.21 - ROBUST NON-ADAPTIVE LAUNCHER ICON
+        versionCode = 27
+        versionName = "1.2.22" // RELEASE 1.2.22 - DENSITY-SPECIFIC RASTER LAUNCHER ICON
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
