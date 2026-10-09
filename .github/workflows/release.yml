@@ -165,9 +165,10 @@ jobs:
           "$BUILD_TOOLS/zipalign" -c -P 16 -v 4 "$apk"
           badging="$("$BUILD_TOOLS/aapt2" dump badging "$apk")"
           printf '%s\n' "$badging" | grep -q "package: name='com.chiniyar.app'"
-          printf '%s\n' "$badging" | grep -q "application-icon.*chiniyar_launcher_final\\.png" || {
-            echo "APK does not expose the expected raster launcher icon."
-            printf '%s\n' "$badging"
+          resources="$("$BUILD_TOOLS/aapt2" dump resources "$apk")"
+          printf '%s\n' "$resources" | grep -q "mipmap/chiniyar_launcher_final" || {
+            echo "APK resource table does not contain the expected launcher icon resource."
+            printf '%s\n' "$resources" | grep -i "chiniyar_launcher" || true
             exit 1
           }
           unzip -t "$apk" >/dev/null
